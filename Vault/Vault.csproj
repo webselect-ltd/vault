@@ -96,6 +96,7 @@
     <Content Include="Content\Img\ui-icons_ffe180_256x240.png" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\passpack-v1.1.js" />
+    <Content Include="Views\Main\Generate.aspx" />
     <Content Include="Views\Main\Index.aspx" />
     <Content Include="Views\Shared\Credential.ascx" />
     <Content Include="Views\Shared\Login.ascx" />

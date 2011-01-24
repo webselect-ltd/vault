@@ -24,6 +24,11 @@ namespace Vault.Controllers
             return View();
         }
 
+        public ActionResult Generate()
+        {
+            return View();
+        }
+
         [HttpPost]
         public ActionResult GetAll()
         {
