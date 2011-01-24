@@ -32,7 +32,8 @@
                     $.each(data, function (i, item) {
 
                         for (var p in item)
-                            item[p] = Passpack.decode('AES', item[p], masterKey);
+                            if (p == 'Description' || p == 'Url')
+                                item[p] = Passpack.decode('AES', item[p], masterKey);
 
                         output.push(createCredentialView(item));
 
@@ -47,6 +48,13 @@
 
                 }
             });
+
+        }
+
+        function showDetail(id) {
+
+            $('body').append('<div id="details"></div>');
+            $('#details').dialog();
 
         }
 
@@ -65,27 +73,7 @@
                 row.push(credential.Description);
         
             row.push('</td>');
-            row.push('<td>');
-
-            // Only show a link for the credentials that this record has - so for example,
-            // don't show a password link if the password is blank
-            var credentialArray = new Array();
-
-            if (credential.Username != '')
-                credentialArray.push('<a href="#" onclick="alert(\'' + credential.Username + '\'); return false;">' + credential.Username + '</a>');
-
-            if (credential.Password != '')
-                credentialArray.push('<a href="#" onclick="alert(\'' + credential.Password + '\'); return false;">' + credential.Password + '</a>');
-
-            if (credential.UserDefined1 != '')
-                credentialArray.push('<a href="#" onclick="alert(\'' + credential.UserDefined1 + '\'); return false;">' + credential.UserDefined1 + '</a>');
-
-            if (credential.UserDefined2 != '')
-                credentialArray.push('<a href="#" onclick="alert(\'' + credential.UserDefined2 + '\'); return false;">' + credential.UserDefined2 + '</a>');
-
-            row.push(credentialArray.join(' | '));
-        
-            row.push('</td>');
+            row.push('<td><a href="#" onclick="showDetail(\'' + credential.CredentialID + '\'); return false;">Details</a></td>');
             row.push('<td><a href="#" onclick="loadCredential(\'' + credential.CredentialID + '\'); return false;">Edit</a> | <a href="#" onclick="deleteCredential(\'' + credential.CredentialID + '\'); return false;">Delete</a></td>');
             row.push('</tr>');
 

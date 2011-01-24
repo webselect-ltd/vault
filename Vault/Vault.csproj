@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Css\jquery-ui-1.8.9.custom.css" />
+    <Content Include="Content\Css\screen.css" />
     <Content Include="Content\Img\ui-bg_diagonals-medium_20_d34d17_40x40.png" />
     <Content Include="Content\Img\ui-bg_flat_30_cccccc_40x100.png" />
     <Content Include="Content\Img\ui-bg_flat_50_5c5c5c_40x100.png" />
