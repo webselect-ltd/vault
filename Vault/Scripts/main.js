@@ -96,6 +96,24 @@ function loadCredential(credentialId, masterKey) {
             for (var p in data)
                 data[p] = Passpack.decode('AES', data[p], masterKey);
 
+            var details = [];
+
+            details.push('<table>');
+
+            var f = $('#credential-form');
+
+            $('#Description', f).val(data.Description);
+            $('#Username', f).val(data.Username);
+            $('#Password', f).val(data.Password);
+            $('#Url', f).val(data.Url);
+            $('#UserDefined1Label', f).val(data.UserDefined1Label);
+            $('#UserDefined1', f).val(data.UserDefined1);
+            $('#UserDefined2Label', f).val(data.UserDefined2Label);
+            $('#UserDefined2', f).val(data.UserDefined2);
+            $('#Notes', f).val(data.Notes);
+
+            $('#credential-form-dialog').dialog({ title: 'Edit Credential', width: 500, modal: true });
+
         },
         error: function (request, status, error) {
 
@@ -104,13 +122,28 @@ function loadCredential(credentialId, masterKey) {
         }
     });
 
-    $('#credential-form-dialog').dialog({ modal: true });
+}
+
+function dodeleteCredential(id) {
+
+    alert(id);
+    $('#modal-dialog').dialog('destroy');
 
 }
 
 function deleteCredential(id) {
 
-    $('#modal-dialog').dialog({ modal: true });
+    var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
+                     '<form>' +
+                     '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="dodeleteCredential(\'' + id + '\'); return false;">Yes</button></p>' +
+                     '</form>';
+
+    $('#modal-dialog').html(dialogHtml).dialog({
+        title: 'Delete Credential',
+        width: 500, 
+        modal: true,
+        minHeight: 50
+    });
 
 }
 
@@ -165,6 +198,8 @@ $(function () {
         var _username = $('#login-form #Username').val();
         var _password = $('#login-form #Password').val();
 
+        $('#login-form-dialog .submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+
         $.ajax({
             url: '/Main/Login',
             data: {
@@ -177,16 +212,11 @@ $(function () {
 
                 if (data.result == 1 && data.id != '') {
 
-                    // Successfully logged in. Hide the login form
-                    $('#login-form').hide();
-
                     // Set some global variables so that we can use them to encrypt in this session
                     $_VAULT.USER_ID = data.id;
                     $_VAULT.USERNAME = _username;
                     $_VAULT.PASSWORD = _password;
                     $_VAULT.MASTER_KEY = Passpack.utils.hashx($_VAULT.PASSWORD + Passpack.utils.hashx($_VAULT.PASSWORD, 1, 1), 1, 1);
-
-                    $('#container').prepend('<p id="load-msg">Loading</p>');
 
                     loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
 
@@ -208,17 +238,23 @@ $(function () {
 		                    ]
                         });
 
-                        $('#load-msg').remove();
+                        // Successfully logged in. Hide the login form
+                        $('#login-form').hide();
+                        $('#login-form-dialog').dialog('destroy');
                         $('#records_filter input:first').focus();
 
                     });
 
                 }
 
+                $('#spinner').remove();
+
             },
             error: function (request, status, error) {
 
                 alert('Http Error: ' + status + ' - ' + error);
+
+                $('#spinner').remove();
 
             }
         });
@@ -249,5 +285,7 @@ $(function () {
         return false;
 
     });
+
+    $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
 
 });
