@@ -103,6 +103,33 @@ namespace Vault.Controllers
         }
 
         [HttpPost]
+        public ActionResult Delete(string credentialId, string userId)
+        {
+            _conn.Open();
+
+            var success = true;
+
+            try
+            {
+                var cmd = new SQLiteCommand("delete from tcredential where userid = @UserID and credentialid = @CredentialID;", _conn);
+
+                cmd.Parameters.Add("@CredentialID", DbType.String).Value = credentialId;
+                cmd.Parameters.Add("@UserID", DbType.String).Value = userId;
+                cmd.ExecuteNonQuery();
+            }
+            catch (SQLiteException exception)
+            {
+                // Not much can go wrong here but if it does we want to know so eventually we
+                // will pass the error info back in the JSON response
+                success = false;
+            }
+
+            _conn.Close();
+
+            return Json(new { Success = success });
+        }
+
+        [HttpPost]
         public ActionResult Update(CredentialViewModel model)
         {
             _conn.Open();
@@ -118,17 +145,17 @@ namespace Vault.Controllers
 
             var cmd = new SQLiteCommand(sql, _conn);
 
-            cmd.Parameters.Add("CredentialID", DbType.String).Value = (model.CredentialID == null) ? Guid.NewGuid().ToString() : model.CredentialID;
-            cmd.Parameters.Add("UserID", DbType.String).Value = model.UserID;
-            cmd.Parameters.Add("Description", DbType.String).Value = model.Description;
-            cmd.Parameters.Add("Username", DbType.String).Value = model.Username;
-            cmd.Parameters.Add("Password", DbType.String).Value = model.Password;
-            cmd.Parameters.Add("Url", DbType.String).Value = model.Url;
-            cmd.Parameters.Add("UserDefined1Label", DbType.String).Value = model.UserDefined1Label;
-            cmd.Parameters.Add("UserDefined1", DbType.String).Value = model.UserDefined1;
-            cmd.Parameters.Add("UserDefined2Label", DbType.String).Value = model.UserDefined2Label;
-            cmd.Parameters.Add("UserDefined2", DbType.String).Value = model.UserDefined2;
-            cmd.Parameters.Add("Notes", DbType.String).Value = model.Notes;
+            cmd.Parameters.Add("@CredentialID", DbType.String).Value = (model.CredentialID == null) ? Guid.NewGuid().ToString() : model.CredentialID;
+            cmd.Parameters.Add("@UserID", DbType.String).Value = model.UserID;
+            cmd.Parameters.Add("@Description", DbType.String).Value = model.Description;
+            cmd.Parameters.Add("@Username", DbType.String).Value = model.Username;
+            cmd.Parameters.Add("@Password", DbType.String).Value = model.Password;
+            cmd.Parameters.Add("@Url", DbType.String).Value = model.Url;
+            cmd.Parameters.Add("@UserDefined1Label", DbType.String).Value = model.UserDefined1Label;
+            cmd.Parameters.Add("@UserDefined1", DbType.String).Value = model.UserDefined1;
+            cmd.Parameters.Add("@UserDefined2Label", DbType.String).Value = model.UserDefined2Label;
+            cmd.Parameters.Add("@UserDefined2", DbType.String).Value = model.UserDefined2;
+            cmd.Parameters.Add("@Notes", DbType.String).Value = model.Notes;
 
             model.CredentialID = Convert.ToString(cmd.ExecuteScalar());
                     
@@ -143,8 +170,8 @@ namespace Vault.Controllers
             _conn.Open();
 
             var cmd = new SQLiteCommand("select * from tuser where username = UserName and password = Password", _conn);
-            cmd.Parameters.Add("Username", DbType.String).Value = model.Username;
-            cmd.Parameters.Add("Password", DbType.String).Value = model.Password;
+            cmd.Parameters.Add("@Username", DbType.String).Value = model.Username;
+            cmd.Parameters.Add("@Password", DbType.String).Value = model.Password;
 
             var userId = "";
 

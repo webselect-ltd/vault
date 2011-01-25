@@ -28,3 +28,5 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 0 0 
 .ui-dialog-content .chk { font-size: 12px; font-weight: normal; padding-left: 23px; vertical-align: middle; }
 .ui-dialog-content .chk input { float: none; margin: 0 10px 0 0; padding: 0; width: 13px; height: 13px; vertical-align: middle; }
 .ui-dialog-content .chk label { float: none; display: inline; vertical-align: middle; }
+
+#add-link { padding-top: 20px; text-align: right; }

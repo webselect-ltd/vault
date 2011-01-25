@@ -2,7 +2,23 @@
     USER_ID: '',
     USERNAME: '',
     PASSWORD: '',
-    MASTER_KEY: ''
+    MASTER_KEY: '',
+    TABLE: null,
+    TABLE_OPTIONS: {
+        'bJQueryUI': true,
+        'sPaginationType': 'full_numbers',
+        'bAutoWidth': false,
+        'bLengthChange': false,
+        'iDisplayLength': 20,
+        'sScrollY': 442,
+        'aaSorting': [[0, 'asc']],
+        'aoColumns': [
+		    { 'sType': 'html' },
+		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
+		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
+		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
+		]
+    }
 };
 
 function loadCredentials(userId, masterKey, callback) {
@@ -140,10 +156,44 @@ function loadCredential(credentialId, masterKey) {
 
 }
 
-function dodeleteCredential(id) {
+function dodeleteCredential(credentialId, userId) {
 
-    alert(id);
-    $('#modal-dialog').dialog('destroy');
+    $.ajax({
+        url: '/Main/Delete',
+        data: { credentialId: credentialId, userId: userId },
+        dataType: 'json',
+        type: 'POST',
+        success: function (data, status, request) {
+
+            if (data.Success) {
+
+                $_VAULT.TABLE.fnDestroy();
+                $('#records, #add-link').remove();
+
+                // For now, just reload the entire table in the background
+                loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
+
+                    $('#container').append(createCredentialTable(rows));
+
+                    $_VAULT.TABLE = $('#records').dataTable($_VAULT.TABLE_OPTIONS);
+
+                    $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button></p>');
+
+                    $('#modal-dialog').dialog('destroy');
+
+                });
+
+            }
+
+        },
+        error: function (request, status, error) {
+
+            alert('Http Error: ' + status + ' - ' + error);
+
+            $('#modal-dialog').dialog('destroy');
+
+        }
+    });
 
 }
 
@@ -151,7 +201,7 @@ function deleteCredential(id) {
 
     var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
                      '<form>' +
-                     '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="dodeleteCredential(\'' + id + '\'); return false;">Yes</button></p>' +
+                     '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="dodeleteCredential(\'' + id + '\', \'' + $_VAULT.USER_ID + '\'); return false;">Yes</button></p>' +
                      '</form>';
 
     $('#modal-dialog').html(dialogHtml).dialog({
@@ -238,24 +288,10 @@ $(function () {
 
                         $('#container').append(createCredentialTable(rows));
 
-                        $('#records').dataTable({
-                            'bJQueryUI': true,
-                            'sPaginationType': 'full_numbers',
-                            'bAutoWidth': false,
-                            'bLengthChange': false,
-                            'iDisplayLength': 20,
-                            'sScrollY': 442,
-                            'aaSorting': [[0, 'asc']],
-                            'aoColumns': [
-			                    { 'sType': 'html' },
-			                    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-			                    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-			                    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
-		                    ]
-                        });
+                        $_VAULT.TABLE = $('#records').dataTable($_VAULT.TABLE_OPTIONS);
 
                         // Successfully logged in. Hide the login form
-                        $('#container').append('<p><a href="#" onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</a></p>');
+                        $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button></p>');
                         $('#login-form').hide();
                         $('#login-form-dialog').dialog('destroy');
                         $('#records_filter input:first').focus();
@@ -282,6 +318,8 @@ $(function () {
 
     $('#credential-form').bind('submit', function () {
 
+        $('.submit', $(this)).after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+
         var credential = {};
 
         $('input[class!=submit], textarea', $(this)).each(function () {
@@ -300,17 +338,31 @@ $(function () {
             type: 'POST',
             success: function (data, status, request) {
 
-                
+                $_VAULT.TABLE.fnDestroy();
+                $('#records, #add-link').remove();
+
+                // For now, just reload the entire table in the background
+                loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
+
+                    $('#container').append(createCredentialTable(rows));
+
+                    $_VAULT.TABLE = $('#records').dataTable($_VAULT.TABLE_OPTIONS);
+
+                    $('#container').append('<p id="add-link"><a href="#" onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</a></p>');
+
+                    $('#spinner').remove();
+
+                });
 
             },
             error: function (request, status, error) {
 
                 alert('Http Error: ' + status + ' - ' + error);
 
+                $('#spinner').remove();
+
             }
         });
-
-        //Passpack.encode("AES", $(this).val(), masterKey)
 
         return false;
 
