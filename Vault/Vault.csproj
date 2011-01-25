@@ -81,6 +81,7 @@
     <Content Include="Content\Css\datatables.css" />
     <Content Include="Content\Css\jquery-ui-1.8.9.custom.css" />
     <Content Include="Content\Css\screen.css" />
+    <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery.dataTables.min.js" />
     <Content Include="Scripts\main.js" />
@@ -100,9 +101,7 @@
     </Content>
     <Content Include="Views\Web.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\Img\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App_Data\vault.sqlite" />
     <Content Include="Views\Shared\Main.Master" />
