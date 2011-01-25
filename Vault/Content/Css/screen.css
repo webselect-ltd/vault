@@ -1,7 +1,7 @@
 ﻿body, h1, h2, h3, h4, p, ul, ol, li, form { margin: 0; padding: 0; }
 body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 0 0 0 0; }
 
-#container { width: 520px; margin: 30px auto; }
+#container { width: 520px; margin: 40px auto; }
 
 .display th { text-align: left; }
 .display tbody { font-weight: bold; }
