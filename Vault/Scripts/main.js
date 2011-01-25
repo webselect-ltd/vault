@@ -39,7 +39,7 @@ function loadCredentials(userId, masterKey, callback) {
 
 }
 
-function showDetail(credentialId) {
+function showDetail(credentialId, masterKey) {
 
     $.ajax({
         url: '/Main/Load',
@@ -49,8 +49,30 @@ function showDetail(credentialId) {
         success: function (data, status, request) {
 
             for (var p in data)
-                if (p == 'Description' || p == 'Url')
-                    item[p] = Passpack.decode('AES', item[p], masterKey);
+                data[p] = Passpack.decode('AES', data[p], masterKey);
+
+            var details = [];
+
+            details.push('<table>');
+
+            if(data.Username != '')
+                details.push('<tr><th>Username</th><td>' + data.Username + '</td></tr>');
+
+            if (data.Password != '')
+                details.push('<tr><th>Password</th><td>' + data.Password + '</td></tr>');
+
+            if (data.UserDefined1 != '')
+                details.push('<tr><th>' + data.UserDefined1Label + '</th><td>' + data.UserDefined1 + '</td></tr>');
+
+            if (data.UserDefined2 != '')
+                details.push('<tr><th>' + data.UserDefined2Label + '</th><td>' + data.UserDefined2 + '</td></tr>');
+
+            if (data.Notes != '')
+                details.push('<tr><th>Notes</th><td class="notes">' + data.Notes + '</td></tr>');
+
+            details.push('</table>');
+
+            $('#modal-dialog').html(details.join('')).dialog({ title: data.Description, width: 500, minHeight: 50, modal: true });
 
         },
         error: function (request, status, error) {
@@ -60,11 +82,9 @@ function showDetail(credentialId) {
         }
     });
 
-    $('#modal-dialog').dialog({ modal: true });
-
 }
 
-function loadCredential(credentialId) {
+function loadCredential(credentialId, masterKey) {
 
     $.ajax({
         url: '/Main/Load',
@@ -73,20 +93,8 @@ function loadCredential(credentialId) {
         type: 'POST',
         success: function (data, status, request) {
 
-            var rows = [];
-
-            // Show the matching credential information
-            $.each(data, function (i, item) {
-
-                for (var p in item)
-                    if (p == 'Description' || p == 'Url')
-                        item[p] = Passpack.decode('AES', item[p], masterKey);
-
-                rows.push(createCredentialRow(item));
-
-            });
-
-            callback(rows);
+            for (var p in data)
+                data[p] = Passpack.decode('AES', data[p], masterKey);
 
         },
         error: function (request, status, error) {
@@ -139,8 +147,8 @@ function createCredentialRow(credential) {
         row.push(credential.Description);
 
     row.push('</td>');
-    row.push('<td class="center"><a href="#" onclick="showDetail(\'' + credential.CredentialID + '\'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>');
-    row.push('<td class="center"><a href="#" onclick="loadCredential(\'' + credential.CredentialID + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
+    row.push('<td class="center"><a href="#" onclick="showDetail(\'' + credential.CredentialID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>');
+    row.push('<td class="center"><a href="#" onclick="loadCredential(\'' + credential.CredentialID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
     row.push('<td class="center"><a href="#" onclick="deleteCredential(\'' + credential.CredentialID + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
     row.push('</tr>');
 
@@ -201,6 +209,7 @@ $(function () {
                         });
 
                         $('#load-msg').remove();
+                        $('#records_filter input:first').focus();
 
                     });
 

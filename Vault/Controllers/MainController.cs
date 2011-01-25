@@ -67,7 +67,37 @@ namespace Vault.Controllers
         [HttpPost]
         public ActionResult Load(string id)
         {
-            return Json("");
+            _conn.Open();
+
+            var cmd = new SQLiteCommand("select * from tcredential where credentialid = @CredentialID", _conn);
+            cmd.Parameters.Add("@CredentialID", DbType.String).Value = Request["id"].ToString();
+
+            var credential = new CredentialViewModel();
+
+            using (var r = cmd.ExecuteReader())
+            {
+                if (r.Read())
+                {
+                    credential = new CredentialViewModel
+                    {
+                        CredentialID = r["CredentialID"].ToString(),
+                        Description = r["Description"].ToString(),
+                        Username = r["Username"].ToString(),
+                        Password = r["Password"].ToString(),
+                        PasswordConfirmation = r["Password"].ToString(),
+                        Url = r["Url"].ToString(),
+                        UserDefined1Label = r["UserDefined1Label"].ToString(),
+                        UserDefined1 = r["UserDefined1"].ToString(),
+                        UserDefined2Label = r["UserDefined2Label"].ToString(),
+                        UserDefined2 = r["UserDefined2"].ToString(),
+                        Notes = r["Notes"].ToString()
+                    };
+                }
+            }
+
+            _conn.Close();
+
+            return Json(credential);
         }
 
         [HttpPost]
