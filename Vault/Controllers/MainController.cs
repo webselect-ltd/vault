@@ -30,12 +30,12 @@ namespace Vault.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetAll()
+        public ActionResult GetAll(string userId)
         {
             _conn.Open();
 
-            var cmd = new SQLiteCommand("select * from tcredential where userid = UserID", _conn);
-            cmd.Parameters.Add("UserID", DbType.String).Value = Request["id"].ToString();
+            var cmd = new SQLiteCommand("select * from tcredential where userid = @UserID", _conn);
+            cmd.Parameters.Add("@UserID", DbType.String).Value = userId;
 
             var credentials = new List<CredentialViewModel>();
 
@@ -70,8 +70,8 @@ namespace Vault.Controllers
         {
             _conn.Open();
 
-            var cmd = new SQLiteCommand("select * from tcredential where credentialid = CredentialID", _conn);
-            cmd.Parameters.Add("CredentialID", DbType.String).Value = Request["id"].ToString();
+            var cmd = new SQLiteCommand("select * from tcredential where credentialid = @CredentialID", _conn);
+            cmd.Parameters.Add("@CredentialID", DbType.String).Value = id;
 
             var credential = new CredentialViewModel();
 
@@ -113,7 +113,7 @@ namespace Vault.Controllers
             if (model.CredentialID != null)
             {
                 sql = "update tcredential set Description = @Description, Username = @Username, Password = @Password, Url = @Url, UserDefined1Label = @UserDefined1Label, " +
-                      "UserDefined1 = @UserDefined1, UserDefined2Label = @UserDefined2Label, UserDefined2 = @UserDefined2, Notes = @Notes, UserID = @UserID where credentialid = CredentialID; select @CredentialID as id";
+                      "UserDefined1 = @UserDefined1, UserDefined2Label = @UserDefined2Label, UserDefined2 = @UserDefined2, Notes = @Notes, UserID = @UserID where credentialid = @CredentialID; select @CredentialID as id;";
             }
 
             var cmd = new SQLiteCommand(sql, _conn);

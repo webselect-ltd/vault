@@ -9,7 +9,7 @@ function loadCredentials(userId, masterKey, callback) {
 
     $.ajax({
         url: '/Main/GetAll',
-        data: { id: userId },
+        data: { userId: userId },
         dataType: 'json',
         type: 'POST',
         success: function (data, status, request) {
@@ -284,7 +284,7 @@ $(function () {
 
         var credential = {};
 
-        $('input[class!=submit]', $(this)).each(function () {
+        $('input[class!=submit], textarea', $(this)).each(function () {
             credential[this.name] = $(this).val();
         });
 
@@ -300,7 +300,7 @@ $(function () {
             type: 'POST',
             success: function (data, status, request) {
 
-
+                
 
             },
             error: function (request, status, error) {
