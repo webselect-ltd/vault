@@ -34,8 +34,8 @@ namespace Vault.Controllers
         {
             _conn.Open();
 
-            var cmd = new SQLiteCommand("select * from tcredential where userid = @UserID", _conn);
-            cmd.Parameters.Add("@UserID", DbType.String).Value = Request["id"].ToString();
+            var cmd = new SQLiteCommand("select * from tcredential where userid = UserID", _conn);
+            cmd.Parameters.Add("UserID", DbType.String).Value = Request["id"].ToString();
 
             var credentials = new List<CredentialViewModel>();
 
@@ -45,6 +45,7 @@ namespace Vault.Controllers
                 {
                     credentials.Add(new CredentialViewModel {
                         CredentialID = r["CredentialID"].ToString(),
+                        UserID = r["UserID"].ToString(),
                         Description = r["Description"].ToString(),
                         Username = r["Username"].ToString(),
                         Password = r["Password"].ToString(),
@@ -69,8 +70,8 @@ namespace Vault.Controllers
         {
             _conn.Open();
 
-            var cmd = new SQLiteCommand("select * from tcredential where credentialid = @CredentialID", _conn);
-            cmd.Parameters.Add("@CredentialID", DbType.String).Value = Request["id"].ToString();
+            var cmd = new SQLiteCommand("select * from tcredential where credentialid = CredentialID", _conn);
+            cmd.Parameters.Add("CredentialID", DbType.String).Value = Request["id"].ToString();
 
             var credential = new CredentialViewModel();
 
@@ -81,6 +82,7 @@ namespace Vault.Controllers
                     credential = new CredentialViewModel
                     {
                         CredentialID = r["CredentialID"].ToString(),
+                        UserID = r["UserID"].ToString(),
                         Description = r["Description"].ToString(),
                         Username = r["Username"].ToString(),
                         Password = r["Password"].ToString(),
@@ -103,6 +105,35 @@ namespace Vault.Controllers
         [HttpPost]
         public ActionResult Update(CredentialViewModel model)
         {
+            _conn.Open();
+
+            var sql = "insert into tcredential (CredentialID, Description, Username, Password, Url, UserDefined1Label, UserDefined1, UserDefined2Label, UserDefined2, Notes, UserID) values " +
+                      "(@CredentialID, @Description, @Username, @Password, @Url, @UserDefined1Label, @UserDefined1, @UserDefined2Label, @UserDefined2, @Notes, @UserID); select @CredentialID as id;";
+
+            if (model.CredentialID != null)
+            {
+                sql = "update tcredential set Description = @Description, Username = @Username, Password = @Password, Url = @Url, UserDefined1Label = @UserDefined1Label, " +
+                      "UserDefined1 = @UserDefined1, UserDefined2Label = @UserDefined2Label, UserDefined2 = @UserDefined2, Notes = @Notes, UserID = @UserID where credentialid = CredentialID; select @CredentialID as id";
+            }
+
+            var cmd = new SQLiteCommand(sql, _conn);
+
+            cmd.Parameters.Add("CredentialID", DbType.String).Value = (model.CredentialID == null) ? Guid.NewGuid().ToString() : model.CredentialID;
+            cmd.Parameters.Add("UserID", DbType.String).Value = model.UserID;
+            cmd.Parameters.Add("Description", DbType.String).Value = model.Description;
+            cmd.Parameters.Add("Username", DbType.String).Value = model.Username;
+            cmd.Parameters.Add("Password", DbType.String).Value = model.Password;
+            cmd.Parameters.Add("Url", DbType.String).Value = model.Url;
+            cmd.Parameters.Add("UserDefined1Label", DbType.String).Value = model.UserDefined1Label;
+            cmd.Parameters.Add("UserDefined1", DbType.String).Value = model.UserDefined1;
+            cmd.Parameters.Add("UserDefined2Label", DbType.String).Value = model.UserDefined2Label;
+            cmd.Parameters.Add("UserDefined2", DbType.String).Value = model.UserDefined2;
+            cmd.Parameters.Add("Notes", DbType.String).Value = model.Notes;
+
+            model.CredentialID = Convert.ToString(cmd.ExecuteScalar());
+                    
+            _conn.Close();
+
             return Json(model);
         }
 
@@ -111,9 +142,9 @@ namespace Vault.Controllers
         {
             _conn.Open();
 
-            var cmd = new SQLiteCommand("select * from tuser where username = @UserName and password = @Password", _conn);
-            cmd.Parameters.Add("@Username", DbType.String).Value = model.Username;
-            cmd.Parameters.Add("@Password", DbType.String).Value = model.Password;
+            var cmd = new SQLiteCommand("select * from tuser where username = UserName and password = Password", _conn);
+            cmd.Parameters.Add("Username", DbType.String).Value = model.Username;
+            cmd.Parameters.Add("Password", DbType.String).Value = model.Password;
 
             var userId = "";
 

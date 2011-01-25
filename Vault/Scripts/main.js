@@ -86,41 +86,57 @@ function showDetail(credentialId, masterKey) {
 
 function loadCredential(credentialId, masterKey) {
 
-    $.ajax({
-        url: '/Main/Load',
-        data: { id: credentialId },
-        dataType: 'json',
-        type: 'POST',
-        success: function (data, status, request) {
+    if (credentialId != null) {
 
-            for (var p in data)
-                data[p] = Passpack.decode('AES', data[p], masterKey);
+        $.ajax({
+            url: '/Main/Load',
+            data: { id: credentialId },
+            dataType: 'json',
+            type: 'POST',
+            success: function (data, status, request) {
 
-            var details = [];
+                // CredentialID and UserID are not encrypted so don't try to decode them
+                for (var p in data)
+                    if (p != 'CredentialID' && p != 'UserID')
+                        data[p] = Passpack.decode('AES', data[p], masterKey);
 
-            details.push('<table>');
+                var details = [];
 
-            var f = $('#credential-form');
+                details.push('<table>');
 
-            $('#Description', f).val(data.Description);
-            $('#Username', f).val(data.Username);
-            $('#Password', f).val(data.Password);
-            $('#Url', f).val(data.Url);
-            $('#UserDefined1Label', f).val(data.UserDefined1Label);
-            $('#UserDefined1', f).val(data.UserDefined1);
-            $('#UserDefined2Label', f).val(data.UserDefined2Label);
-            $('#UserDefined2', f).val(data.UserDefined2);
-            $('#Notes', f).val(data.Notes);
+                var f = $('#credential-form');
 
-            $('#credential-form-dialog').dialog({ title: 'Edit Credential', width: 500, modal: true });
+                $('#CredentialID', f).val(data.CredentialID);
+                $('#Description', f).val(data.Description);
+                $('#Username', f).val(data.Username);
+                $('#Password', f).val(data.Password);
+                $('#Url', f).val(data.Url);
+                $('#UserDefined1Label', f).val(data.UserDefined1Label);
+                $('#UserDefined1', f).val(data.UserDefined1);
+                $('#UserDefined2Label', f).val(data.UserDefined2Label);
+                $('#UserDefined2', f).val(data.UserDefined2);
+                $('#Notes', f).val(data.Notes);
+                $('#UserID', f).val(data.UserID);
 
-        },
-        error: function (request, status, error) {
+                $('#credential-form-dialog').dialog({ title: 'Edit Credential', width: 500, modal: true });
 
-            alert('Http Error: ' + status + ' - ' + error);
+            },
+            error: function (request, status, error) {
 
-        }
-    });
+                alert('Http Error: ' + status + ' - ' + error);
+
+            }
+        });
+
+    }
+    else {
+
+        $('#credential-form-dialog input:not(.submit), #credential-form-dialog textarea').val('');
+        $('#credential-form #UserID').val($_VAULT.USER_ID);
+
+        $('#credential-form-dialog').dialog({ title: 'Edit Credential', width: 500, modal: true });
+
+    }
 
 }
 
@@ -239,6 +255,7 @@ $(function () {
                         });
 
                         // Successfully logged in. Hide the login form
+                        $('#container').append('<p><a href="#" onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</a></p>');
                         $('#login-form').hide();
                         $('#login-form-dialog').dialog('destroy');
                         $('#records_filter input:first').focus();
@@ -265,14 +282,25 @@ $(function () {
 
     $('#credential-form').bind('submit', function () {
 
+        var credential = {};
+
+        $('input[class!=submit]', $(this)).each(function () {
+            credential[this.name] = $(this).val();
+        });
+
+        // Encode everything except Credential and User ID
+        for (var p in credential)
+            if (p != 'CredentialID' && p != 'UserID')
+                credential[p] = Passpack.encode('AES', credential[p], $_VAULT.MASTER_KEY);
+
         $.ajax({
             url: '/Main/Update',
-            data: $('#credential-form').serialize(),
+            data: credential,
             dataType: 'json',
             type: 'POST',
             success: function (data, status, request) {
 
-                alert(data);
+
 
             },
             error: function (request, status, error) {
@@ -281,6 +309,8 @@ $(function () {
 
             }
         });
+
+        //Passpack.encode("AES", $(this).val(), masterKey)
 
         return false;
 

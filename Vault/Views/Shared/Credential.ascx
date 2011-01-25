@@ -31,7 +31,10 @@
 <p><%= Html.LabelFor(x => x.Notes) %> 
 <%= Html.TextAreaFor(x => x.Notes)%></p>
 
-<p><input class="submit" type="submit" value="Save" /></p>
+<p>
+<%= Html.HiddenFor(x => x.CredentialID) %>
+<%= Html.HiddenFor(x => x.UserID) %>
+<input class="submit" type="submit" value="Save" /></p>
 
 <% } %>
 
