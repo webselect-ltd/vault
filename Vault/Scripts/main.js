@@ -32,6 +32,7 @@ Array.prototype.contains = function (value) {
 
 };
 
+// Truncate a string at a specified length
 String.prototype.truncate = function (len) {
 
     return (this.length > len) ? this.substring(0, (len - 3)) + '...' : this;
@@ -75,7 +76,7 @@ function loadCredentials(userId, masterKey, callback) {
             var rows = [];
 
             // At this point we only need to decrypt Description and Url for display, which speeds up table construction time dramatically
-            var excludes = ['CredentialID', 'UserID', 'Username', 'Password', 'UserDefined1', 'UserDefined1Label', 'UserDefined2', 'UserDefined2Label', 'Notes'];
+            var excludes = ['CredentialID', 'UserID', 'Url', 'Username', 'Password', 'UserDefined1', 'UserDefined1Label', 'UserDefined2', 'UserDefined2Label', 'Notes'];
 
             // Create a table row for each record and add it to the rows array
             $.each(data, function (i, item) {
@@ -287,7 +288,7 @@ function createCredentialTableRow(credential) {
 
     // Only show the URL link if there's a URL
     if (credential.Url != '')
-        row.push(' <a href="' + credential.Url + '" onclick="window.open(this.href); return false;">' + credential.Description + '</a>');
+        row.push(' <a href="#" onclick="showDetail(\'' + credential.CredentialID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">' + credential.Description + '</a>');
     else
         row.push(credential.Description);
 
