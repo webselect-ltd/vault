@@ -14,6 +14,7 @@ namespace Vault
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.IgnoreRoute("{resource}/favicon.ico");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
