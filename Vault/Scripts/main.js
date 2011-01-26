@@ -1,4 +1,5 @@
-﻿window.$_VAULT = {
+﻿// Global object to hold user/encryption data and table specifications
+window.$_VAULT = {
     USER_ID: '',
     USERNAME: '',
     PASSWORD: '',
@@ -21,6 +22,41 @@
     }
 };
 
+// Utility function to check a value exists in an array
+Array.prototype.contains = function (value) {
+
+    for (var i = 0; i < this.length; i++)
+        if (this[i] == value) return true;
+
+    return false;
+
+};
+
+// Encrypt the properties of an object literal using Passpack
+// excludes is an array of property names whose values should not be encrypted
+function encryptObject(obj, masterKey, excludes) {
+
+    for (var p in obj)
+        if (!excludes.contains(p))
+            obj[p] = Passpack.encode('AES', obj[p], masterKey);
+
+    return obj;
+
+}
+
+// Encrypt the properties of an object literal using Passpack
+// excludes is an array of property names whose values should not be encrypted
+function decryptObject(obj, masterKey, excludes) {
+
+    for (var p in obj)
+        if (!excludes.contains(p))
+            obj[p] = Passpack.decode('AES', obj[p], masterKey);
+
+    return obj;
+
+}
+
+// Load all records for a specific user
 function loadCredentials(userId, masterKey, callback) {
 
     $.ajax({
@@ -32,17 +68,17 @@ function loadCredentials(userId, masterKey, callback) {
 
             var rows = [];
 
-            // Show the matching credential information
+            // At this point we only need to decrypt Description and Url for display, which speeds up table construction time dramatically
+            var excludes = ['CredentialID', 'UserID', 'Username', 'Password', 'UserDefined1', 'UserDefined1Label', 'UserDefined2', 'UserDefined2Label', 'Notes'];
+
+            // Create a table row for each record and add it to the rows array
             $.each(data, function (i, item) {
 
-                for (var p in item)
-                    if (p == 'Description' || p == 'Url')
-                        item[p] = Passpack.decode('AES', item[p], masterKey);
-
-                rows.push(createCredentialRow(item));
+                rows.push(createCredentialTableRow(decryptObject(item, masterKey, excludes)));
 
             });
 
+            // Fire the callback and pass it the array of rows
             callback(rows);
 
         },
@@ -55,6 +91,7 @@ function loadCredentials(userId, masterKey, callback) {
 
 }
 
+// Show the read-only details dialog 
 function showDetail(credentialId, masterKey) {
 
     $.ajax({
@@ -64,14 +101,17 @@ function showDetail(credentialId, masterKey) {
         type: 'POST',
         success: function (data, status, request) {
 
-            for (var p in data)
-                data[p] = Passpack.decode('AES', data[p], masterKey);
+            // CredentialID and UserID are not currently encrypted so don't try to decode them
+            data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
 
             var details = [];
 
             details.push('<table>');
 
-            if(data.Username != '')
+            if (data.Url != '')
+                details.push('<tr><th>Url</th><td><a href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url + '</a></td></tr>');
+
+            if (data.Username != '')
                 details.push('<tr><th>Username</th><td>' + data.Username + '</td></tr>');
 
             if (data.Password != '')
@@ -100,6 +140,8 @@ function showDetail(credentialId, masterKey) {
 
 }
 
+// Load a record into the edit form
+// If null is passed as the credentialId, we set up the form for adding a new record
 function loadCredential(credentialId, masterKey) {
 
     if (credentialId != null) {
@@ -111,14 +153,8 @@ function loadCredential(credentialId, masterKey) {
             type: 'POST',
             success: function (data, status, request) {
 
-                // CredentialID and UserID are not encrypted so don't try to decode them
-                for (var p in data)
-                    if (p != 'CredentialID' && p != 'UserID')
-                        data[p] = Passpack.decode('AES', data[p], masterKey);
-
-                var details = [];
-
-                details.push('<table>');
+                // CredentialID and UserID are not currently encrypted so don't try to decode them
+                data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
 
                 var f = $('#credential-form');
 
@@ -145,7 +181,7 @@ function loadCredential(credentialId, masterKey) {
         });
 
     }
-    else {
+    else { // New record setup
 
         $('#credential-form-dialog input:not(.submit), #credential-form-dialog textarea').val('');
         $('#credential-form #UserID').val($_VAULT.USER_ID);
@@ -156,7 +192,8 @@ function loadCredential(credentialId, masterKey) {
 
 }
 
-function dodeleteCredential(credentialId, userId) {
+// Delete a record
+function deleteCredential(credentialId, userId) {
 
     $.ajax({
         url: '/Main/Delete',
@@ -167,10 +204,11 @@ function dodeleteCredential(credentialId, userId) {
 
             if (data.Success) {
 
+                // Completely destroy the existing DataTable and remove the table and add link from the DOM
                 $_VAULT.TABLE.fnDestroy();
                 $('#records, #add-link').remove();
 
-                // For now, just reload the entire table in the background
+                // For now we just reload the entire table in the background
                 loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
 
                     $('#container').append(createCredentialTable(rows));
@@ -197,11 +235,12 @@ function dodeleteCredential(credentialId, userId) {
 
 }
 
-function deleteCredential(id) {
+// Show delete confirmation dialog
+function confirmDelete(id) {
 
     var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
                      '<form>' +
-                     '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="dodeleteCredential(\'' + id + '\', \'' + $_VAULT.USER_ID + '\'); return false;">Yes</button></p>' +
+                     '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="deleteCredential(\'' + id + '\', \'' + $_VAULT.USER_ID + '\'); return false;">Yes</button></p>' +
                      '</form>';
 
     $('#modal-dialog').html(dialogHtml).dialog({
@@ -231,7 +270,7 @@ function createCredentialTable(rows) {
 
 }
 
-function createCredentialRow(credential) {
+function createCredentialTableRow(credential) {
 
     var row = [];
 
@@ -248,7 +287,7 @@ function createCredentialRow(credential) {
     row.push('</td>');
     row.push('<td class="center"><a href="#" onclick="showDetail(\'' + credential.CredentialID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>');
     row.push('<td class="center"><a href="#" onclick="loadCredential(\'' + credential.CredentialID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
-    row.push('<td class="center"><a href="#" onclick="deleteCredential(\'' + credential.CredentialID + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
+    row.push('<td class="center"><a href="#" onclick="confirmDelete(\'' + credential.CredentialID + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
     row.push('</tr>');
 
     return row.join('');
@@ -259,6 +298,7 @@ $(function () {
 
     $('body').append('<div id="modal-dialog"></div>');
 
+    // Initialise globals and load data on correct login
     $('#login-form').bind('submit', function () {
 
         var _username = $('#login-form #Username').val();
@@ -276,9 +316,10 @@ $(function () {
             type: 'POST',
             success: function (data, status, request) {
 
+                // If the details were valid
                 if (data.result == 1 && data.id != '') {
 
-                    // Set some global variables so that we can use them to encrypt in this session
+                    // Set some global variables so that we can use them for encryption during this session
                     $_VAULT.USER_ID = data.id;
                     $_VAULT.USERNAME = _username;
                     $_VAULT.PASSWORD = _password;
@@ -316,20 +357,20 @@ $(function () {
 
     });
 
+    // Save the new details on edit form submit
     $('#credential-form').bind('submit', function () {
 
         $('.submit', $(this)).after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
 
         var credential = {};
 
+        // Serialize the form into an object
         $('input[class!=submit], textarea', $(this)).each(function () {
             credential[this.name] = $(this).val();
         });
 
-        // Encode everything except Credential and User ID
-        for (var p in credential)
-            if (p != 'CredentialID' && p != 'UserID')
-                credential[p] = Passpack.encode('AES', credential[p], $_VAULT.MASTER_KEY);
+        // CredentialID and UserID are not currently encrypted so don't try to decode them
+        credential = encryptObject(credential, $_VAULT.MASTER_KEY, ['CredentialID', 'UserID']);
 
         $.ajax({
             url: '/Main/Update',
@@ -338,10 +379,11 @@ $(function () {
             type: 'POST',
             success: function (data, status, request) {
 
+                // Completely destroy the existing DataTable and remove the table and add link from the DOM
                 $_VAULT.TABLE.fnDestroy();
                 $('#records, #add-link').remove();
 
-                // For now, just reload the entire table in the background
+                // For now we just reload the entire table in the background
                 loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
 
                     $('#container').append(createCredentialTable(rows));
@@ -368,6 +410,7 @@ $(function () {
 
     });
 
+    // Initially show the login form
     $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
 
 });

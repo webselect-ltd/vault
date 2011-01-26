@@ -119,7 +119,7 @@ namespace Vault.Controllers
             }
             catch (SQLiteException exception)
             {
-                // Not much can go wrong here but if it does we want to know so eventually we
+                // Not much can go wrong here but if it does we want to know, so eventually we
                 // will pass the error info back in the JSON response
                 success = false;
             }
