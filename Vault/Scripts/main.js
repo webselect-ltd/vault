@@ -32,6 +32,12 @@ Array.prototype.contains = function (value) {
 
 };
 
+String.prototype.truncate = function (len) {
+
+    return (this.length > len) ? this.substring(0, (len - 3)) + '...' : this;
+
+}
+
 // Encrypt the properties of an object literal using Passpack
 // excludes is an array of property names whose values should not be encrypted
 function encryptObject(obj, masterKey, excludes) {
@@ -109,7 +115,7 @@ function showDetail(credentialId, masterKey) {
             details.push('<table>');
 
             if (data.Url != '')
-                details.push('<tr><th>Url</th><td><a href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url + '</a></td></tr>');
+                details.push('<tr><th>Url</th><td><a href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url.truncate(30) + '</a></td></tr>');
 
             if (data.Username != '')
                 details.push('<tr><th>Username</th><td>' + data.Username + '</td></tr>');
