@@ -11,7 +11,10 @@
 <%= Html.TextBoxFor(x => x.Username)%></p>
 
 <p><%= Html.LabelFor(x => x.Password) %> 
-<%= Html.TextBoxFor(x => x.Password)%></p>
+<%= Html.PasswordFor(x => x.Password)%></p>
+
+<p><%= Html.LabelFor(x => x.PasswordConfirmation) %> 
+<%= Html.PasswordFor(x => x.PasswordConfirmation)%></p>
 
 <p><%= Html.LabelFor(x => x.Url) %> 
 <%= Html.TextBoxFor(x => x.Url)%></p>

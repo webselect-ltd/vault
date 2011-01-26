@@ -162,6 +162,7 @@ function loadCredential(credentialId, masterKey) {
                 $('#Description', f).val(data.Description);
                 $('#Username', f).val(data.Username);
                 $('#Password', f).val(data.Password);
+                $('#PasswordConfirmation', f).val(data.PasswordConfirmation);
                 $('#Url', f).val(data.Url);
                 $('#UserDefined1Label', f).val(data.UserDefined1Label);
                 $('#UserDefined1', f).val(data.UserDefined1);
@@ -294,6 +295,39 @@ function createCredentialTableRow(credential) {
 
 }
 
+function validateRecord(f) {
+
+    var errors = [];
+
+    // $('#CredentialID', f).val(data.CredentialID);
+
+    var description = $('#Description', f);
+    var password = $('#Password', f);
+    var passwordConfirmation = $('#PasswordConfirmation', f);
+
+    if (description.val() == '')
+        errors.push({ field: description, msg: 'You must fill in a Description' });
+
+    // $('#Username', f).val(data.Username);
+
+    if (password.val() == '') {
+
+        errors.push({ field: password, msg: 'You must fill in a Password' });
+
+    }
+    else {
+
+        if(password.val() != passwordConfirmation.val())
+            errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
+
+    }
+
+    // $('#UserID', f).val(data.UserID);
+
+    return errors;
+
+}
+
 $(function () {
 
     $('body').append('<div id="modal-dialog"></div>');
@@ -359,6 +393,24 @@ $(function () {
 
     // Save the new details on edit form submit
     $('#credential-form').bind('submit', function () {
+
+        $('#validation-message').remove();
+        $('input[class!=submit], textarea', $(this)).removeClass('invalid');
+
+        var errors = validateRecord($(this));
+        var errorMsg = [];
+
+        if (errors.length > 0) {
+
+            for (var i = 0; i < errors.length; i++) {
+                errorMsg.push(errors[i].msg);
+                errors[i].field.addClass('invalid');
+            }
+
+            $(this).prepend('<div id="validation-message"><p>' + errorMsg.join('<br />') + '</p></div>');
+            return false;
+
+        }
 
         $('.submit', $(this)).after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
 
