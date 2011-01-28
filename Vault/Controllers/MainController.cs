@@ -152,7 +152,7 @@ namespace Vault.Controllers
                     
             _conn.Close();
 
-            return Json(model);
+            return Json(new { CredentialID = model.CredentialID });
         }
 
         [HttpPost]
