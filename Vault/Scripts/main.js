@@ -524,7 +524,7 @@ $(function () {
 
                     $_VAULT.TABLE = $('#records').dataTable($_VAULT.TABLE_OPTIONS);
 
-                    $('#container').append('<p id="add-link"><a href="#" onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</a></p>');
+                    $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button></p>');
 
                     $('#spinner').remove();
 
