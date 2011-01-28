@@ -80,6 +80,8 @@ function updateDescription(id, description) {
 
     }
 
+    list.push({ CredentialID: id, Description: description });
+
 }
 
 function buildDataTable(data, callback)
