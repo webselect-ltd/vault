@@ -116,7 +116,7 @@ function showDetail(credentialId, masterKey) {
             details.push('<table>');
 
             if (data.Url != '')
-                details.push('<tr><th>Url</th><td><a href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url.truncate(30) + '</a></td></tr>');
+                details.push('<tr><th>Url</th><td><a class="display-link" href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url.truncate(30) + '</a></td></tr>');
 
             if (data.Username != '')
                 details.push('<tr><th>Username</th><td>' + data.Username + '</td></tr>');
