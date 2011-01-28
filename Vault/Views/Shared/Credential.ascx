@@ -2,7 +2,7 @@
 
 <div id="credential-form-dialog">
 
-<% using(Html.BeginForm("Update", "Main", FormMethod.Post, new { id = "credential-form" })) { %>
+<% using(Html.BeginForm("Update", "Main", FormMethod.Post, new { id = "credential-form", autocomplete = "off" })) { %>
 
 <p><%= Html.LabelFor(x => x.Description) %> 
 <%= Html.TextBoxFor(x => x.Description)%></p>
