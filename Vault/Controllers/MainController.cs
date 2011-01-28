@@ -37,25 +37,16 @@ namespace Vault.Controllers
             var cmd = new SQLiteCommand("select * from tcredential where userid = @UserID", _conn);
             cmd.Parameters.Add("@UserID", DbType.String).Value = userId;
 
-            var credentials = new List<CredentialViewModel>();
+            var credentials = new List<CredentialListViewModel>();
 
             using (var r = cmd.ExecuteReader())
             {
                 while (r.Read())
                 {
-                    credentials.Add(new CredentialViewModel {
+                    credentials.Add(new CredentialListViewModel {
                         CredentialID = r["CredentialID"].ToString(),
                         UserID = r["UserID"].ToString(),
-                        Description = r["Description"].ToString(),
-                        Username = r["Username"].ToString(),
-                        Password = r["Password"].ToString(),
-                        PasswordConfirmation = r["Password"].ToString(),
-                        Url = r["Url"].ToString(),
-                        UserDefined1Label = r["UserDefined1Label"].ToString(),
-                        UserDefined1 = r["UserDefined1"].ToString(),
-                        UserDefined2Label = r["UserDefined2Label"].ToString(),
-                        UserDefined2 = r["UserDefined2"].ToString(),
-                        Notes = r["Notes"].ToString()
+                        Description = r["Description"].ToString()
                     });
                 }
             }

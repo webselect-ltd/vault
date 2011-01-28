@@ -34,3 +34,7 @@
 	</form>
 
 </asp:Content>
+
+<asp:Content ID="EndPageContent" ContentPlaceHolderID="EndPageContent" runat="server">
+
+</asp:Content>

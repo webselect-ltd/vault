@@ -261,11 +261,11 @@ Passpack.crypt.AES = {
 	 *
 	 *   returns byte-array encrypted value (16 bytes)
 	 */
-	Cipher: function (input, w) {    // main Cipher function [รยง5.1]
+	Cipher: function (input, w) {    // main Cipher function [รโ€รยง5.1]
 	  var Nb = 4;               // block size (in words): no of columns in state (fixed at 4 for AES)
 	  var Nr = w.length/Nb - 1; // no of rounds: 10/12/14 for 128/192/256-bit keys
 	
-	  var state = [[],[],[],[]];  // initialise 4xNb byte-array 'state' with input [ง3.4]
+	  var state = [[],[],[],[]];  // initialise 4xNb byte-array 'state' with input [ยง3.4]
 	  for (var i=0; i<4*Nb; i++) state[i%4][Math.floor(i/4)] = input[i];
 	
 	  state = this.AddRoundKey(state, w, 0, Nb);
@@ -281,13 +281,13 @@ Passpack.crypt.AES = {
 	  state = this.ShiftRows(state, Nb);
 	  state = this.AddRoundKey(state, w, Nr, Nb);
 	
-	  var output = new Array(4*Nb);  // convert state to 1-d array before returning [ง3.4]
+	  var output = new Array(4*Nb);  // convert state to 1-d array before returning [ยง3.4]
 	  for (var i=0; i<4*Nb; i++) output[i] = state[i%4][Math.floor(i/4)];
 	  return output;
 	},
 	
 	
-	SubBytes: function (s, Nb) {    // apply SBox to state S [ง5.1.1]
+	SubBytes: function (s, Nb) {    // apply SBox to state S [ยง5.1.1]
 	  for (var r=0; r<4; r++) {
 		for (var c=0; c<Nb; c++) s[r][c] = this.Sbox[s[r][c]];
 	  }
@@ -295,7 +295,7 @@ Passpack.crypt.AES = {
 	},
 	
 	
-	ShiftRows: function (s, Nb) {    // shift row r of state S left by r bytes [ง5.1.2]
+	ShiftRows: function (s, Nb) {    // shift row r of state S left by r bytes [ยง5.1.2]
 	  var t = new Array(4);
 	  for (var r=1; r<4; r++) {
 		for (var c=0; c<4; c++) t[c] = s[r][(c+r)%Nb];  // shift into temp copy
@@ -305,7 +305,7 @@ Passpack.crypt.AES = {
 	},
 	
 	
-	MixColumns: function (s, Nb) {   // combine bytes of each col of state S [ง5.1.3]
+	MixColumns: function (s, Nb) {   // combine bytes of each col of state S [ยง5.1.3]
 	  for (var c=0; c<4; c++) {
 		var a = new Array(4);  // 'a' is a copy of the current column from 's'
 		var b = new Array(4);  // 'b' is a*{02} in GF(2^8)
@@ -323,7 +323,7 @@ Passpack.crypt.AES = {
 	},
 	
 	
-	AddRoundKey: function (state, w, rnd, Nb) {  // xor Round Key into state S [ง5.1.4]
+	AddRoundKey: function (state, w, rnd, Nb) {  // xor Round Key into state S [ยง5.1.4]
 	  for (var r=0; r<4; r++) {
 		for (var c=0; c<Nb; c++) state[r][c] ^= w[rnd*4+c][r];
 	  }
@@ -331,7 +331,7 @@ Passpack.crypt.AES = {
 	},
 	
 	
-	KeyExpansion: function (key) {  // generate Key Schedule (byte-array Nr+1 x Nb) from Key [ง5.2]
+	KeyExpansion: function (key) {  // generate Key Schedule (byte-array Nr+1 x Nb) from Key [ยง5.2]
 	  var Nb = 4;            // block size (in words): no of columns in state (fixed at 4 for AES)
 	  var Nk = key.length/4;  // key length (in words): 4/6/8 for 128/192/256-bit keys
 	  var Nr = Nk + 6;       // no of rounds: 10/12/14 for 128/192/256-bit keys
@@ -371,7 +371,7 @@ Passpack.crypt.AES = {
 	},
 	
 	
-	// Sbox is pre-computed multiplicative inverse in GF(2^8) used in SubBytes and KeyExpansion [ง5.1.1]
+	// Sbox is pre-computed multiplicative inverse in GF(2^8) used in SubBytes and KeyExpansion [ยง5.1.1]
 	Sbox:  [0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
 				 0xca,0x82,0xc9,0x7d,0xfa,0x59,0x47,0xf0,0xad,0xd4,0xa2,0xaf,0x9c,0xa4,0x72,0xc0,
 				 0xb7,0xfd,0x93,0x26,0x36,0x3f,0xf7,0xcc,0x34,0xa5,0xe5,0xf1,0x71,0xd8,0x31,0x15,
@@ -389,7 +389,7 @@ Passpack.crypt.AES = {
 				 0xe1,0xf8,0x98,0x11,0x69,0xd9,0x8e,0x94,0x9b,0x1e,0x87,0xe9,0xce,0x55,0x28,0xdf,
 				 0x8c,0xa1,0x89,0x0d,0xbf,0xe6,0x42,0x68,0x41,0x99,0x2d,0x0f,0xb0,0x54,0xbb,0x16],
 	
-	// Rcon is Round Constant used for the Key Expansion [1st col is 2^(r-1) in GF(2^8)] [ง5.2]
+	// Rcon is Round Constant used for the Key Expansion [1st col is 2^(r-1) in GF(2^8)] [ยง5.2]
 	Rcon: [ [0x00, 0x00, 0x00, 0x00],
 				 [0x01, 0x00, 0x00, 0x00],
 				 [0x02, 0x00, 0x00, 0x00],
@@ -429,7 +429,7 @@ Passpack.crypt.AES = {
 		
 	  var key = this.SetKey(password,nBits);
 	
-	  // initialise counter block (NIST SP800-38A งB.2): millisecond time-stamp for nonce in 1st 8 bytes,
+	  // initialise counter block (NIST SP800-38A ยงB.2): millisecond time-stamp for nonce in 1st 8 bytes,
 	  // block counter in 2nd 8 bytes
 	  var blockSize = 16;  // block size fixed at 16 bytes / 128 bits (Nb=4) for AES
 	  var counterBlock = new Array(blockSize);  // block size fixed at 16 bytes / 128 bits (Nb=4) for AES

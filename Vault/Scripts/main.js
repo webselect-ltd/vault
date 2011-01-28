@@ -19,7 +19,8 @@ window.$_VAULT = {
 		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
 		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
 		]
-    }
+    },
+    BASE_URL: ''
 };
 
 // Utility function to check a value exists in an array
@@ -75,8 +76,8 @@ function loadCredentials(userId, masterKey, callback) {
 
             var rows = [];
 
-            // At this point we only need to decrypt Description and Url for display, which speeds up table construction time dramatically
-            var excludes = ['CredentialID', 'UserID', 'Url', 'Username', 'Password', 'UserDefined1', 'UserDefined1Label', 'UserDefined2', 'UserDefined2Label', 'Notes'];
+            // At this point we only need to decrypt Description for display, which speeds up table construction time dramatically
+            var excludes = ['CredentialID', 'UserID'];
 
             // Create a table row for each record and add it to the rows array
             $.each(data, function (i, item) {
@@ -339,6 +340,15 @@ $(function () {
 
     $('body').append('<div id="modal-dialog"></div>');
 
+    // Load the datatable stylesheet
+    var tableStyles = $("<link>");
+    tableStyles.attr({
+        type: 'text/css',
+        rel: 'stylesheet',
+        href: $_VAULT.BASE_URL + 'content/css/datatables.css'
+    });
+    $("head").append(tableStyles); 
+
     // Initialise globals and load data on correct login
     $('#login-form').bind('submit', function () {
 
@@ -452,6 +462,8 @@ $(function () {
                     $('#container').append('<p id="add-link"><a href="#" onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</a></p>');
 
                     $('#spinner').remove();
+
+                    $('#credential-form-dialog').dialog('destroy');
 
                 });
 

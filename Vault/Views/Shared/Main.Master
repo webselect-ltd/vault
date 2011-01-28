@@ -7,11 +7,9 @@
     <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
     <link rel="shortcut icon" href="<%= ResolveUrl("~/") %>content/img/favicon.ico" />
     <link rel="stylesheet" type="text/css" href="<%= ResolveUrl("~/") %>content/css/jquery-ui-1.8.9.custom.css" />
-    <link rel="stylesheet" type="text/css" href="<%= ResolveUrl("~/") %>content/css/datatables.css" />
     <link rel="stylesheet" type="text/css" href="<%= ResolveUrl("~/") %>content/css/screen.css" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="<%= ResolveUrl("~/") %>scripts/passpack-v1.1.js"></script>
     <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
 </head>
 <body>
@@ -20,5 +18,6 @@
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
         </div>
     </div>
+    <asp:ContentPlaceHolder ID="EndPageContent" runat="server" />
 </body>
 </html>
