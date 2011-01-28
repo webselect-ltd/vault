@@ -358,17 +358,9 @@ function validateRecord(f) {
 
     // $('#Username', f).val(data.Username);
 
-    if (password.val() == '') {
-
-        errors.push({ field: password, msg: 'You must fill in a Password' });
-
-    }
-    else {
-
-        if(password.val() != passwordConfirmation.val())
-            errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
-
-    }
+    // We don't mind if these are blank, but they must be the same!
+    if (password.val() != passwordConfirmation.val())
+        errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
 
     // $('#UserID', f).val(data.UserID);
 
