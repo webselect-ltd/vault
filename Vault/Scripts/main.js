@@ -20,7 +20,8 @@ window.$_VAULT = {
 		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
 		]
     },
-    BASE_URL: ''
+    BASE_URL: '',
+    CACHED_LIST: null
 };
 
 // Utility function to check a value exists in an array
@@ -64,38 +65,77 @@ function decryptObject(obj, masterKey, excludes) {
 
 }
 
+function updateDescription(id, description) {
+
+    var list = $_VAULT.CACHED_LIST;
+
+    for (var i = 0; i < list.length; i++) {
+
+        if (list[i].CredentialID == id) {
+
+            list[i].Description = description;
+            break;
+
+        }
+
+    }
+
+}
+
+function buildDataTable(data, callback)
+{
+    var rows = [];
+
+    // Create a table row for each record and add it to the rows array
+    $.each(data, function (i, item) {
+
+        rows.push(createCredentialTableRow(item));
+
+    });
+
+    // Fire the callback and pass it the array of rows
+    callback(rows);
+}
+
 // Load all records for a specific user
 function loadCredentials(userId, masterKey, callback) {
 
-    $.ajax({
-        url: '/Main/GetAll',
-        data: { userId: userId },
-        dataType: 'json',
-        type: 'POST',
-        success: function (data, status, request) {
+    if ($_VAULT.CACHED_LIST != null) {
 
-            var rows = [];
+        buildDataTable($_VAULT.CACHED_LIST, callback);
 
-            // At this point we only need to decrypt Description for display, which speeds up table construction time dramatically
-            var excludes = ['CredentialID', 'UserID'];
+    } else {
 
-            // Create a table row for each record and add it to the rows array
-            $.each(data, function (i, item) {
+        $.ajax({
+            url: '/Main/GetAll',
+            data: { userId: userId },
+            dataType: 'json',
+            type: 'POST',
+            success: function (data, status, request) {
 
-                rows.push(createCredentialTableRow(decryptObject(item, masterKey, excludes)));
+                var items = [];
+                // At this point we only need to decrypt Description for display, which speeds up table construction time dramatically
+                var excludes = ['CredentialID', 'UserID'];
 
-            });
+                $.each(data, function (i, item) {
 
-            // Fire the callback and pass it the array of rows
-            callback(rows);
+                    items.push(decryptObject(item, masterKey, excludes));
 
-        },
-        error: function (request, status, error) {
+                });
 
-            alert('Http Error: ' + status + ' - ' + error);
+                // Cache the whole (decrypted) list on the client
+                $_VAULT.CACHED_LIST = items;
+                buildDataTable($_VAULT.CACHED_LIST, callback);
 
-        }
-    });
+            },
+            error: function (request, status, error) {
+
+                alert('Http Error: ' + status + ' - ' + error);
+
+            }
+        });
+
+    }
 
 }
 
@@ -349,7 +389,7 @@ $(function () {
         href: $_VAULT.BASE_URL + 'content/css/datatables.css'
     });
 
-    $("head").append(tableStyles); 
+    $("head").append(tableStyles);
 
     // Initialise globals and load data on correct login
     $('#login-form').bind('submit', function () {
@@ -440,6 +480,9 @@ $(function () {
             credential[this.name] = $(this).val();
         });
 
+        // Hold the modified Description so we can update the list if the update succeeds
+        var description = $('#Description', $(this)).val();
+
         // CredentialID and UserID are not currently encrypted so don't try to decode them
         credential = encryptObject(credential, $_VAULT.MASTER_KEY, ['CredentialID', 'UserID']);
 
@@ -449,6 +492,9 @@ $(function () {
             dataType: 'json',
             type: 'POST',
             success: function (data, status, request) {
+
+                // Update the cached credential list with the new Description so it is correct when we rebuild 
+                updateDescription(data.CredentialID, description);
 
                 // Completely destroy the existing DataTable and remove the table and add link from the DOM
                 $_VAULT.TABLE.fnDestroy();
