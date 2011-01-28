@@ -19,7 +19,7 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 0 0 
 
 .ui-dialog-content form { overflow: auto; padding-top: 10px; padding-bottom: 20px; }
 .ui-dialog-content p { overflow: auto; padding-top: 10px; padding-right: 0; }
-.ui-dialog-content label { display: block; width: 130px; float: left; font-weight: bold; text-align: right; padding: 2px 20px 0 0; }
+.ui-dialog-content label { display: block; width: 130px; float: left; font-weight: bold; text-align: right; padding: 3px 20px 0 0; }
 .ui-dialog-content input { width: 250px; float: left; margin-right: 5px; outline: none; }
 .ui-dialog-content input.submit { width: 190px; margin-left: 150px; }
 .ui-dialog-content textarea { width: 310px; height: 150px; float: left; margin-right: 5px; outline: none; }
