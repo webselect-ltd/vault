@@ -453,6 +453,8 @@ $(function () {
 
                     $('#spinner').remove();
 
+                    $('#credential-form-dialog').dialog('destroy');
+
                 });
 
             },
