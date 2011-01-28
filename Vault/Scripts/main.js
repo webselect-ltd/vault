@@ -342,11 +342,13 @@ $(function () {
 
     // Load the datatable stylesheet
     var tableStyles = $("<link>");
+
     tableStyles.attr({
         type: 'text/css',
         rel: 'stylesheet',
         href: $_VAULT.BASE_URL + 'content/css/datatables.css'
     });
+
     $("head").append(tableStyles); 
 
     // Initialise globals and load data on correct login
