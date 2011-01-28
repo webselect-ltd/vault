@@ -74,7 +74,7 @@ function updateDescription(id, description) {
         if (list[i].CredentialID == id) {
 
             list[i].Description = description;
-            break;
+            return;
 
         }
 
