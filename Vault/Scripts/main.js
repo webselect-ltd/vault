@@ -65,7 +65,27 @@ function decryptObject(obj, masterKey, excludes) {
 
 }
 
-function updateDescription(id, description) {
+function removeFromList(id) {
+
+    var list = $_VAULT.CACHED_LIST;
+
+    var i;
+
+    for (i = 0; i < list.length; i++) {
+
+        if (list[i].CredentialID == id) {
+
+            break;
+
+        }
+
+    }
+
+    $_VAULT.CACHED_LIST.splice(i, 1);
+
+}
+
+function updateDescription(id, description, userId) {
 
     var list = $_VAULT.CACHED_LIST;
 
@@ -80,7 +100,7 @@ function updateDescription(id, description) {
 
     }
 
-    list.push({ CredentialID: id, Description: description });
+    list.push({ CredentialID: id, Description: description, UserID: userId });
 
 }
 
@@ -258,6 +278,9 @@ function deleteCredential(credentialId, userId) {
                 // Completely destroy the existing DataTable and remove the table and add link from the DOM
                 $_VAULT.TABLE.fnDestroy();
                 $('#records, #add-link').remove();
+
+                // Remove the deleted item from the cached list before reload
+                removeFromList(credentialId);
 
                 // For now we just reload the entire table in the background
                 loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
@@ -488,7 +511,7 @@ $(function () {
             success: function (data, status, request) {
 
                 // Update the cached credential list with the new Description so it is correct when we rebuild 
-                updateDescription(data.CredentialID, description);
+                updateDescription(data.CredentialID, description, $_VAULT.USER_ID);
 
                 // Completely destroy the existing DataTable and remove the table and add link from the DOM
                 $_VAULT.TABLE.fnDestroy();
