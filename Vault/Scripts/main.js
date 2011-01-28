@@ -130,8 +130,8 @@ function showDetail(credentialId, masterKey) {
             if (data.UserDefined2 != '')
                 details.push('<tr><th>' + data.UserDefined2Label + '</th><td>' + data.UserDefined2 + '</td></tr>');
 
-            if (data.Notes != '')
-                details.push('<tr><th>Notes</th><td class="notes">' + data.Notes + '</td></tr>');
+            if (data.Notes != '') 
+                details.push('<tr><th>Notes</th><td class="notes">' + data.Notes.replace(/\r\n|\n|\r/gi, '<br />') + '</td></tr>');
 
             details.push('</table>');
 
