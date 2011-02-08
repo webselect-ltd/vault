@@ -19,9 +19,11 @@
 
     <% Html.RenderPartial("Credential"); %>
 
-    <script type="text/javascript">$('#credential-form-dialog').hide();</script>
-
     <% Html.RenderPartial("Login"); %>
+
+    <script type="text/javascript">
+        $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
+    </script>
 
 </asp:Content>
 

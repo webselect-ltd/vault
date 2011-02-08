@@ -11,7 +11,7 @@ window.$_VAULT = {
         'bAutoWidth': false,
         'bLengthChange': false,
         'iDisplayLength': 20,
-        'sScrollY': 442,
+        'sScrollY': 441,
         'aaSorting': [[0, 'asc']],
         'aoColumns': [
 		    { 'sType': 'html' },
@@ -547,6 +547,6 @@ $(function () {
     });
 
     // Initially show the login form
-    $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
+    // $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
 
 });
