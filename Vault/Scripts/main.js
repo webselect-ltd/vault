@@ -161,6 +161,35 @@ function loadCredentials(userId, masterKey, callback) {
 
 }
 
+function insertCopyLink(text) {
+
+    return '<span class="copy-link"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' +
+           '        width="14"' +
+           '        height="14">' +
+           '<param name="movie" value="/content/img/clippy.swf"/>' +
+           '<param name="allowScriptAccess" value="always" />' +
+           '<param name="quality" value="high" />' +
+           '<param name="scale" value="noscale" />' +
+           '<param name="FlashVars" value="text=' + encodeURIComponent(text) + '">' +
+           '<param name="bgcolor" value="#ffffff">' +
+           '<param name="wmode" value="opaque">' + 
+           '<embed src="/content/img/clippy.swf"' +
+           '       width="14"' +
+           '       height="14"' +
+           '       wmode="opaque"' + 
+           '       name="clippy"' +
+           '       quality="high"' +
+           '       scale="noscale"' +
+           '       allowScriptAccess="always"' +
+           '       type="application/x-shockwave-flash"' +
+           '       pluginspage="http://www.macromedia.com/go/getflashplayer"' +
+           '       FlashVars="text=' + encodeURIComponent(text) + '"' +
+           '       bgcolor="#ffffff"' +
+           '/>' +
+           '</object></span>';
+
+}
+
 // Show the read-only details dialog 
 function showDetail(credentialId, masterKey) {
 
@@ -182,16 +211,16 @@ function showDetail(credentialId, masterKey) {
                 details.push('<tr><th>Url</th><td><a class="display-link" href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url.truncate(30) + '</a></td></tr>');
 
             if (data.Username != '')
-                details.push('<tr><th>Username</th><td>' + data.Username + '</td></tr>');
+                details.push('<tr><th>Username ' + insertCopyLink(data.Username) + '</th><td>' + data.Username + '</td></tr>');
 
             if (data.Password != '')
-                details.push('<tr><th>Password</th><td>' + data.Password + '</td></tr>');
+                details.push('<tr><th>Password ' + insertCopyLink(data.Password) + '</th><td>' + data.Password + '</td></tr>');
 
             if (data.UserDefined1 != '')
-                details.push('<tr><th>' + data.UserDefined1Label + '</th><td>' + data.UserDefined1 + '</td></tr>');
+                details.push('<tr><th>' + data.UserDefined1Label + ' ' + insertCopyLink(data.UserDefined1) + '</th><td>' + data.UserDefined1 + '</td></tr>');
 
             if (data.UserDefined2 != '')
-                details.push('<tr><th>' + data.UserDefined2Label + '</th><td>' + data.UserDefined2 + '</td></tr>');
+                details.push('<tr><th>' + data.UserDefined2Label + ' ' + insertCopyLink(data.UserDefined2) + '</th><td>' + data.UserDefined2 + '</td></tr>');
 
             if (data.Notes != '') 
                 details.push('<tr><th>Notes</th><td class="notes">' + data.Notes.replace(/\r\n|\n|\r/gi, '<br />') + '</td></tr>');
