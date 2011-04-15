@@ -160,7 +160,7 @@ namespace Vault.Controllers
         {
             _conn.Open();
 
-            var cmd = new SQLiteCommand("select * from tuser where username = UserName and password = Password", _conn);
+            var cmd = new SQLiteCommand("select * from tuser where username = @UserName and password = @Password", _conn);
             cmd.Parameters.Add("@Username", DbType.String).Value = model.Username;
             cmd.Parameters.Add("@Password", DbType.String).Value = model.Password;
 
