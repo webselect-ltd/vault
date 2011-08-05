@@ -37,4 +37,6 @@
 
 <asp:Content ID="EndPageContent" ContentPlaceHolderID="EndPageContent" runat="server">
 
+    <script type="text/javascript" src="<%= ResolveUrl("~/") %>scripts/passpack-v1.1.min.js"></script>
+
 </asp:Content>
