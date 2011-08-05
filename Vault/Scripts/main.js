@@ -318,7 +318,7 @@ function deleteCredential(credentialId, userId) {
 
                     $_VAULT.TABLE = $('#records').dataTable($_VAULT.TABLE_OPTIONS);
 
-                    $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button></p>');
+                    $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
 
                     $('#modal-dialog').dialog('destroy');
 
@@ -349,6 +349,44 @@ function confirmDelete(id) {
     $('#modal-dialog').html(dialogHtml).dialog({
         title: 'Delete Credential',
         width: 500, 
+        modal: true,
+        minHeight: 50
+    });
+
+}
+
+function generatePasswordHash(password) {
+
+    return Passpack.utils.hashx(password);
+
+}
+
+// The hash is now a full 64 char string
+function generatePasswordHash64(password) {
+
+    return Passpack.utils.hashx(password, false, true);
+
+}
+
+function changePassword() {
+
+    alert('change');
+    return false;
+
+}
+
+function options() {
+
+    var dialogHtml = '<p>Change password:</p>' +
+                     '<form>' +
+                     '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
+                     '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
+                     '<p><button onclick="changePassword(); return false;">Change Password</button></p>' +
+                     '</form>';
+
+    $('#modal-dialog').html(dialogHtml).dialog({
+        title: 'Options',
+        width: 500,
         modal: true,
         minHeight: 50
     });
@@ -471,7 +509,7 @@ $(function () {
                         $_VAULT.TABLE = $('#records').dataTable($_VAULT.TABLE_OPTIONS);
 
                         // Successfully logged in. Hide the login form
-                        $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button></p>');
+                        $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
                         $('#login-form').hide();
                         $('#login-form-dialog').dialog('destroy');
                         $('#records_filter input:first').focus();
