@@ -23,7 +23,7 @@
         loginDialog.find('input[name="Username"]').focus();
 
         $(function () {
-            Vault.init();
+            Vault.init('@(Url.Action("Index", "Main", null))');
         });
     </script>
 

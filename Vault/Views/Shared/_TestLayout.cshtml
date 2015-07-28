@@ -19,6 +19,7 @@
         @Scripts.Render("~/Content/Js/bundle")
         <script type="text/javascript">
             $('script[src="/Content/Js/main.js"]').attr('data-cover', '');
+            var _BASE_URL = '@(Url.Action("Index", "Main", null))';
         </script>
         @Scripts.Render("~/Content/Js/test")
         @RenderSection("foot", false)

@@ -13,6 +13,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _hasFlash = false, // Set true if browser has Flash Player installed
     _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
+    _basePath = null,
     // A map of the properties which can be searched for using the fieldName:query syntax
     // We need this because the search is not case-sensitive, whereas JS properties are!
     _queryablePropertyMap = {
@@ -40,7 +41,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         credentialForm: null,
         deleteConfirmationDialog: null,
         optionsDialog: null,
-        exportedDataWindow: null,
+        expouserrtedDataWindow: null,
         credentialTable: null,
         credentialTableRow: null,
         validationMessage: null,
@@ -138,7 +139,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         if (_cachedList !== null && _cachedList.length) {
             _buildDataTable(_cachedList, callback, masterKey, userId);
         } else {
-            _ajaxPost('/Main/GetAll', { userId: userId }, function (data, status, request) {
+            _ajaxPost(_basePath + 'Main/GetAll', { userId: userId }, function (data, status, request) {
                 var items = [];
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
@@ -155,7 +156,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
     // Show the read-only details modal
     var _showDetail = function (credentialId, masterKey) {
-        _ajaxPost('/Main/Load', { id: credentialId }, function (data, status, request) {
+        _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data, status, request) {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
 
@@ -241,7 +242,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     // If null is passed as the credentialId, we set up the form for adding a new record
     var _loadCredential = function (credentialId, masterKey, userId) {
         if (credentialId !== null) {
-            _ajaxPost('/Main/Load', { id: credentialId }, function (data, status, request) {
+            _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data, status, request) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
                 _showModal({
@@ -271,7 +272,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
     // Delete a record
     var _deleteCredential = function (credentialId, userId, masterKey) {
-        _ajaxPost('/Main/Delete', { credentialId: credentialId, userId: userId }, function (data, status, request) {
+        _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data, status, request) {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 _removeFromList(credentialId, _cachedList);
@@ -336,21 +337,21 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         var newData = [];
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
-        _ajaxPost('/Main/GetAllComplete', { userId: userId }, function (data, status, request) {
+        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data, status, request) {
             var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
             $.each(data, function (i, item) {
                 newData.push(_encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes));
             });
 
-            _ajaxPost('/Main/UpdateMultiple', Passpack.JSON.stringify(newData), function (data, status, request) {
+            _ajaxPost(_basePath + 'Main/UpdateMultiple', Passpack.JSON.stringify(newData), function (data, status, request) {
                 // Store the new password in hashed form
-                _ajaxPost('/Main/UpdatePassword', {
+                _ajaxPost(_basePath + 'Main/UpdatePassword', {
                     newHash: newPasswordHash,
                     userid: userId,
                     oldHash: Passpack.utils.hashx(_password)
                 }, function (data, status, request) {
                     // Just reload the whole page when we're done to force login
-                    window.location.href = '/'; 
+                    window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath; 
                 });
             }, null, 'application/json; charset=utf-8');
         });
@@ -362,7 +363,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     var _exportData = function (userId, masterKey) {
         var exportItems = [];
         // Get all the credentials, decrypt each one
-        _ajaxPost('/Main/GetAllComplete', { userId: userId }, function (data, status, request) {
+        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data, status, request) {
             $.each(data, function (i, item) {
                 var o = _decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
@@ -396,9 +397,9 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             newData.push(_encryptObject(item, _b64_to_utf8(masterKey), excludes));
         });
 
-        _ajaxPost('/Main/UpdateMultiple', Passpack.JSON.stringify(newData), function (data, status, request) {
+        _ajaxPost(_basePath + 'Main/UpdateMultiple', Passpack.JSON.stringify(newData), function (data, status, request) {
             // Just reload the whole page when we're done to force login
-            window.location.href = '/';
+            window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
         }, null, 'application/json; charset=utf-8');
 
         return false;
@@ -626,7 +627,9 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Initialise the app
-    var _init = function (test) {
+    var _init = function (basePath, test) {
+        // Set the base path for AJAX requests/redirects
+        _basePath = basePath;
         // Determine whether we're testing or not
         if (typeof test !== 'undefined' && test) {
             var testMethods = {
@@ -758,7 +761,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 var username = _ui.loginForm.find('#VaultUsername').val();
                 var password = _ui.loginForm.find('#VaultPassword').val();
 
-                _ajaxPost('/Main/Login', {
+                _ajaxPost(_basePath + 'Main/Login', {
                     Username: Passpack.utils.hashx(username),
                     Password: Passpack.utils.hashx(password)
                 }, function (data, status, request) {
@@ -823,7 +826,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
-                _ajaxPost('/Main/Update', credential, function (data, status, request) {
+                _ajaxPost(_basePath + 'Main/Update', credential, function (data, status, request) {
                     // Update the cached credential list with the new property values, so it is correct when we rebuild
                     _updateProperties(data.CredentialID, properties, _userId, _cachedList);
                     // Re-sort the list in case the order should change
