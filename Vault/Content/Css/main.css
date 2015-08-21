@@ -150,6 +150,10 @@
     opacity: 0.8;
 }
 
+.chrome-autocomplete-fake {
+    display: none;
+}
+
 @media (min-width: 500px) {
     .full {
         display: inline;

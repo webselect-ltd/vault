@@ -10,6 +10,9 @@
                 </div>
                 <div class="modal-body">
                     <p>Enter your username and master password:</p>
+                    <!-- These fake fields are a workaround for Chrome not respecting the autocomplete attribute and autofilling fields with the wrong values... -->
+                    <input class="chrome-autocomplete-fake" type="text" name="chromeusername"/>
+                    <input class="chrome-autocomplete-fake" type="password" name="chromepassword"/>
                     <div class="form-group">
                         @Html.LabelFor(model => model.UN1209, new { @class = "col-sm-4 control-label" })
                         <div class="col-sm-8">
