@@ -149,7 +149,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                userId = conn.Query<string>("select * from tUser where Username = @Username and Password = @Password", new { Username = model.Username, Password = model.Password }).FirstOrDefault();
+                userId = conn.Query<string>("select * from tUser where Username = @Username and Password = @Password", new { Username = model.UN1209, Password = model.PW9804 }).FirstOrDefault();
             }
 
             return Json(new { result = ((!string.IsNullOrEmpty(userId)) ? 1 : 0), id = userId });

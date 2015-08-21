@@ -758,12 +758,12 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
             // Initialise globals and load data on correct login
             _ui.loginForm.on('submit', function () {
-                var username = _ui.loginForm.find('#VaultUsername').val();
-                var password = _ui.loginForm.find('#VaultPassword').val();
+                var username = _ui.loginForm.find('#UN1209').val();
+                var password = _ui.loginForm.find('#PW9804').val();
 
                 _ajaxPost(_basePath + 'Main/Login', {
-                    Username: Passpack.utils.hashx(username),
-                    Password: Passpack.utils.hashx(password)
+                    UN1209: Passpack.utils.hashx(username),
+                    PW9804: Passpack.utils.hashx(password)
                 }, function (data, status, request) {
                     // If the details were valid
                     if (data.result === 1 && data.id !== '') {
