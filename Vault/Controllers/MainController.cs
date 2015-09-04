@@ -29,6 +29,11 @@ namespace Vault.Controllers
             });
         }
 
+        public ActionResult SetDevCookie()
+        {
+            return View();
+        }
+
         [HttpPost]
         public ActionResult GetAll(string userId)
         {

@@ -40,7 +40,7 @@ QUnit.begin(function () {
 });
 
 QUnit.testStart(function () {
-    Vault.init(_BASE_URL, true);
+    Vault.init(_BASE_URL, true, false);
 });
 
 QUnit.testDone(function () {

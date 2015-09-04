@@ -2,7 +2,7 @@
 // Vault client app code
 //////////////////////////////////////////////////////////////////////////////////
 
-var Vault = (function ($, Passpack, Handlebars, window, undefined) {
+var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undefined) {
     'use strict';
     // Private member variables
     var _userId = '', // GUID identifying logged-in user
@@ -627,11 +627,11 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Initialise the app
-    var _init = function (basePath, test) {
+    var _init = function (basePath, testMode, devMode) {
         // Set the base path for AJAX requests/redirects
         _basePath = basePath;
         // Determine whether we're testing or not
-        if (typeof test !== 'undefined' && test) {
+        if (testMode) {
             var testMethods = {
                 insertCopyLink: _insertCopyLink,
                 encryptObject: _encryptObject,
@@ -711,7 +711,8 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         // Set global Flash Player support flag
         _hasFlash = _detectFlash();
 
-        if (typeof test === 'undefined' || !test) {
+        // Don't set up event handlers in test mode
+        if (!testMode) {
             _ui.container.on('click', '.btn-credential-show-detail', function (e) {
                 e.preventDefault();
                 var id = $(this).parent().parent().attr('id');
@@ -858,6 +859,13 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 $('#PasswordConfirmation').val(password);
                 _showPasswordStrength($('#Password'));
             });
+
+            // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
+            if (devMode) {
+                _ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
+                _ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
+                _ui.loginForm.submit();
+            }
         }
     };
 
@@ -871,4 +879,4 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
     return vault;
 
-}(jQuery, Passpack, Handlebars, window, undefined));
+}(jQuery, Passpack, Handlebars, Cookies, window, document, undefined));
