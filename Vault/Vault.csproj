@@ -173,7 +173,6 @@
     <Content Include="Content\Css\qunit-1.15.0.css" />
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
-    <Content Include="Content\Img\clippy.swf" />
     <Content Include="Content\Img\favicon.ico" />
     <Content Include="Content\Js\blanket.js" />
     <Content Include="Content\Js\bootstrap.js" />
