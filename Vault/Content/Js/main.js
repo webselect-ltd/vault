@@ -11,7 +11,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
     _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
-    _hasFlash = false, // Set true if browser has Flash Player installed
     _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
     _basePath = null,
     // A map of the properties which can be searched for using the fieldName:query syntax
@@ -163,15 +162,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             var detailHtml = _templates.detail({
                 Url: data.Url,
                 Username: data.Username,
-                UsernameCopyLink: _hasFlash ? _insertCopyLink(data.Username) : '',
+                UsernameCopyLink: _insertCopyLink(data.Username),
                 Password: data.Password,
-                PasswordCopyLink: _hasFlash ? _insertCopyLink(data.Password) : '',
+                PasswordCopyLink: _insertCopyLink(data.Password),
                 UserDefined1: data.UserDefined1,
                 UserDefined1Label: data.UserDefined1Label,
-                UserDefined1CopyLink: _hasFlash? _insertCopyLink(data.UserDefined1) : '',
+                UserDefined1CopyLink: _insertCopyLink(data.UserDefined1),
                 UserDefined2: data.UserDefined2,
                 UserDefined2Label: data.UserDefined2Label,
-                UserDefined2CopyLink: _hasFlash ? _insertCopyLink(data.UserDefined2) : '',
+                UserDefined2CopyLink: _insertCopyLink(data.UserDefined2),
                 Notes: data.Notes
             });
 
@@ -551,43 +550,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         });
     };
 
-    // Detect Flash plugin for copy-paste links
-    // Solution found here: http://stackoverflow.com/a/9865667/43140
-    // Recompiled up to date function body here: http://closure-compiler.appspot.com/home
-    var _detectFlash = function () {
-        var a = !1;
-        function b(d) {
-            if (d = d.match(/[\d]+/g)) {
-                d.length = 3;
-            }
-        }
-        if (navigator.plugins && navigator.plugins.length) {
-            var c = navigator.plugins["Shockwave Flash"];
-            c && (a = !0, c.description && b(c.description));
-            navigator.plugins["Shockwave Flash 2.0"] && (a = !0);
-        } else {
-            if (navigator.mimeTypes && navigator.mimeTypes.length) {
-                var e = navigator.mimeTypes["application/x-shockwave-flash"];
-                (a = e && e.enabledPlugin) && b(e.enabledPlugin.description);
-            } else {
-                try {
-                    var f = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.7"), a = !0;
-                    b(f.GetVariable("$version"));
-                } catch (g) {
-                    try {
-                        f = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6"), a = !0;
-                    } catch (h) {
-                        try {
-                            f = new ActiveXObject("ShockwaveFlash.ShockwaveFlash"), a = !0, b(f.GetVariable("$version"));
-                        } catch (k) {
-                        }
-                    }
-                }
-            }
-        }
-        return a;
-    };
-
     // Show password strength visually
     var _showPasswordStrength = function (field) {
         var strengthIndicator = field.next('div.password-strength');
@@ -707,9 +669,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
-
-        // Set global Flash Player support flag
-        _hasFlash = _detectFlash();
 
         // Don't set up event handlers in test mode
         if (!testMode) {
