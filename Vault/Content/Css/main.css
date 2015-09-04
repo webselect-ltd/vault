@@ -68,7 +68,7 @@
 }
 
 .detail-copylink {
-    width: 20px;
+    width: 68px;
 }
 
 #spinner {
@@ -179,6 +179,18 @@
     .container {
         width: 700px;
     }
+}
+
+.copy-link .glyphicon {
+    top: 2px;
+}
+
+.copy-link:hover {
+    text-decoration: none;
+}
+
+.copy-link span {
+    color: #5cbb37;
 }
 
 .copy-content {
