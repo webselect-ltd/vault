@@ -52,7 +52,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
 
     // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
     var _insertCopyLink = function (text) {
-        return _templates.copyLink({ text: encodeURIComponent(text) });
+        return _templates.copyLink({ text: text });
     };
 
     // Encrypt the properties of an object literal using Passpack
@@ -858,6 +858,23 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
                 _showPasswordStrength($('#Password'));
+            });
+
+            // Copy content to clipboard when copy icon is clicked
+            $('body').on('click', 'a.copy-link', function (e) {
+                e.preventDefault();
+                $(this).next('input[name="copy-content"]').select();
+                var copySuccess;
+                try {
+                    copySuccess = document.execCommand("copy");
+                } catch (e) {
+                    copySuccess = false;
+                }
+                if (copySuccess) {
+                    alert('Copied!');
+                } else {
+                    alert('Copy operation is not supported by the current browser.')
+                }
             });
 
             // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
