@@ -36,6 +36,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
     },
     _templates = {
         copyLink: null,
+        urlLink: null,
+        urlText: null,
         detail: null,
         credentialForm: null,
         deleteConfirmationDialog: null,
@@ -158,10 +160,14 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data, status, request) {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+            // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
+            var urlText = _templates.urlText({ Url: data.Url });
+            var urlHtml = data.Url.indexOf('//') === -1 ? urlText : _templates.urlLink({ Url: data.Url, UrlText: urlText });
 
             var detailHtml = _templates.detail({
                 Url: data.Url,
                 UrlCopyLink: _insertCopyLink(data.Url),
+                UrlHtml: urlHtml,
                 Username: data.Username,
                 UsernameCopyLink: _insertCopyLink(data.Username),
                 Password: data.Password,
@@ -646,6 +652,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _ui.spinner = $('#spinner');
 
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.urlLink = Handlebars.compile($('#tmpl-urllink').html());
+        _templates.urlText = Handlebars.compile($('#tmpl-urltext').html());
         _templates.detail = Handlebars.compile($('#tmpl-detail').html());
         _templates.credentialForm = Handlebars.compile($('#tmpl-credentialform').html());
         _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());

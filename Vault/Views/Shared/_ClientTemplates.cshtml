@@ -33,6 +33,15 @@
     <input type="text" class="copy-content" name="copy-content" value="{{text}}" />
 </script>
 
+<script id="tmpl-urllink" type="text/x-handlebars-template">
+    <a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;">{{{UrlText}}}</a>
+</script>
+
+<script id="tmpl-urltext" type="text/x-handlebars-template">
+    <span class="full">{{Url}}</span>
+    <span class="truncated">{{truncate Url 26}}</span>
+</script>
+
 <script id="tmpl-detail" type="text/x-handlebars-template">
     <table class="table detail">
         <colgroup>
@@ -45,7 +54,7 @@
             <tr>
                 <th>Url</th>
                 <td>{{{UrlCopyLink}}}</td>
-                <td><a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;"><span class="full">{{Url}}</span><span class="truncated">{{truncate Url 26}}</span></a></td>
+                <td>{{{UrlHtml}}}</td>
             </tr>
             {{/if}}
             {{#if Username}}
