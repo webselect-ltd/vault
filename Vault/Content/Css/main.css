@@ -190,6 +190,10 @@
 }
 
 .copy-link span {
+    color: #E0E0E0;
+}
+
+.copy-link span.copied {
     color: #5cbb37;
 }
 

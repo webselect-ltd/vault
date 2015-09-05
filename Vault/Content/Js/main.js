@@ -822,7 +822,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             // Copy content to clipboard when copy icon is clicked
             $('body').on('click', 'a.copy-link', function (e) {
                 e.preventDefault();
-                $(this).next('input[name="copy-content"]').select();
+                $('a.copy-link').find('span').removeClass('copied');
+                var a = $(this);
+                a.next('input[name="copy-content"]').select();
                 var copySuccess;
                 try {
                     copySuccess = document.execCommand("copy");
@@ -830,9 +832,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     copySuccess = false;
                 }
                 if (copySuccess) {
-                    alert('Copied!');
+                    a.find('span').addClass('copied');
                 } else {
-                    alert('Copy operation is not supported by the current browser.')
+                    window.alert('Copy operation is not supported by the current browser.');
                 }
             });
 
