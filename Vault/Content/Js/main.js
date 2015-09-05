@@ -853,6 +853,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 _ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
                 _ui.loginForm.submit();
             }
+            else
+            {
+                _ui.loginForm.find('#UN1209').focus();
+            }
         }
     };
 

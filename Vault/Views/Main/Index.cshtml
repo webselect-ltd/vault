@@ -20,7 +20,6 @@
     <script type="text/javascript">
         var loginDialog = $('#login-form-dialog');
         loginDialog.modal({ keyboard: false, backdrop: 'static' });
-        loginDialog.find('input[name="Username"]').focus();
 
         $(function () {
             Vault.init('@(Url.Action("Index", "Main", null))', false, @(System.Configuration.ConfigurationManager.AppSettings["DevMode"]));
