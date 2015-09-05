@@ -161,6 +161,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
 
             var detailHtml = _templates.detail({
                 Url: data.Url,
+                UrlCopyLink: _insertCopyLink(data.Url),
                 Username: data.Username,
                 UsernameCopyLink: _insertCopyLink(data.Username),
                 Password: data.Password,
