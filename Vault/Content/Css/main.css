@@ -223,7 +223,3 @@
 .generate-password-options {
     display: none;
 }
-
-.generate-password-options .checkbox {
-    padding-top: 0;
-}

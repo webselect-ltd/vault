@@ -12,7 +12,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
     _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
-    _passwordLength = 16,
     _basePath = null,
     // A map of the properties which can be searched for using the fieldName:query syntax
     // We need this because the search is not case-sensitive, whereas JS properties are!
@@ -243,6 +242,11 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _ui.modal.on('click', 'button.btn-action', options.accept || _defaultAcceptAction);
         _ui.modal.on('click', 'button.btn-close', options.close || _defaultCloseAction);
         _ui.modal.modal();
+    };
+
+    var _getPasswordLength = function () {
+        var len = parseInt($('#len').val(), 10);
+        return isNaN(len) ? 16 : len;
     };
 
     var _getPasswordGenerationOptions = function () {
@@ -834,8 +838,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             // Generate a nice strong password
             $('body').on('click', 'button.generate-password', function (e) {
                 e.preventDefault();
-                var options = _getPasswordGenerationOptions();
-                var password = Passpack.utils.passGenerator(options, _passwordLength);
+                var password = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength());
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
                 _showPasswordStrength($('#Password'));
