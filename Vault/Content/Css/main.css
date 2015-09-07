@@ -202,3 +202,28 @@
     top: 0;
     left: -300px;
 }
+
+.generate-password {
+    width: 100%;
+}
+
+.generate-password-options-toggle {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    outline: none !important;
+    text-decoration: none;
+}
+
+.generate-password-options-toggle:active, .generate-password-options-toggle:focus, .generate-password-options-toggle:hover {
+    text-decoration: none !important;
+}
+
+.generate-password-options {
+    display: none;
+}
+
+.generate-password-options .checkbox {
+    padding-top: 0;
+}

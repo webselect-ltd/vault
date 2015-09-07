@@ -12,6 +12,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
     _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
+    _passwordLength = 16,
     _basePath = null,
     // A map of the properties which can be searched for using the fieldName:query syntax
     // We need this because the search is not case-sensitive, whereas JS properties are!
@@ -242,6 +243,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _ui.modal.on('click', 'button.btn-action', options.accept || _defaultAcceptAction);
         _ui.modal.on('click', 'button.btn-close', options.close || _defaultCloseAction);
         _ui.modal.modal();
+    };
+
+    var _getPasswordGenerationOptions = function () {
+        var options = {};
+        $('input.generate-password-option').each(function (i, item) {
+            var checkbox = $(this);
+            if (checkbox[0].checked) {
+                options[checkbox.attr('name')] = 1;
+            }
+        });
+        return options;
     };
 
     // Load a record into the edit form
@@ -822,10 +834,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             // Generate a nice strong password
             $('body').on('click', 'button.generate-password', function (e) {
                 e.preventDefault();
-                var password = Passpack.utils.passGenerator({ ucase: 1, lcase: 1, nums: 1, symb: 1 }, 16);
+                var options = _getPasswordGenerationOptions();
+                var password = Passpack.utils.passGenerator(options, _passwordLength);
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
                 _showPasswordStrength($('#Password'));
+            });
+
+            // Toggle password generation option UI visibility
+            $('body').on('click', 'a.generate-password-options-toggle', function (e) {
+                e.preventDefault();
+                $('div.generate-password-options').toggle();
             });
 
             // Copy content to clipboard when copy icon is clicked
