@@ -19,7 +19,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         description: 'Description',
         username: 'Username',
         password: 'Password',
-        url: 'Url'
+        url: 'Url',
+        filter: 'FILTER'
     },
     _ui = {
         loginFormDialog: null,
@@ -537,9 +538,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     }
                 }
             }
-            for (var i = 0; i < list.length; i++) {
-                if (list[i][queryField].toLowerCase().indexOf(query) > -1) {
-                    results.push(list[i]);
+            if (queryField === 'FILTER' && query === 'all') {
+                results = list;
+            } else {
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i][queryField].toLowerCase().indexOf(query) > -1) {
+                        results.push(list[i]);
+                    }
                 }
             }
         }
