@@ -18,7 +18,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
     _queryablePropertyMap = {
         description: 'Description',
         username: 'Username',
-        password: 'Password'
+        password: 'Password',
+        url: 'Url'
     },
     _ui = {
         loginFormDialog: null,
@@ -468,6 +469,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             description: credential.Description,
             username: credential.Username,
             password: credential.Password,
+            url: credential.Url,
             weak: ($.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold)
         };
     };
