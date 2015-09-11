@@ -131,7 +131,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         } else {
             setTimeout(function () {
                 $.ajax(options);
-            }, 1000);
+            }, 2000);
         }
     };
 
