@@ -19,6 +19,12 @@
 
 <script id="tmpl-modalfooter" type="text/x-handlebars-template">
     <div class="modal-footer">
+        {{#if showEdit}}
+        <button type="button" class="btn btn-default btn-edit" data-credentialid="{{credentialId}}">{{editText}}</button>
+        {{/if}}
+        {{#if showDelete}}
+        <button type="button" class="btn btn-default btn-delete" data-credentialid="{{credentialId}}">{{deleteText}}</button>
+        {{/if}}
         {{#if showClose}}
         <button type="button" class="btn btn-default btn-close">{{closeText}}</button>
         {{/if}}
@@ -29,7 +35,7 @@
 </script>
 
 <script id="tmpl-copylink" type="text/x-handlebars-template">
-    <a class="copy-link" href="#">Copy <span class="fa fa-check-square"></span></a>
+    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
     <input type="text" class="copy-content" name="copy-content" value="{{text}}" />
 </script>
 
@@ -185,13 +191,18 @@
             </button>
         </td>
         <td class="center">
-            <button class="btn btn-primary btn-block btn-credential-edit">
-                <span class="fa fa-pencil"></span>
+            <button class="btn btn-primary btn-block btn-credential-open">
+                <span class="fa fa-external-link"></span> Open
             </button>
         </td>
         <td class="center">
-            <button class="btn btn-danger btn-block btn-credential-delete">
-                <span class="fa fa-trash"></span>
+            <button class="btn btn-primary btn-block btn-credential-copy-username">
+                <span class="fa fa-clipboard"></span> Username
+            </button>
+        </td>
+        <td class="center">
+            <button class="btn btn-primary btn-block btn-credential-copy-password">
+                <span class="fa fa-clipboard"></span> Password
             </button>
         </td>
     </tr>

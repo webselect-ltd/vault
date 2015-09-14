@@ -184,9 +184,14 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             });
 
             _showModal({
+                credentialId: credentialId,
                 title: data.Description,
                 content: detailHtml,
-                showAccept: false
+                showAccept: false,
+                showEdit: true,
+                showDelete: true,
+                edit: function (e) { _loadCredential($(this).data('credentialid'), masterKey, _userId); },
+                delete: function (e) { _confirmDelete($(this).data('credentialid'), masterKey, _userId); }
             });
         });
     };
@@ -207,42 +212,62 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
 
     // Show a Bootstrap modal with options as below
     // var modalOptions = {
+    //     credentialId: '9c75660b-13ae-4c4f-b1d7-6770498a2466',
     //     title: 'TEST',
     //     content: '<p>TEST</p>',
     //     showAccept: true,
     //     showClose: true,
+    //     showEdit: true,
+    //     showDelete: true,
     //     acceptText: 'OK',
     //     accept: function() {}
     //     closeText: 'Close',
     //     close: function() {}
+    //     editText: 'Edit',
+    //     edit: function() {}
+    //     deleteText: 'Delete',
+    //     delete: function() {}
     // };
     var _showModal = function (options) {
         var showAccept = options.showAccept === false ? false : true;
         var showClose = options.showClose === false ? false : true;
+        var showEdit = options.showEdit === true ? true : false;
+        var showDelete = options.showDelete === true ? true : false;
 
         var html = _templates.modalHeader({
             title: options.title,
             closeText: options.closeText || 'Close',
             showAccept: showAccept,
-            showClose: showClose
+            showClose: showClose,
+            showEdit: showEdit,
+            showDelete: showDelete,
         }) + _templates.modalBody({
             content: options.content
         });
 
-        if (showAccept || showClose) {
+        if (showAccept || showClose || showEdit || showDelete) {
             html += _templates.modalFooter({
+                credentialId: options.credentialId,
                 acceptText: options.acceptText || 'OK',
                 closeText: options.closeText || 'Close',
+                editText: options.editText || 'Edit',
+                deleteText: options.deleteText || 'Delete',
                 showAccept: showAccept,
-                showClose: showClose
+                showClose: showClose,
+                showEdit: showEdit,
+                showDelete: showDelete
             });
         }
 
         _ui.modalContent.html(html);
         _ui.modal.off('click', 'button.btn-action');
         _ui.modal.off('click', 'button.btn-close');
+        _ui.modal.off('click', 'button.btn-edit');
+        _ui.modal.off('click', 'button.btn-delete');
         _ui.modal.on('click', 'button.btn-action', options.accept || _defaultAcceptAction);
         _ui.modal.on('click', 'button.btn-close', options.close || _defaultCloseAction);
+        _ui.modal.on('click', 'button.btn-edit', options.edit || function (e) { window.alert('NOT BOUND'); });
+        _ui.modal.on('click', 'button.btn-delete', options.delete || function (e) { window.alert('NOT BOUND'); });
         _ui.modal.modal();
     };
 
@@ -710,17 +735,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 _showDetail(id, _masterKey);
             });
 
-            _ui.container.on('click', '.btn-credential-edit', function (e) {
-                e.preventDefault();
-                var id = $(this).parent().parent().attr('id');
-                _loadCredential(id, _masterKey, _userId);
-            });
+            //_ui.container.on('click', '.btn-credential-edit', function (e) {
+            //    e.preventDefault();
+            //    var id = $(this).parent().parent().attr('id');
+            //    _loadCredential(id, _masterKey, _userId);
+            //});
 
-            _ui.container.on('click', '.btn-credential-delete', function (e) {
-                e.preventDefault();
-                var id = $(this).parent().parent().attr('id');
-                _confirmDelete(id, _masterKey, _userId);
-            });
+            //_ui.container.on('click', '.btn-credential-delete', function (e) {
+            //    e.preventDefault();
+            //    var id = $(this).parent().parent().attr('id');
+            //    _confirmDelete(id, _masterKey, _userId);
+            //});
 
             _ui.newButton.on('click', function (e) {
                 e.preventDefault();

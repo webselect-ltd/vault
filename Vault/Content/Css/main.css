@@ -6,10 +6,6 @@
     padding: 11px 16px 10px 16px;
 }
 
-.glyphicon {
-    top: 3px;
-}
-
 #controls {
     display: none;
     padding-top: 15px;
@@ -30,10 +26,6 @@
 
 #records .btn {
     height: 60px;
-}
-
-.btn-credential-edit, .btn-credential-delete {
-    padding: 3px 8px;
 }
 
 #validation-message {
@@ -179,10 +171,6 @@
     .container {
         width: 700px;
     }
-}
-
-.copy-link .glyphicon {
-    top: 2px;
 }
 
 .copy-link:hover {
