@@ -37,7 +37,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         spinner: null
     },
     _templates = {
-        copyLink: null,
         urlLink: null,
         urlText: null,
         detail: null,
@@ -51,11 +50,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         modalHeader: null,
         modalBody: null,
         modalFooter: null
-    };
-
-    // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
-    var _insertCopyLink = function (text) {
-        return _templates.copyLink({ text: text });
     };
 
     // Encrypt the properties of an object literal using Passpack
@@ -168,18 +162,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
 
             var detailHtml = _templates.detail({
                 Url: data.Url,
-                UrlCopyLink: _insertCopyLink(data.Url),
                 UrlHtml: urlHtml,
                 Username: data.Username,
-                UsernameCopyLink: _insertCopyLink(data.Username),
                 Password: data.Password,
-                PasswordCopyLink: _insertCopyLink(data.Password),
                 UserDefined1: data.UserDefined1,
                 UserDefined1Label: data.UserDefined1Label,
-                UserDefined1CopyLink: _insertCopyLink(data.UserDefined1),
                 UserDefined2: data.UserDefined2,
                 UserDefined2Label: data.UserDefined2Label,
-                UserDefined2CopyLink: _insertCopyLink(data.UserDefined2),
                 Notes: data.Notes
             });
 
@@ -652,7 +641,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         // Determine whether we're testing or not
         if (testMode) {
             var testMethods = {
-                insertCopyLink: _insertCopyLink,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 removeFromList: _removeFromList,
@@ -701,7 +689,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _ui.searchInput = $('#search');
         _ui.spinner = $('#spinner');
 
-        _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
         _templates.urlLink = Handlebars.compile($('#tmpl-urllink').html());
         _templates.urlText = Handlebars.compile($('#tmpl-urltext').html());
         _templates.detail = Handlebars.compile($('#tmpl-detail').html());
@@ -889,7 +876,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 e.preventDefault();
                 $('a.copy-link').find('span').removeClass('copied');
                 var a = $(this);
-                a.next('input[name="copy-content"]').select();
+                a.next('input.copy-content').select();
                 var copySuccess;
                 try {
                     copySuccess = document.execCommand("copy");

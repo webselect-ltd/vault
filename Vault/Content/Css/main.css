@@ -188,7 +188,7 @@
 .copy-content {
     position: absolute;
     top: 0;
-    left: -300px;
+    left: -10000px;
 }
 
 .generate-password {

@@ -34,11 +34,6 @@
     </div>
 </script>
 
-<script id="tmpl-copylink" type="text/x-handlebars-template">
-    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
-    <input type="text" class="copy-content" name="copy-content" value="{{text}}" />
-</script>
-
 <script id="tmpl-urllink" type="text/x-handlebars-template">
     <a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;">{{{UrlText}}}</a>
 </script>
@@ -59,35 +54,50 @@
             {{#if Url}}
             <tr>
                 <th>Url</th>
-                <td>{{{UrlCopyLink}}}</td>
+                <td>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <input type="text" class="copy-content" value="{{Url}}" />
+                </td>
                 <td>{{{UrlHtml}}}</td>
             </tr>
             {{/if}}
             {{#if Username}}
             <tr>
                 <th>Username</th>
-                <td>{{{UsernameCopyLink}}}</td>
+                <td>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <input type="text" class="copy-content" value="{{Username}}" />
+                </td>
                 <td>{{Username}}</td>
             </tr>
             {{/if}}
             {{#if Password}}
             <tr>
                 <th>Password</th>
-                <td>{{{PasswordCopyLink}}}</td>
+                <td>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <input type="text" class="copy-content" value="{{Password}}" />
+                </td>
                 <td>{{Password}}</td>
             </tr>
             {{/if}}
             {{#if UserDefined1}}
             <tr>
                 <th>{{UserDefined1Label}}</th>
-                <td>{{{UserDefined1CopyLink}}}</td>
+                <td>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <input type="text" class="copy-content" value="{{UserDefined1}}" />
+                </td>
                 <td>{{UserDefined1}}</td>
             </tr>
             {{/if}}
             {{#if UserDefined2}}
             <tr>
                 <th>{{UserDefined2Label}}</th>
-                <td>{{{UserDefined2CopyLink}}}</td>
+                <td>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <input type="text" class="copy-content" value="{{UserDefined2}}" />
+                </td>
                 <td>{{UserDefined2}}</td>
             </tr>
             {{/if}}

@@ -1,6 +1,5 @@
 ﻿/*
 var testMethods = {
-    insertCopyLink: _insertCopyLink,
     encryptObject: _encryptObject,
     decryptObject: _decryptObject,
     removeFromList: _removeFromList,
@@ -53,11 +52,6 @@ QUnit.done(function () {
 
 QUnit.test('Got Vault', function (assert) {
     assert.ok(typeof Vault !== 'undefined');
-});
-
-QUnit.test('Test _insertCopyLink', function (assert) {
-    var copyLink = $(Vault.insertCopyLink('http://www.test.com'));
-    assert.ok(copyLink.find('param[name="FlashVars"]').attr('value') === 'text=http%3A%2F%2Fwww.test.com');
 });
 
 QUnit.test('Test _encryptObject', function (assert) {
