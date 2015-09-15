@@ -55,7 +55,7 @@
             <tr>
                 <th>Url</th>
                 <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
                     <input type="text" class="copy-content" value="{{Url}}" />
                 </td>
                 <td>{{{UrlHtml}}}</td>
@@ -65,7 +65,7 @@
             <tr>
                 <th>Username</th>
                 <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
                     <input type="text" class="copy-content" value="{{Username}}" />
                 </td>
                 <td>{{Username}}</td>
@@ -75,7 +75,7 @@
             <tr>
                 <th>Password</th>
                 <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
                     <input type="text" class="copy-content" value="{{Password}}" />
                 </td>
                 <td>{{Password}}</td>
@@ -85,7 +85,7 @@
             <tr>
                 <th>{{UserDefined1Label}}</th>
                 <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
                     <input type="text" class="copy-content" value="{{UserDefined1}}" />
                 </td>
                 <td>{{UserDefined1}}</td>
@@ -95,7 +95,7 @@
             <tr>
                 <th>{{UserDefined2Label}}</th>
                 <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-clipboard"></span></a>
+                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
                     <input type="text" class="copy-content" value="{{UserDefined2}}" />
                 </td>
                 <td>{{UserDefined2}}</td>
@@ -201,24 +201,24 @@
         </td>
         <td class="center">
             {{#if url}}
-            <a class="btn btn-default btn-block btn-credential-open" href="{{url}}" target="_blank">
-                <span class="fa fa-external-link"></span> Open
+            <a class="btn btn-default btn-action btn-block btn-credential-open" href="{{url}}" target="_blank">
+                <span class="fa fa-fw fa-external-link-square"></span> Open
             </a>
             {{else}}
-            <button class="btn btn-default btn-block btn-credential-open" disabled="disabled">
-                <span class="fa fa-external-link"></span> Open
+            <button class="btn btn-default btn-action btn-block btn-credential-open" disabled="disabled">
+                <span class="fa fa-fw fa-external-link"></span> Open
             </button>
             {{/if}}
         </td>
         <td class="center">
-            <button class="btn btn-default btn-block btn-credential-copy btn-credential-copy-username">
-                <span class="fa fa-clipboard"></span> User
+            <button class="btn btn-default btn-action btn-block btn-credential-copy btn-credential-copy-username">
+                <span class="fa fa-fw fa-clone"></span> User
             </button>
             <input type="text" class="copy-content" name="copy-content" value="{{username}}" />
         </td>
         <td class="center">
-            <button class="btn btn-default btn-block btn-credential-copy btn-credential-copy-password">
-                <span class="fa fa-clipboard"></span> Pwd
+            <button class="btn btn-default btn-action btn-block btn-credential-copy btn-credential-copy-password">
+                <span class="fa fa-fw fa-clone"></span> Pwd
             </button>
             <input type="text" class="copy-content" name="copy-content" value="{{password}}" />
         </td>

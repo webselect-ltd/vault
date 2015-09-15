@@ -181,10 +181,6 @@
     text-decoration: none;
 }
 
-.copy-link span {
-    color: #E0E0E0;
-}
-
 .copied, .copy-link span.copied {
     color: #5cbb37;
 }
@@ -218,4 +214,14 @@
 
 .btn-credential-copy, .btn-credential-open {
     padding: 6px 6px;
+}
+
+.btn-action {
+    background-color: #F5F6FF;
+    border-color: #E4E7FF;
+}
+
+.btn-action:hover, .btn-action:active {
+    background-color: #E3E5F7;
+    border-color: #D8DAE8;
 }

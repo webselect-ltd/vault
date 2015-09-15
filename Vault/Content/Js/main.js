@@ -862,7 +862,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
             // Copy content to clipboard when copy icon is clicked
             $('body').on('click', 'a.copy-link', function (e) {
                 e.preventDefault();
-                $('a.copy-link').find('span').removeClass('copied');
+                $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
                 var a = $(this);
                 a.next('input.copy-content').select();
                 var copySuccess;
@@ -872,7 +872,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     copySuccess = false;
                 }
                 if (copySuccess) {
-                    a.find('span').addClass('copied');
+                    a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
                 } else {
                     window.alert('Copy operation is not supported by the current browser.');
                 }
@@ -886,7 +886,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
 
             $('body').on('click', 'button.btn-credential-copy', function (e) {
                 e.preventDefault();
-                $('button.btn-credential-copy').find('span').removeClass('copied');
+                $('button.btn-credential-copy').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');;
                 var button = $(this);
                 button.next('input.copy-content').select();
                 var copySuccess;
@@ -896,7 +896,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     copySuccess = false;
                 }
                 if (copySuccess) {
-                    button.find('span').addClass('copied');
+                    button.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
                 } else {
                     window.alert('Copy operation is not supported by the current browser.');
                 }
