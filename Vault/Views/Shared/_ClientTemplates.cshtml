@@ -20,16 +20,16 @@
 <script id="tmpl-modalfooter" type="text/x-handlebars-template">
     <div class="modal-footer">
         {{#if showEdit}}
-        <button type="button" class="btn btn-default btn-edit" data-credentialid="{{credentialId}}">{{editText}}</button>
+        <button type="button" class="btn btn-default btn-edit" data-credentialid="{{credentialId}}">{{editText}} <span class="fa fa-pencil"></span></button>
         {{/if}}
         {{#if showDelete}}
-        <button type="button" class="btn btn-default btn-delete" data-credentialid="{{credentialId}}">{{deleteText}}</button>
+        <button type="button" class="btn btn-default btn-delete" data-credentialid="{{credentialId}}">{{deleteText}} <span class="fa fa-trash-o"></span></button>
         {{/if}}
         {{#if showClose}}
-        <button type="button" class="btn btn-default btn-close">{{closeText}}</button>
+        <button type="button" class="btn btn-default btn-close">{{closeText}} <span class="fa fa-times"></span></button>
         {{/if}}
         {{#if showAccept}}
-        <button type="submit" class="btn btn-primary btn-action">{{acceptText}}</button>
+        <button type="submit" class="btn btn-primary btn-accept">{{acceptText}} <span class="fa fa-check"></span></button>
         {{/if}}
     </div>
 </script>
@@ -206,7 +206,7 @@
             </a>
             {{else}}
             <button class="btn btn-default btn-action btn-block btn-credential-open" disabled="disabled">
-                <span class="fa fa-fw fa-external-link"></span> Open
+                <span class="fa fa-fw fa-external-link-square"></span> Open
             </button>
             {{/if}}
         </td>

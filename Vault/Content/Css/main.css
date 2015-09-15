@@ -64,7 +64,7 @@
 }
 
 .detail-copylink {
-    width: 72px;
+    width: 82px;
 }
 
 #spinner {
@@ -213,7 +213,7 @@
 }
 
 .btn-credential-copy, .btn-credential-open {
-    padding: 6px 6px;
+    padding: 6px 6px 6px 4px;
 }
 
 .btn-action {
