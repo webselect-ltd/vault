@@ -563,8 +563,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     }
                 }
             }
-            if (queryField === 'FILTER' && query === 'all') {
-                results = list;
+            if (queryField === 'FILTER') {
+                if (query === 'all') {
+                    results = list;
+                }
             } else {
                 for (var i = 0; i < list.length; i++) {
                     if (list[i][queryField].toLowerCase().indexOf(query) > -1) {
