@@ -194,26 +194,33 @@
                 <span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span>
                 <br />
                 <span class="label label-std">{{username}}</span>
-                @*<span class="label label-std">{{password}}</span>*@
                 {{#if weak}}
                 <span class="label label-warning">Weak Password</span>
                 {{/if}}
             </button>
         </td>
         <td class="center">
-            <button class="btn btn-primary btn-block btn-credential-open">
+            {{#if url}}
+            <a class="btn btn-default btn-block btn-credential-open" href="{{url}}" target="_blank">
+                <span class="fa fa-external-link"></span> Open
+            </a>
+            {{else}}
+            <button class="btn btn-default btn-block btn-credential-open" disabled="disabled">
                 <span class="fa fa-external-link"></span> Open
             </button>
+            {{/if}}
         </td>
         <td class="center">
-            <button class="btn btn-primary btn-block btn-credential-copy-username">
-                <span class="fa fa-clipboard"></span> Username
+            <button class="btn btn-default btn-block btn-credential-copy btn-credential-copy-username">
+                <span class="fa fa-clipboard"></span> User
             </button>
+            <input type="text" class="copy-content" name="copy-content" value="{{username}}" />
         </td>
         <td class="center">
-            <button class="btn btn-primary btn-block btn-credential-copy-password">
-                <span class="fa fa-clipboard"></span> Password
+            <button class="btn btn-default btn-block btn-credential-copy btn-credential-copy-password">
+                <span class="fa fa-clipboard"></span> Pwd
             </button>
+            <input type="text" class="copy-content" name="copy-content" value="{{password}}" />
         </td>
     </tr>
 </script>

@@ -724,18 +724,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 _showDetail(id, _masterKey);
             });
 
-            //_ui.container.on('click', '.btn-credential-edit', function (e) {
-            //    e.preventDefault();
-            //    var id = $(this).parent().parent().attr('id');
-            //    _loadCredential(id, _masterKey, _userId);
-            //});
-
-            //_ui.container.on('click', '.btn-credential-delete', function (e) {
-            //    e.preventDefault();
-            //    var id = $(this).parent().parent().attr('id');
-            //    _confirmDelete(id, _masterKey, _userId);
-            //});
-
             _ui.newButton.on('click', function (e) {
                 e.preventDefault();
                 _loadCredential(null, _masterKey, _userId);
@@ -885,6 +873,30 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 }
                 if (copySuccess) {
                     a.find('span').addClass('copied');
+                } else {
+                    window.alert('Copy operation is not supported by the current browser.');
+                }
+            });
+
+            $('body').on('click', 'button.btn-credential-open', function (e) {
+                e.preventDefault();
+                var url = $(this).data('url');
+                window.open(url);
+            });
+
+            $('body').on('click', 'button.btn-credential-copy', function (e) {
+                e.preventDefault();
+                $('button.btn-credential-copy').find('span').removeClass('copied');
+                var button = $(this);
+                button.next('input.copy-content').select();
+                var copySuccess;
+                try {
+                    copySuccess = document.execCommand("copy");
+                } catch (e) {
+                    copySuccess = false;
+                }
+                if (copySuccess) {
+                    button.find('span').addClass('copied');
                 } else {
                     window.alert('Copy operation is not supported by the current browser.');
                 }

@@ -28,6 +28,10 @@
     height: 60px;
 }
 
+#records a.btn {
+    line-height: 46px;
+}
+
 #validation-message {
     color: #a94442;
     font-weight: bold;
@@ -181,7 +185,7 @@
     color: #E0E0E0;
 }
 
-.copy-link span.copied {
+.copied, .copy-link span.copied {
     color: #5cbb37;
 }
 
@@ -210,4 +214,8 @@
 
 .generate-password-options {
     display: none;
+}
+
+.btn-credential-copy, .btn-credential-open {
+    padding: 6px 6px;
 }
