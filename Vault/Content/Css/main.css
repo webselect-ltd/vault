@@ -213,7 +213,7 @@
 }
 
 .btn-credential-copy, .btn-credential-open {
-    padding: 6px 6px 6px 4px;
+    padding: 6px 4px 6px 0;
 }
 
 .btn-action {
