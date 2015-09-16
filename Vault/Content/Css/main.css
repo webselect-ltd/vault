@@ -215,13 +215,3 @@
 .btn-credential-copy, .btn-credential-open {
     padding: 6px 4px 6px 0;
 }
-
-.btn-action {
-    background-color: #F5F6FF;
-    border-color: #E4E7FF;
-}
-
-.btn-action:hover, .btn-action:active {
-    background-color: #E3E5F7;
-    border-color: #D8DAE8;
-}

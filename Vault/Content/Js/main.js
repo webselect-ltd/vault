@@ -886,7 +886,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
 
             $('body').on('click', 'button.btn-credential-copy', function (e) {
                 e.preventDefault();
-                $('button.btn-credential-copy').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');;
+                var allButtons = $('button.btn-credential-copy');
+                allButtons.removeClass('btn-success').addClass('btn-primary');
+                allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
                 var button = $(this);
                 button.next('input.copy-content').select();
                 var copySuccess;
@@ -896,7 +898,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     copySuccess = false;
                 }
                 if (copySuccess) {
-                    button.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
+                    button.addClass('btn-success').removeClass('btn-primary');
+                    button.find('span').removeClass('fa-clone').addClass('fa-check-square');
                 } else {
                     window.alert('Copy operation is not supported by the current browser.');
                 }
