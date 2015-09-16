@@ -20,16 +20,16 @@
 <script id="tmpl-modalfooter" type="text/x-handlebars-template">
     <div class="modal-footer">
         {{#if showEdit}}
-        <button type="button" class="btn btn-default btn-edit" data-credentialid="{{credentialId}}">{{editText}} <span class="fa fa-pencil"></span></button>
+        <button type="button" class="btn btn-default btn-edit" data-credentialid="{{credentialId}}"><span class="fa fa-pencil"></span> {{editText}}</button>
         {{/if}}
         {{#if showDelete}}
-        <button type="button" class="btn btn-default btn-delete" data-credentialid="{{credentialId}}">{{deleteText}} <span class="fa fa-trash-o"></span></button>
+        <button type="button" class="btn btn-default btn-delete" data-credentialid="{{credentialId}}"><span class="fa fa-trash-o"></span> {{deleteText}}</button>
         {{/if}}
         {{#if showClose}}
-        <button type="button" class="btn btn-default btn-close">{{closeText}} <span class="fa fa-times"></span></button>
+        <button type="button" class="btn btn-default btn-close"><span class="fa fa-times"></span> {{closeText}}</button>
         {{/if}}
         {{#if showAccept}}
-        <button type="submit" class="btn btn-primary btn-accept">{{acceptText}} <span class="fa fa-check"></span></button>
+        <button type="submit" class="btn btn-primary btn-accept"><span class="fa fa-check"></span> {{acceptText}}</button>
         {{/if}}
     </div>
 </script>
@@ -202,11 +202,11 @@
         <td class="center">
             {{#if url}}
             <a class="btn btn-default btn-action btn-block btn-credential-open" href="{{url}}" target="_blank">
-                <span class="fa fa-fw fa-external-link-square"></span> Open
+                <span class="fa fa-fw fa-external-link-square"></span> Web
             </a>
             {{else}}
             <button class="btn btn-default btn-action btn-block btn-credential-open" disabled="disabled">
-                <span class="fa fa-fw fa-external-link-square"></span> Open
+                <span class="fa fa-fw fa-external-link-square"></span> Web
             </button>
             {{/if}}
         </td>
