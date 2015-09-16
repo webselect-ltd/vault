@@ -179,8 +179,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 showAccept: false,
                 showEdit: true,
                 showDelete: true,
-                edit: function (e) { _loadCredential($(this).data('credentialid'), masterKey, _userId); },
-                delete: function (e) { _confirmDelete($(this).data('credentialid'), masterKey, _userId); }
+                onedit: function (e) { _loadCredential($(this).data('credentialid'), masterKey, _userId); },
+                ondelete: function (e) { _confirmDelete($(this).data('credentialid'), masterKey, _userId); }
             });
         });
     };
@@ -253,10 +253,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _ui.modal.off('click', 'button.btn-close');
         _ui.modal.off('click', 'button.btn-edit');
         _ui.modal.off('click', 'button.btn-delete');
-        _ui.modal.on('click', 'button.btn-accept', options.accept || _defaultAcceptAction);
-        _ui.modal.on('click', 'button.btn-close', options.close || _defaultCloseAction);
-        _ui.modal.on('click', 'button.btn-edit', options.edit || function (e) { window.alert('NOT BOUND'); });
-        _ui.modal.on('click', 'button.btn-delete', options.delete || function (e) { window.alert('NOT BOUND'); });
+        _ui.modal.on('click', 'button.btn-accept', options.onaccept || _defaultAcceptAction);
+        _ui.modal.on('click', 'button.btn-close', options.onclose || _defaultCloseAction);
+        _ui.modal.on('click', 'button.btn-edit', options.onedit || function (e) { window.alert('NOT BOUND'); });
+        _ui.modal.on('click', 'button.btn-delete', options.ondelete || function (e) { window.alert('NOT BOUND'); });
         _ui.modal.modal();
     };
 
@@ -287,7 +287,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                     title: 'Edit Credential',
                     content: _templates.credentialForm(data),
                     acceptText: 'Save',
-                    accept: function (e) {
+                    onaccept: function (e) {
                         $('#credential-form').submit();
                     }
                 });
@@ -299,7 +299,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
                 title: 'Add Credential',
                 content: _templates.credentialForm({ UserID: _userId }),
                 acceptText: 'Save',
-                accept: function (e) {
+                onaccept: function (e) {
                     $('#credential-form').submit();
                 }
             });
