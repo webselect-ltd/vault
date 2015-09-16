@@ -332,7 +332,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         _showModal({
             title: 'Delete Credential',
             content: _templates.deleteConfirmationDialog(),
-            accept: function (e) {
+            showAccept: false,
+            showDelete: true,
+            deleteText: 'Yes, Delete This Credential',
+            ondelete: function (e) {
                 e.preventDefault();
                 _deleteCredential(id, userId, masterKey);
             }
