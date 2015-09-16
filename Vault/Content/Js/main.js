@@ -249,11 +249,11 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document, undef
         }
 
         _ui.modalContent.html(html);
-        _ui.modal.off('click', 'button.btn-action');
+        _ui.modal.off('click', 'button.btn-accept');
         _ui.modal.off('click', 'button.btn-close');
         _ui.modal.off('click', 'button.btn-edit');
         _ui.modal.off('click', 'button.btn-delete');
-        _ui.modal.on('click', 'button.btn-action', options.accept || _defaultAcceptAction);
+        _ui.modal.on('click', 'button.btn-accept', options.accept || _defaultAcceptAction);
         _ui.modal.on('click', 'button.btn-close', options.close || _defaultCloseAction);
         _ui.modal.on('click', 'button.btn-edit', options.edit || function (e) { window.alert('NOT BOUND'); });
         _ui.modal.on('click', 'button.btn-delete', options.delete || function (e) { window.alert('NOT BOUND'); });
