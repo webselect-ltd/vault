@@ -179,6 +179,12 @@
 
 <script id="tmpl-credentialtable" type="text/x-handlebars-template">
     <table id="records" class="table table-condensed">
+        <colgroup>
+            <col class="td-credential-info" />
+            <col class="td-credential-button" />
+            <col class="td-credential-button" />
+            <col class="td-credential-button" />
+        </colgroup>
         <tbody>
             {{#each rows}}
             {{> credentialtablerow}}
