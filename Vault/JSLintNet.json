@@ -3,8 +3,16 @@
   "output": "Warning",
   "ignore": [],
   "options": {
-    "this": true
+    "this": true,
+    "white": true
   },
-  "globalVariables": [],
+  "globalVariables": [
+    "jQuery",
+    "Passpack",
+    "Handlebars",
+    "Cookies",
+    "window",
+    "document"
+  ],
   "runOnSave": true
 }

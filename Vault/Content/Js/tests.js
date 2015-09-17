@@ -25,7 +25,6 @@ var testMethods = {
     validateRecord: _validateRecord,
     utf8_to_b64: _utf8_to_b64,
     b64_to_utf8: _b64_to_utf8,
-    contains: _contains,
     truncate: _truncate,
     search: _search,
     debounce: _debounce,
@@ -134,21 +133,23 @@ QUnit.test('Test _removeFromList', function (assert) {
 
 QUnit.test('Test _updateProperties', function (assert) {
     var list = [
-        { CredentialID: 1, Description: 'ITEM1', UserID: '1', Username: 'item1', Password: 'is9j' },
-        { CredentialID: 2, Description: 'ITEM2', UserID: '1', Username: 'item2', Password: '4ngi' },
-        { CredentialID: 3, Description: 'ITEM3', UserID: '1', Username: 'item3', Password: 's05n' }
+        { CredentialID: 1, Description: 'ITEM1', UserID: '1', Username: 'item1', Password: 'is9j', Url: 'http://test1.com' },
+        { CredentialID: 2, Description: 'ITEM2', UserID: '1', Username: 'item2', Password: '4ngi', Url: 'http://test2.com' },
+        { CredentialID: 3, Description: 'ITEM3', UserID: '1', Username: 'item3', Password: 's05n', Url: 'http://test3.com' }
     ];
     var userId = 1;
-    Vault.updateProperties(2, { Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd' }, userId, list);
-    Vault.updateProperties(0, { Description: 'ITEM4', Username: 'item4', Password: 'c9yn' }, userId, list);
+    Vault.updateProperties(2, { Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd', Url: 'http://test4.com' }, userId, list);
+    Vault.updateProperties(0, { Description: 'ITEM4', Username: 'item4', Password: 'c9yn', Url: 'http://test5.com' }, userId, list);
     assert.ok(list[1].Description === 'ITEM2UPDATE');
     assert.ok(list[1].Username === 'item2new');
     assert.ok(list[1].Password === 'abcd');
+    assert.ok(list[1].Url === 'http://test4.com');
     assert.ok(list.length === 4);
     assert.ok(list[3].CredentialID === 0);
     assert.ok(list[3].Description == 'ITEM4');
     assert.ok(list[3].Username === 'item4');
     assert.ok(list[3].Password === 'c9yn');
+    assert.ok(list[3].Url === 'http://test5.com');
     assert.ok(list[3].UserID === 1);
 });
 
@@ -249,12 +250,6 @@ QUnit.test('Test _utf8_to_b64', function (assert) {
 QUnit.test('Test _b64_to_utf8', function (assert) {
     var utf8 = Vault.b64_to_utf8('VEVTVA==');
     assert.ok(utf8 === 'TEST');
-});
-
-QUnit.test('Test _contains', function (assert) {
-    var list = [1, 2, 3];
-    assert.ok(Vault.contains(list, 2) === true);
-    assert.ok(Vault.contains(list, 4) === false);
 });
 
 QUnit.test('Test _truncate', function (assert) {
