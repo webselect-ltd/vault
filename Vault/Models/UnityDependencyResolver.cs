@@ -7,7 +7,7 @@ namespace Vault.Models
 {
     public class UnityDependencyResolver : IDependencyResolver
     {
-        private IUnityContainer container;
+        private readonly IUnityContainer container;
 
         public UnityDependencyResolver(IUnityContainer container)
         {

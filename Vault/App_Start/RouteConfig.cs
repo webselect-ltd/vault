@@ -7,16 +7,16 @@ using System.Web.Routing;
 
 namespace Vault
 {
-    public class RouteConfig
+    public static class RouteConfig
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                name: "Main",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Main", action = "Index", id = UrlParameter.Optional }
+                "Main",
+                "{controller}/{action}/{id}",
+                new { controller = "Main", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

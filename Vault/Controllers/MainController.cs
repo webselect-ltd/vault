@@ -107,7 +107,7 @@ namespace Vault.Controllers
         {
             var updated = UpdateCredential(model);
 
-            return Json(new { CredentialID = updated.CredentialID });
+            return Json(new { updated.CredentialID });
         }
 
         private CredentialViewModel UpdateCredential(CredentialViewModel model)

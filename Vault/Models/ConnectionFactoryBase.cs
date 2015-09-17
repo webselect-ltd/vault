@@ -6,7 +6,7 @@ namespace Vault.Models
     {
         protected string _connectionString;
 
-        public ConnectionFactoryBase(string connectionString)
+        protected ConnectionFactoryBase(string connectionString)
         {
             _connectionString = connectionString;
         }
