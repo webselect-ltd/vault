@@ -11,4 +11,12 @@ Although all data is encrypted before transmission over HTTP, as an extra precau
 * Vault uses [jQuery](http://jquery.com/), [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout/UI widgets. 
 * Encryption is handled by the [Passpack Host-Proof Hosting package](http://code.google.com/p/passpack/).
 
+## Filters
 
+You can filter credential search results by using query prefixes. Currently available prefixes are:
+
+* `username:XXXX`: shows all credentials where username matches `XXXX`
+* `password:XXXX`: shows all credentials where password matches `XXXX`
+* `description:XXXX`: shows all credentials where description matches `XXXX`
+* `url:XXXX`: shows all credentials where URL matches `XXXX`
+* `filter:all`: shows *all* credentials
