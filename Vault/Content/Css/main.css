@@ -190,12 +190,12 @@
 .btn-credential-show-detail {
     padding-top: 8px;
     display: table-cell;
-    height: 58px;
+    height: 62px;
 }
 
 .btn-credential-copy, .btn-credential-open {
-    padding: 6px 10px 6px 8px;
-    line-height: 45px;
+    padding: 8px 10px 6px 8px;
+    line-height: 46px;
     margin-top: 5px;
     margin-bottom: 10px;
 }
