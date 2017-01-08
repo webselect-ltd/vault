@@ -210,10 +210,10 @@ QUnit.test('Test _createCredentialTable', function (assert) {
         { credentialid: 3, masterkey: masterKey, userid: 1, description: 'ITEM3' }
     ];
     var table = $(Vault.createCredentialTable(data));
-    var rows = table.find('tr');
+    var rows = table.filter('.row');
     assert.ok(rows.length === 3);
     assert.ok($(rows[0]).attr('id') === '1');
-    assert.ok($(rows[1]).find('td:first span.full').html() === 'ITEM2');
+    assert.ok($(rows[1]).find('.full').text() === 'ITEM2');
 });
 
 QUnit.test('Test _createCredentialDisplayData', function (assert) {
