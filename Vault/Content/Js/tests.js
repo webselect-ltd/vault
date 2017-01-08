@@ -146,7 +146,7 @@ QUnit.test('Test _updateProperties', function (assert) {
     assert.ok(list[1].Url === 'http://test4.com');
     assert.ok(list.length === 4);
     assert.ok(list[3].CredentialID === 0);
-    assert.ok(list[3].Description == 'ITEM4');
+    assert.ok(list[3].Description === 'ITEM4');
     assert.ok(list[3].Username === 'item4');
     assert.ok(list[3].Password === 'c9yn');
     assert.ok(list[3].Url === 'http://test5.com');
@@ -207,7 +207,7 @@ QUnit.test('Test _createCredentialTable', function (assert) {
     var data = [
         { credentialid: 1, masterkey: masterKey, userid: 1, description: 'ITEM1' },
         { credentialid: 2, masterkey: masterKey, userid: 1, description: 'ITEM2' },
-        { credentialid: 3, masterkey: masterKey, userid: 1, description: 'ITEM3' },
+        { credentialid: 3, masterkey: masterKey, userid: 1, description: 'ITEM3' }
     ];
     var table = $(Vault.createCredentialTable(data));
     var rows = table.find('tr');
@@ -237,8 +237,8 @@ QUnit.test('Test _validateRecord', function (assert) {
     var passwordNoMatch = Vault.validateRecord(form);
     form.find('#PasswordConfirmation').val('A');
     var valid = Vault.validateRecord(form);
-    assert.ok(noDescription.length === 2 && noDescription[0].field.attr('id') == 'Description' && noDescription[1].field.attr('id') == 'PasswordConfirmation');
-    assert.ok(passwordNoMatch.length === 1 && passwordNoMatch[0].field.attr('id') == 'PasswordConfirmation');
+    assert.ok(noDescription.length === 2 && noDescription[0].field.attr('id') === 'Description' && noDescription[1].field.attr('id') === 'PasswordConfirmation');
+    assert.ok(passwordNoMatch.length === 1 && passwordNoMatch[0].field.attr('id') === 'PasswordConfirmation');
     assert.ok(valid.length === 0);
 });
 
