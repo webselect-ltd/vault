@@ -562,8 +562,33 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     });
                 }
             } else {
-                list.forEach(function (item) {
-                    if (item[queryField].toLowerCase().indexOf(query) > -1) {
+                 list.forEach(function (item) {
+                    var desc = item[queryField].toLowerCase();
+                    var weight = 0;
+                    var words = desc.replace(/\s{2,}/g, ' ').split(' ');
+                    var terms = query.replace(/\s{2,}/g, ' ').split(' ');
+
+                    for(var i = 0; i < terms.length; i++) {
+                        if(desc.indexOf(terms[i]) != -1) {
+                            weight += 1000;
+                        }
+                    }
+
+                    if(weight < 1000) {
+                        var len = words.length;
+
+                        for(var i = 0; i < len; i++) {
+                            var dl = _damerauLevenshteinDistance(query, words[i]);
+                        
+                            if(dl < 5) {
+                                console.log(words[i], dl);
+                                weight += (400 - Math.abs((dl * 100) * -1));
+                            }
+                        };
+                    }
+                    console.log(desc, weight);
+
+                    if (weight >= 200) {
                         results.push(item);
                     }
                 });
@@ -637,6 +662,35 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             status.html('Extremely Strong (' + strength + ')');
             bar.css('width', '100%');
         }
+    }
+
+    function _damerauLevenshteinDistance(s, t) {
+        var d = [];
+        var n = s.length;
+        var m = t.length;
+        if (n == 0) return m;
+        if (m == 0) return n;
+        for (var i = n; i >= 0; i--) d[i] = [];
+        for (var i = n; i >= 0; i--) d[i][0] = i;
+        for (var j = m; j >= 0; j--) d[0][j] = j;
+        for (var i = 1; i <= n; i++) {
+            var s_i = s.charAt(i - 1);
+            for (var j = 1; j <= m; j++) {
+                if (i == j && d[i][j] > 4) return n;
+                var t_j = t.charAt(j - 1);
+                var cost = (s_i == t_j) ? 0 : 1;
+                var mi = d[i - 1][j] + 1;
+                var b = d[i][j - 1] + 1;
+                var c = d[i - 1][j - 1] + cost;
+                if (b < mi) mi = b;
+                if (c < mi) mi = c;
+                d[i][j] = mi;
+                if (i > 1 && j > 1 && s_i == t.charAt(j - 2) && s.charAt(i - 2) == t_j) {
+                    d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + cost);
+                }
+            }
+        }
+        return d[n][m];
     }
 
     // Initialise the app

@@ -282,6 +282,10 @@ QUnit.test('Test _search', function (assert) {
     assert.ok(results.length === 2);
     assert.ok(results[0].Description === 'Cat');
     assert.ok(results[1].Description === 'Catfish');
+    results = Vault.search('dgo', list);
+    assert.ok(results.length === 2);
+    assert.ok(results[0].Description === 'Dog');
+    assert.ok(results[1].Description === 'Dogfish');
 });
 
 QUnit.asyncTest('Test _debounce', function (assert) {
