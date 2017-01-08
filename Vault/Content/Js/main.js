@@ -11,7 +11,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
         _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
         _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
-        _basePath = null,
+        _basePath = null, // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
+        _public = {}, // Public function container
         // A map of the properties which can be searched for using the fieldName:query syntax
         // We need this because the search is not case-sensitive, whereas JS properties are!
         _queryablePropertyMap = {
@@ -524,7 +525,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             username: credential.Username,
             password: credential.Password,
             url: credential.Url,
-            weak: ($.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold)
+            weak: $.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold
         };
     };
 
@@ -631,7 +632,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         credentials.sort(function (a, b) {
             var desca = a.Description.toUpperCase(),
                 descb = b.Description.toUpperCase();
-            return (desca < descb) ? -1 : (desca > descb) ? 1 : 0;
+            return desca < descb ? -1 : desca > descb ? 1 : 0;
         });
     };
 
@@ -736,12 +737,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
         _templates.credentialTable = Handlebars.compile($('#tmpl-credentialtable').html());
         _templates.credentialTableRow = Handlebars.compile($('#tmpl-credentialtablerow').html());
-        Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
         _templates.validationMessage = Handlebars.compile($('#tmpl-validationmessage').html());
         _templates.modalHeader = Handlebars.compile($('#tmpl-modalheader').html());
         _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
         _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
+
+        Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
 
         Handlebars.registerPartial('copylink', _templates.copyLink); 
 
@@ -752,7 +754,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         });
 
         Handlebars.registerHelper('truncate', function (text, size) {
-            text = (text.length > size) ? text.substring(0, (size - 3)) + '...' : text;
+            text = text.length > size ? text.substring(0, size - 3) + '...' : text;
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
