@@ -19,4 +19,5 @@ You can filter credential search results by using query prefixes. Currently avai
 * `password:XXXX`: shows all credentials where password matches `XXXX`
 * `description:XXXX`: shows all credentials where description matches `XXXX`
 * `url:XXXX`: shows all credentials where URL matches `XXXX`
+* `filter:weak`: shows all credentials where the password strength is lower than the weak password threshold
 * `filter:all`: shows *all* credentials

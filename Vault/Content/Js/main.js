@@ -587,6 +587,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             if (queryField === 'FILTER') {
                 if (query === 'all') {
                     results = list;
+                } else if (query === 'weak') {
+                    list.forEach(function (item) {
+                        var pwd = item['Password'];
+                        if (pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold) {
+                            results.push(item);
+                        }
+                    });
                 }
             } else {
                 list.forEach(function (item) {
