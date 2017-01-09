@@ -322,14 +322,14 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     var results = _search(_ui.searchInput.val(), _cachedList);
                     _buildDataTable(results, function (rows) {
                         _ui.container.html(_createCredentialTable(rows));
-                    }, _masterKey, _userId);
+                    }, _masterKey, userId);
                 });
             }
         });
     }
 
     // Show delete confirmation dialog
-    function _confirmDelete(id, masterKey, userId) {
+    function _confirmDelete(id, masterKey) {
         _showModal({
             title: 'Delete Credential',
             content: _templates.deleteConfirmationDialog(),
@@ -337,7 +337,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             deleteText: 'Yes, Delete This Credential',
             ondelete: function (e) {
                 e.preventDefault();
-                _deleteCredential(id, userId, masterKey);
+                _deleteCredential(id, _userId, masterKey);
             }
         });
     }
