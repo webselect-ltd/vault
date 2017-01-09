@@ -190,14 +190,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     function _defaultAcceptAction(e) {
         e.preventDefault();
         _ui.modal.modal('hide');
-        _ui.searchInput.focus();
     }
 
     // Default action for modal close button
     function _defaultCloseAction(e) {
         e.preventDefault();
         _ui.modal.modal('hide');
-        _ui.searchInput.focus();
     }
 
     // Show a Bootstrap modal with options as below
@@ -324,7 +322,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     var results = _search(_ui.searchInput.val(), _cachedList);
                     _buildDataTable(results, function (rows) {
                         _ui.container.html(_createCredentialTable(rows));
-                        _ui.searchInput.focus();
                     }, _masterKey, _userId);
                 });
             }
@@ -837,7 +834,6 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         _ui.modal.modal('hide');
                         _buildDataTable(results, function (rows) {
                             _ui.container.html(_createCredentialTable(rows));
-                            _ui.searchInput.focus();
                         }, _masterKey, _userId);
                     });
                 });
@@ -907,6 +903,24 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     }
                 } catch (ex) {
                     window.alert('Copy operation is not supported by the current browser: ' + ex.message);
+                }
+            });
+
+            // Automatically focus the search field if a key is pressed from the credential list
+            $('body').on('keydown', function(e) {
+                if(e.target.nodeName == 'BODY') {
+                    e.preventDefault();
+                    // Cancel the first mouseup event which will be fired after focus
+                    _ui.searchInput.one('mouseup', function(me){
+                        me.preventDefault();
+                    });
+                    _ui.searchInput.focus();
+                    var char = String.fromCharCode(e.keyCode);
+                    if (/[a-zA-Z0-9]/.test(char)) {
+                        _ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
+                    } else {
+                        _ui.searchInput.select();
+                    }
                 }
             });
 
