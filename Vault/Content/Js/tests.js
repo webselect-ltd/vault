@@ -161,16 +161,6 @@ QUnit.test('Test _defaultAjaxErrorCallback', function (assert) {
     assert.ok(alertResult === 'Http Error: STATUS - ERROR');
 });
 
-QUnit.test('Test _ajaxPost', function (assert) { });
-QUnit.test('Test _loadCredentials', function (assert) { });
-QUnit.test('Test _showDetail', function (assert) { });
-QUnit.test('Test _defaultAcceptAction', function (assert) { });
-QUnit.test('Test _defaultCloseAction', function (assert) { });
-QUnit.test('Test _showModal', function (assert) { });
-QUnit.test('Test _loadCredential', function (assert) { });
-QUnit.test('Test _deleteCredential', function (assert) { });
-QUnit.test('Test _confirmDelete', function (assert) { });
-
 QUnit.test('Test _generatePasswordHash', function (assert) {
     var hash = Vault.generatePasswordHash('TEST');
     assert.ok(hash === '94053587014b06e04fa78bc6fd5af62c');
@@ -183,7 +173,6 @@ QUnit.test('Test _generatePasswordHash64', function (assert) {
 
 QUnit.test('Test _changePassword', function (assert) { });
 QUnit.test('Test _exportData', function (assert) { });
-QUnit.test('Test _options', function (assert) { });
 
 QUnit.test('Test _buildDataTable', function (assert) {
     expect(4);
@@ -317,5 +306,3 @@ QUnit.test('Test _sortCredentials', function (assert) {
     assert.ok(list[2].Description === 'CCC');
     assert.ok(list[3].Description === 'DDD');
 });
-
-QUnit.test('Test _init', function (assert) { });
