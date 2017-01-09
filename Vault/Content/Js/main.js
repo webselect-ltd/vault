@@ -137,11 +137,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             _buildDataTable(_cachedList, callback, masterKey, userId);
         } else {
             _ajaxPost(_basePath + 'Main/GetAll', { userId: userId }, function (data) {
-                var items = [];
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
-                data.forEach(function (item) {
-                    items.push(_decryptObject(item, masterKey, ['CredentialID', 'UserID']));
+                var items = data.map(function (item) {
+                    return _decryptObject(item, masterKey, ['CredentialID', 'UserID']);
                 });
                 // Cache the whole (decrypted) list on the client
                 _cachedList = items;
@@ -378,13 +377,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         var newPasswordHash = Passpack.utils.hashx(newPassword);
         // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
         var newMasterKey = _utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
-        var newData = [];
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
         _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
             var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            data.forEach(function (item) {
-                newData.push(_encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes));
+            var newData = data.map(function (item) {
+                return _encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes);
             });
 
             _ajaxPost(_basePath + 'Main/UpdateMultiple', Passpack.JSON.stringify(newData), function () {
@@ -405,13 +403,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
     // Export all credential data as JSON
     function _exportData(userId, masterKey) {
-        var exportItems = [];
         // Get all the credentials, decrypt each one
         _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
-            data.forEach(function (item) {
+            var exportItems = data.map(function (item) {
                 var o = _decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
-                exportItems.push(o);
+                return o;
             });
 
             var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
@@ -428,17 +425,16 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     // Import unencrypted JSON credential data
     function _importData(userId, masterKey, rawData) {
         var jsonImportData = JSON.parse(rawData);
-        var newData = [];
         var excludes = ['CredentialID', 'UserID'];
 
-        jsonImportData.forEach(function (item) {
+        var newData = jsonImportData.map(function (item) {
             // Remove the confirmation property
             delete item.PasswordConfirmation;
             // Null out the old credential ID so UpdateMultiple knows this is a new record
             item.CredentialID = null;
             // Set the user ID to the ID of the new (logged in) user
             item.UserID = userId;
-            newData.push(_encryptObject(item, _b64_to_utf8(masterKey), excludes));
+            return _encryptObject(item, _b64_to_utf8(masterKey), excludes);
         });
 
         _ajaxPost(_basePath + 'Main/UpdateMultiple', Passpack.JSON.stringify(newData), function () {
@@ -464,11 +460,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
     // Build the data table
     function _buildDataTable(data, callback, masterKey, userId) {
-        var rows = [];
-
         // Create a table row for each record and add it to the rows array
-        data.forEach(function (item) {
-            rows.push(_createCredentialDisplayData(item, masterKey, userId));
+        var rows = data.map(function (item) {
+            return _createCredentialDisplayData(item, masterKey, userId);
         });
 
         // Fire the callback and pass it the array of rows
@@ -554,18 +548,14 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 if (query === 'all') {
                     results = list;
                 } else if (query === 'weak') {
-                    list.forEach(function (item) {
+                    results = list.filter(function (item) {
                         var pwd = item['Password'];
-                        if (pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold) {
-                            results.push(item);
-                        }
+                        return pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold;
                     });
                 }
             } else {
-                list.forEach(function (item) {
-                    if (item[queryField].toLowerCase().indexOf(query) > -1) {
-                        results.push(item);
-                    }
+                results = list.filter(function (item) {
+                    return item[queryField].toLowerCase().indexOf(query) > -1;
                 });
             }
         }
