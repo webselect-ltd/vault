@@ -1,2 +1,21 @@
-CREATE TABLE "tCredential" ("CredentialID" VARCHAR PRIMARY KEY  NOT NULL ,"Description" VARCHAR,"Url" VARCHAR,"Username" VARCHAR,"Password" VARCHAR,"Notes" VARCHAR,"UserDefined1" VARCHAR,"UserDefined1Label" VARCHAR,"UserDefined2" VARCHAR,"UserDefined2Label" VARCHAR,"UserID" VARCHAR);
-CREATE TABLE "tUser" ("UserID" VARCHAR PRIMARY KEY ,"UserName" VARCHAR,"Password" VARCHAR);
+CREATE TABLE IF NOT EXISTS Credentials (
+    "CredentialID" NVARCHAR(36) PRIMARY KEY NOT NULL,
+    "UserID" NVARCHAR(36) NOT NULL,
+    "Description" NVARCHAR NULL,
+    "Url" NVARCHAR NULL,
+    "Username" NVARCHAR NULL,
+    "Password" NVARCHAR NULL,
+    "Notes" NVARCHAR NULL,
+    "UserDefined1" NVARCHAR NULL,
+    "UserDefined1Label" NVARCHAR NULL,
+    "UserDefined2" NVARCHAR NULL,
+    "UserDefined2Label" NVARCHAR NULL,
+    "PwdOptions" NVARCHAR NULL
+);
+
+CREATE TABLE IF NOT EXISTS Users (
+    "UserID" NVARCHAR(36) PRIMARY KEY NOT NULL,
+    "Username" NVARCHAR NOT NULL,
+    "Password" NVARCHAR NOT NULL
+);
+
