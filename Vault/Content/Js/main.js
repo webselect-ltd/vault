@@ -295,6 +295,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 });
                 _ui.modal.find('#Description').focus();
                 _showPasswordStrength(_ui.modal.find('#Password'));
+                _setPasswordOptions(_ui.modal, data.PwdOptions);
             });
         } else { // New record setup
             _showModal({
@@ -629,6 +630,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         }
     }
 
+    function _setPasswordOptions(form, opts) {
+        var optArray = opts.split('|');
+        form.find('[name=len]').val(optArray[0]);
+        form.find('[name=ucase]')[0].checked = optArray[1] === '1' ? true : false;
+        form.find('[name=lcase]')[0].checked = optArray[2] === '1' ? true : false;
+        form.find('[name=nums]')[0].checked = optArray[3] === '1' ? true : false;
+        form.find('[name=symb]')[0].checked = optArray[4] === '1' ? true : false;
+    }
+
     // Initialise the app
     function _init(basePath, testMode, devMode) {
         // Set the base path for AJAX requests/redirects
@@ -850,6 +860,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 var password = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength());
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
+                var opts = [$('#len').val(),
+                            $('#ucase')[0].checked ? 1 : 0,
+                            $('#lcase')[0].checked ? 1 : 0,
+                            $('#nums')[0].checked ? 1 : 0,
+                            $('#symb')[0].checked ? 1 : 0];
+                $('#PwdOptions').val(opts.join('|'));
                 _showPasswordStrength($('#Password'));
             });
 
