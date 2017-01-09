@@ -775,15 +775,11 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         _masterKey = _utf8_to_b64(window.Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, 1, 1), 1, 1));
 
                         _loadCredentials(_userId, _masterKey, function () {
-
                             // Successfully logged in. Hide the login form
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.modal('hide');
-
                             _ui.controls.show();
-
                             _ui.searchInput.focus();
-
                         });
                     }
                 });
