@@ -21,6 +21,7 @@ namespace Vault.Models
         [DisplayName("Custom 2")]
         public string UserDefined2 { get; set; }
         public string Notes { get; set; }
+        public string PwdOptions { get; set; }
 
         public CredentialViewModel() {
             CredentialID = "{{CredentialID}}";
@@ -35,6 +36,7 @@ namespace Vault.Models
             UserDefined2Label = "{{UserDefined2Label}}";
             UserDefined2 = "{{UserDefined2}}";
             Notes = "{{Notes}}";
+            PwdOptions = "{{PwdOptions}}";
         }
     }
 }

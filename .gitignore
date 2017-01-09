@@ -255,3 +255,4 @@ paket-files/
 # Project-specific
 *.sqlite
 Vault/Web.config
+!db/releases

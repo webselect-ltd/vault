@@ -41,7 +41,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                credentials = conn.Query<CredentialListViewModel>("select CredentialID, UserID, Description, Username, Password, Url from tCredential where UserID = @UserID", new { UserID = userId });
+                credentials = conn.Query<CredentialListViewModel>("select CredentialID, UserID, Description, Username, Password, Url from Credentials where UserID = @UserID", new { UserID = userId });
             }
 
             return Json(credentials);
@@ -55,7 +55,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                credentials = conn.Query<CredentialViewModel>("select * from tCredential where UserID = @UserID", new { UserID = userId });
+                credentials = conn.Query<CredentialViewModel>("select * from Credentials where UserID = @UserID", new { UserID = userId });
             }
 
             return Json(credentials);
@@ -69,7 +69,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                credential = conn.Query<CredentialViewModel>("select * from tCredential where CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
+                credential = conn.Query<CredentialViewModel>("select * from Credentials where CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
             }
 
             // Fix for previous behaviour
@@ -87,7 +87,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                conn.Execute("delete from tcredential where UserID = @UserID and CredentialID = @CredentialID", new { UserID = userId, CredentialID = credentialId });
+                conn.Execute("delete from Credentials where UserID = @UserID and CredentialID = @CredentialID", new { UserID = userId, CredentialID = credentialId });
             }
 
             return Json(new { Success = success });
@@ -112,13 +112,13 @@ namespace Vault.Controllers
 
         private CredentialViewModel UpdateCredential(CredentialViewModel model)
         {
-            var sql = "insert into tcredential (CredentialID, Description, Username, Password, Url, UserDefined1Label, UserDefined1, UserDefined2Label, UserDefined2, Notes, UserID) values " +
-                      "(@CredentialID, @Description, @Username, @Password, @Url, @UserDefined1Label, @UserDefined1, @UserDefined2Label, @UserDefined2, @Notes, @UserID); select @CredentialID as id;";
+            var sql = "insert into Credentials (CredentialID, UserID, Description, Username, Password, Url, UserDefined1Label, UserDefined1, UserDefined2Label, UserDefined2, Notes, PwdOptions) values " +
+                      "(@CredentialID, @UserID, @Description, @Username, @Password, @Url, @UserDefined1Label, @UserDefined1, @UserDefined2Label, @UserDefined2, @Notes, @PwdOptions); select @CredentialID as id;";
 
             if (model.CredentialID != null)
             {
-                sql = "update tcredential set Description = @Description, Username = @Username, Password = @Password, Url = @Url, UserDefined1Label = @UserDefined1Label, " +
-                      "UserDefined1 = @UserDefined1, UserDefined2Label = @UserDefined2Label, UserDefined2 = @UserDefined2, Notes = @Notes, UserID = @UserID where credentialid = @CredentialID; select @CredentialID as id;";
+                sql = "update Credentials set UserID = @UserID, Description = @Description, Username = @Username, Password = @Password, Url = @Url, UserDefined1Label = @UserDefined1Label, " +
+                      "UserDefined1 = @UserDefined1, UserDefined2Label = @UserDefined2Label, UserDefined2 = @UserDefined2, Notes = @Notes, PwdOptions = @PwdOptions where credentialid = @CredentialID; select @CredentialID as id;";
             }
 
             if (model.CredentialID == null)
@@ -139,7 +139,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                conn.Execute("update tUser set Password = @NewHash where UserID = @UserID and Password = @OldHash", new { UserID = userId, OldHash = oldHash, NewHash = newHash });
+                conn.Execute("update Users set Password = @NewHash where UserID = @UserID and Password = @OldHash", new { UserID = userId, OldHash = oldHash, NewHash = newHash });
             }
 
             return Json(new { success = true });
@@ -153,7 +153,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                userId = conn.Query<string>("select * from tUser where Username = @Username and Password = @Password", new { Username = model.UN1209, Password = model.PW9804 }).FirstOrDefault();
+                userId = conn.Query<string>("select * from Users where Username = @Username and Password = @Password", new { Username = model.UN1209, Password = model.PW9804 }).FirstOrDefault();
             }
 
             return Json(new { result = ((!string.IsNullOrEmpty(userId)) ? 1 : 0), id = userId });
