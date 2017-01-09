@@ -1,8 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-  For more information on how to configure your ASP.NET application, please visit
-  http://go.microsoft.com/fwlink/?LinkId=301880
--->
 <configuration>
     <connectionStrings>
         <add name="Vault" connectionString="Server=localhost;Database=vault;Trusted_Connection=yes;" />
@@ -23,7 +19,7 @@
     </system.web>
     <system.webServer>
         <validation validateIntegratedModeConfiguration="false" />
-        <modules runAllManagedModulesForAllRequests="true" />
+        <modules runAllManagedModulesForAllRequests="false" />
         <staticContent>
             <remove fileExtension=".woff" />
             <remove fileExtension=".woff2" />
