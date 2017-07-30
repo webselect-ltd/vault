@@ -1,0 +1,5 @@
+Dapper
+Microsoft.AspNet.Mvc
+Microsoft.AspNet.Web.Optimization
+System.Data.SQLite.Core
+Unity
