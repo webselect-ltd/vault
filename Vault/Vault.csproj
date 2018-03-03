@@ -112,10 +112,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config" />
-    <TypeScriptCompile Include="Content\Js\types\bootstrap.d.ts" />
-    <TypeScriptCompile Include="Content\Js\types\handlebars.d.ts" />
-    <TypeScriptCompile Include="Content\Js\types\jquery.d.ts" />
-    <TypeScriptCompile Include="Content\Js\types\js.cookie.d.ts" />
     <TypeScriptCompile Include="Content\Js\types\passpack.d.ts" />
     <TypeScriptCompile Include="Content\Js\types\vault.d.ts" />
   </ItemGroup>
@@ -155,7 +151,8 @@
     <Content Include="Views\Main\SetDevCookie.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="tsconfig.json" />
+    <Content Include="Content\Js\tsconfig.json" />
+    <Content Include="package.json" />
     <None Include="Web.config.example">
       <SubType>Designer</SubType>
     </None>

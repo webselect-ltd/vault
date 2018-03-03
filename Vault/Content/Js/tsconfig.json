@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "target": "es3",
-        "sourceMap": false,
-        "noImplicitAny": false,
-        "noEmitOnError": false
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "noEmitOnError": true
     },
     "compileOnSave": true,
     "exclude": [

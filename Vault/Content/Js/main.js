@@ -1,8 +1,8 @@
-/// <reference path="types/bootstrap.d.ts" />
-/// <reference path="types/jquery.d.ts" />
+/// <reference types="jquery" />
+/// <reference types="bootstrap" />
+/// <reference types="handlebars" />
+/// <reference types="js-cookie" />
 /// <reference path="types/passpack.d.ts" />
-/// <reference path="types/handlebars.d.ts" />
-/// <reference path="types/js.cookie.d.ts" />
 /// <reference path="types/vault.d.ts" />
 /* tslint:disable */
 var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
@@ -880,3 +880,4 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     // Expose public methods
     return _public;
 }(jQuery, Passpack, Handlebars, Cookies, window, document));
+//# sourceMappingURL=main.js.map

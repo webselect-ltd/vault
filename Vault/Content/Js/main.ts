@@ -1,8 +1,8 @@
-﻿/// <reference path="types/bootstrap.d.ts" />
-/// <reference path="types/jquery.d.ts" />
+﻿/// <reference types="jquery" />
+/// <reference types="bootstrap" />
+/// <reference types="handlebars" />
+/// <reference types="js-cookie" />
 /// <reference path="types/passpack.d.ts" />
-/// <reference path="types/handlebars.d.ts" />
-/// <reference path="types/js.cookie.d.ts" />
 /// <reference path="types/vault.d.ts" />
 
 /* tslint:disable */
@@ -103,7 +103,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Build the data table
-    function _buildDataTable(data, callback, masterKey, userId) {
+    function _buildDataTable(data: Credential[], callback: (c: CredentialSummary[]) => void, masterKey: string, userId: string) {
         // Create a table row for each record and add it to the rows array
         var rows = data.map(function (item) {
             return _createCredentialDisplayData(item, masterKey, userId);
@@ -335,7 +335,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return isNaN(len) ? 16 : len;
     }
 
-    function _getPasswordGenerationOptions(inputs: JQuery, predicate: (JQuery) => boolean): any {
+    function _getPasswordGenerationOptions(inputs: JQuery, predicate: (element: JQuery) => boolean): any {
         let options: any = {};
         inputs.each(function (): void {
             let checkbox: JQuery = $(this);
@@ -407,7 +407,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Load all records for a specific user
-    function _loadCredentials(userId: string, masterKey: string, callback: Function): void {
+    function _loadCredentials(userId: string, masterKey: string, callback: (c: CredentialSummary[]) => void): void {
         if (_cachedList !== null && _cachedList.length) {
             _buildDataTable(_cachedList, callback, masterKey, userId);
         } else {

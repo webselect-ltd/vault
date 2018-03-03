@@ -27,6 +27,7 @@ declare class Credential {
     UserDefined2: string;
     Notes: string;
     PwdOptions: string;
+    [propertyName: string]: string;
 }
 
 declare class CredentialSummary {

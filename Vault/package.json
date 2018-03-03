@@ -1,0 +1,11 @@
+{
+    "version": "1.0.0",
+    "name": "vault",
+    "private": true,
+    "devDependencies": {
+        "@types/bootstrap": "3.3.39",
+        "@types/handlebars": "4.0.36",
+        "@types/jquery": "2.0.49",
+        "@types/js-cookie": "2.1.0"
+    }
+}
