@@ -106,7 +106,6 @@
     <Content Include="Content\Js\qunit-2.1.1.css" />
     <Content Include="Content\Js\qunit-2.1.1.js" />
     <Content Include="Content\Js\tests.js" />
-    <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
