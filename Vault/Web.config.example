@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0"?>
 <configuration>
     <connectionStrings>
         <add name="Vault" connectionString="Server=localhost;Database=vault;Trusted_Connection=yes;" />
@@ -14,7 +14,7 @@
         <add key="DevMode" value="false" />
     </appSettings>
     <system.web>
-        <compilation debug="false" targetFramework="4.5" />
+        <compilation debug="false" targetFramework="4.5.1" />
         <httpRuntime targetFramework="4.5" />
     </system.web>
     <system.webServer>
@@ -46,6 +46,14 @@
                 <bindingRedirect oldVersion="0.0.0.0-9.0.0.0" newVersion="9.0.0.0" />
             </dependentAssembly>
             <dependentAssembly>
+                <assemblyIdentity name="System.Web.WebPages.Deployment" publicKeyToken="31bf3856ad364e35" />
+                <bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+            </dependentAssembly>
+            <dependentAssembly>
+                <assemblyIdentity name="System.Data.SQLite" publicKeyToken="db937bc2d44ff139" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-1.0.96.0" newVersion="1.0.96.0" />
+            </dependentAssembly>
+            <dependentAssembly>
                 <assemblyIdentity name="System.Web.Helpers" publicKeyToken="31bf3856ad364e35" />
                 <bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
             </dependentAssembly>
@@ -54,16 +62,8 @@
                 <bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
             </dependentAssembly>
             <dependentAssembly>
-                <assemblyIdentity name="System.Web.WebPages.Deployment" publicKeyToken="31bf3856ad364e35" />
-                <bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
-            </dependentAssembly>
-            <dependentAssembly>
                 <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" />
-                <bindingRedirect oldVersion="1.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Data.SQLite" publicKeyToken="db937bc2d44ff139" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-1.0.96.0" newVersion="1.0.96.0" />
+                <bindingRedirect oldVersion="1.0.0.0-5.2.4.0" newVersion="5.2.4.0" />
             </dependentAssembly>
         </assemblyBinding>
     </runtime>
