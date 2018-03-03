@@ -11,7 +11,7 @@ using Vault.Models;
 
 namespace Vault
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : HttpApplication
     {
         private bool profiling = Convert.ToBoolean(ConfigurationManager.AppSettings["Profiling"]);
 
