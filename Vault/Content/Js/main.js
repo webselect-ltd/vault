@@ -80,9 +80,7 @@ var Vault;
             $.ajax(options);
         }
         else {
-            window.setTimeout(function () {
-                $.ajax(options);
-            }, 2000);
+            window.setTimeout(function () { return $.ajax(options); }, 2000);
         }
     }
     // Decode Base64 string
@@ -92,9 +90,7 @@ var Vault;
     // Build the data table
     function buildDataTable(data, callback, masterKey, userId) {
         // Create a table row for each record and add it to the rows array
-        var rows = data.map(function (item) {
-            return createCredentialDisplayData(item, masterKey, userId);
-        });
+        var rows = data.map(function (item) { return createCredentialDisplayData(item, masterKey, userId); });
         // Fire the callback and pass it the array of rows
         callback(rows);
     }
@@ -121,9 +117,8 @@ var Vault;
         // and re-encrypt it with the new one
         ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
             var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            var newData = data.map(function (item) {
-                return encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes);
-            });
+            var reEncrypt = function (item) { return encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes); };
+            var newData = data.map(reEncrypt);
             ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
                 // Store the new password in hashed form
                 ajaxPost(internal.basePath + 'Main/UpdatePassword', {
@@ -170,8 +165,8 @@ var Vault;
     function createCredentialFromFormFields(form) {
         var obj = {};
         // Serialize the form inputs into an object
-        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function () {
-            obj[this.name] = $(this).val();
+        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function (i, el) {
+            obj[el.name] = $(el).val();
         });
         return obj;
     }
@@ -203,7 +198,7 @@ var Vault;
         return newCredential;
     }
     // Rate-limit calls to the supplied function
-    function debounce(func, wait, immediate) {
+    function rateLimit(func, wait, immediate) {
         var timeout;
         return function () {
             var context = this;
@@ -301,8 +296,8 @@ var Vault;
     }
     function getPasswordGenerationOptions(inputs, predicate) {
         var options = {};
-        inputs.each(function () {
-            var checkbox = $(this);
+        inputs.each(function (i, el) {
+            var checkbox = $(el);
             if (predicate(checkbox)) {
                 options[checkbox.attr('name')] = 1;
             }
@@ -474,8 +469,8 @@ var Vault;
                 content: detailHtml,
                 showEdit: true,
                 showDelete: true,
-                onedit: function () { loadCredential($(this).data('credentialid'), masterKey); },
-                ondelete: function () { confirmDelete($(this).data('credentialid'), masterKey); }
+                onedit: function () { return loadCredential(credentialId, masterKey); },
+                ondelete: function () { return confirmDelete(credentialId, masterKey); }
             });
         });
     }
@@ -532,8 +527,8 @@ var Vault;
         ui.modal.off('click', 'button.btn-delete');
         ui.modal.on('click', 'button.btn-accept', options.onaccept || defaultAcceptAction);
         ui.modal.on('click', 'button.btn-close', options.onclose || defaultCloseAction);
-        ui.modal.on('click', 'button.btn-edit', options.onedit || function () { window.alert('NOT BOUND'); });
-        ui.modal.on('click', 'button.btn-delete', options.ondelete || function () { window.alert('NOT BOUND'); });
+        ui.modal.on('click', 'button.btn-edit', options.onedit || (function () { return window.alert('NOT BOUND'); }));
+        ui.modal.on('click', 'button.btn-delete', options.ondelete || (function () { return window.alert('NOT BOUND'); }));
         ui.modal.modal();
     }
     // Show password strength visually
@@ -657,7 +652,7 @@ var Vault;
                 base64ToUtf8: base64ToUtf8,
                 truncate: truncate,
                 search: search,
-                debounce: debounce,
+                rateLimit: rateLimit,
                 sortCredentials: sortCredentials,
                 init: init
             };
@@ -705,7 +700,7 @@ var Vault;
         if (!testMode) {
             ui.container.on('click', '.btn-credential-show-detail', function (e) {
                 e.preventDefault();
-                var id = $(this).parent().parent().attr('id');
+                var id = $(e.currentTarget).parent().parent().attr('id');
                 showDetail(id, internal.masterKey);
             });
             ui.newButton.on('click', function (e) {
@@ -724,8 +719,8 @@ var Vault;
                 }, internal.masterKey, internal.userId);
                 ui.searchInput.val('').focus();
             });
-            ui.searchInput.on('keyup', debounce(function () {
-                var results = search(this.value, cachedList);
+            ui.searchInput.on('keyup', rateLimit(function (e) {
+                var results = search(e.currentTarget.value, cachedList);
                 buildDataTable(results, function (rows) {
                     ui.container.html(createCredentialTable(rows));
                 }, internal.masterKey, internal.userId);
@@ -758,7 +753,7 @@ var Vault;
             // Save the new details on edit form submit
             $('body').on('submit', '#credential-form', function (e) {
                 e.preventDefault();
-                var form = $(this);
+                var form = $(e.currentTarget);
                 var errorMsg = [];
                 $('#validation-message').remove();
                 form.find('div.has-error').removeClass('has-error');
@@ -803,8 +798,8 @@ var Vault;
                 return;
             });
             // Show password strength as it is typed
-            $('body').on('keyup', '#Password', debounce(function () {
-                showPasswordStrength($(this));
+            $('body').on('keyup', '#Password', rateLimit(function (e) {
+                showPasswordStrength($(e.currentTarget));
             }));
             // Generate a nice strong password
             $('body').on('click', 'button.generate-password', function (e) {
@@ -830,7 +825,7 @@ var Vault;
             // Copy content to clipboard when copy icon is clicked
             $('body').on('click', 'a.copy-link', function (e) {
                 e.preventDefault();
-                var a = $(this);
+                var a = $(e.currentTarget);
                 $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
                 a.next('input.copy-content').select();
                 try {
@@ -844,12 +839,12 @@ var Vault;
             });
             $('body').on('click', 'button.btn-credential-open', function (e) {
                 e.preventDefault();
-                window.open($(this).data('url'));
+                window.open($(e.currentTarget).data('url'));
             });
             $('body').on('click', 'button.btn-credential-copy', function (e) {
                 e.preventDefault();
                 var allButtons = $('button.btn-credential-copy');
-                var button = $(this);
+                var button = $(e.currentTarget);
                 allButtons.removeClass('btn-success').addClass('btn-primary');
                 allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
                 button.next('input.copy-content').select();

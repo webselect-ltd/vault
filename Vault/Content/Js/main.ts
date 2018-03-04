@@ -72,11 +72,11 @@ namespace Vault {
             data: data,
             dataType: 'json',
             type: 'POST',
-            success: function(responseData: any, status: string, request: JQueryXHR): void {
+            success: (responseData: any, status: string, request: JQueryXHR): void => {
                 ui.spinner.hide();
                 successCallback(responseData, status, request);
             },
-            error: function(request: JQueryXHR, status: string, error: string): void {
+            error: (request: JQueryXHR, status: string, error: string): void => {
                 ui.spinner.hide();
                 errorCallback(request, status, error);
             }
@@ -89,9 +89,7 @@ namespace Vault {
         if (!artificialAjaxDelay) {
             $.ajax(options);
         } else {
-            window.setTimeout(function(): void {
-                $.ajax(options);
-            }, 2000);
+            window.setTimeout(() => $.ajax(options), 2000);
         }
     }
 
@@ -103,9 +101,7 @@ namespace Vault {
     // Build the data table
     function buildDataTable(data: Credential[], callback: (c: CredentialSummary[]) => void, masterKey: string, userId: string) {
         // Create a table row for each record and add it to the rows array
-        const rows = data.map(function(item) {
-            return createCredentialDisplayData(item, masterKey, userId);
-        });
+        const rows = data.map(item => createCredentialDisplayData(item, masterKey, userId));
         // Fire the callback and pass it the array of rows
         callback(rows);
     }
@@ -136,19 +132,18 @@ namespace Vault {
 
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
-        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function(data: Credential[]): void {
+        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, (data: Credential[]): void => {
             const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            const newData: Credential[] = data.map(function(item: Credential): Credential {
-                return encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes);
-            });
+            const reEncrypt = (item: Credential) => encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes);
+            const newData: Credential[] = data.map(reEncrypt);
 
-            ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function(): void {
+            ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), (): void => {
                 // Store the new password in hashed form
                 ajaxPost(internal.basePath + 'Main/UpdatePassword', {
                     newHash: newPasswordHash,
                     userid: userId,
                     oldHash: Passpack.utils.hashx(internal.password)
-                }, function(): void {
+                }, (): void  => {
                     // Just reload the whole page when we're done to force login
                     window.location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
                 });
@@ -167,7 +162,7 @@ namespace Vault {
             content: templates.deleteConfirmationDialog(),
             showDelete: true,
             deleteText: 'Yes, Delete This Credential',
-            ondelete: function(e: Event): void {
+            ondelete: (e: Event): void => {
                 e.preventDefault();
                 deleteCredential(id, internal.userId, masterKey);
             }
@@ -191,8 +186,8 @@ namespace Vault {
     function createCredentialFromFormFields(form: JQuery): Credential {
         const obj: any = {};
         // Serialize the form inputs into an object
-        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function(): void {
-            obj[this.name] = $(this).val();
+        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each((i, el): void => {
+            obj[(el as HTMLInputElement).name] = $(el).val();
         });
         return obj;
     }
@@ -216,7 +211,7 @@ namespace Vault {
      */
     function crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
         const newCredential: any = {};
-        Object.keys(obj).forEach(function(k: string): void {
+        Object.keys(obj).forEach((k: string): void => {
             if (excludes.indexOf(k) === -1) {
                 newCredential[k] = action('AES', obj[k], base64ToUtf8(masterKey));
             } else {
@@ -227,12 +222,12 @@ namespace Vault {
     }
 
     // Rate-limit calls to the supplied function
-    function debounce(func: Function, wait?: number, immediate?: boolean): (e: Event) => void {
+    function rateLimit(func: (e: Event) => void, wait?: number, immediate?: boolean): (e: Event) => void {
         let timeout: number;
         return function(): void {
-            const context: Function = this;
+            const context = this;
             const args: IArguments = arguments;
-            const later: Function = function(): void {
+            const later = (): void => {
                 timeout = null;
                 if (!immediate) {
                     func.apply(context, args);
@@ -273,15 +268,15 @@ namespace Vault {
 
     // Delete a record
     function deleteCredential(credentialId: string, userId: string, masterKey: string): void {
-        ajaxPost(internal.basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function(data: any): void {
+        ajaxPost(internal.basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, (data: any): void => {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 cachedList = removeFromList(credentialId, cachedList);
                 // For now we just reload the entire table in the background
-                loadCredentials(userId, masterKey, function(): void {
+                loadCredentials(userId, masterKey, (): void => {
                     ui.modal.modal('hide');
                     const results: Credential[] = search(ui.searchInput.val(), cachedList);
-                    buildDataTable(results, function(rows: CredentialSummary[]): void {
+                    buildDataTable(results, (rows: CredentialSummary[]): void => {
                         ui.container.html(createCredentialTable(rows));
                     }, masterKey, userId);
                 });
@@ -292,8 +287,8 @@ namespace Vault {
     // Export all credential data as JSON
     export function exportData(userId: string, masterKey: string): void {
         // Get all the credentials, decrypt each one
-        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function(data: Credential[]): void {
-            const exportItems: Credential[] = data.map(function(item: Credential): Credential {
+        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, (data: Credential[]): void => {
+            const exportItems: Credential[] = data.map((item: Credential): Credential => {
                 const o: Credential = decryptObject(item, base64ToUtf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
@@ -336,8 +331,8 @@ namespace Vault {
 
     function getPasswordGenerationOptions(inputs: JQuery, predicate: (element: JQuery) => boolean): any {
         const options: any = {};
-        inputs.each(function(): void {
-            const checkbox: JQuery = $(this);
+        inputs.each((i, el): void => {
+            const checkbox: JQuery = $(el);
             if (predicate(checkbox)) {
                 options[checkbox.attr('name')] = 1;
             }
@@ -350,7 +345,7 @@ namespace Vault {
         const jsonImportData: Credential[] = JSON.parse(rawData);
         const excludes: string[] = ['CredentialID', 'UserID'];
 
-        const newData: Credential[] = jsonImportData.map(function(item: Credential): Credential {
+        const newData: Credential[] = jsonImportData.map((item: Credential): Credential => {
             // Remove the confirmation property
             delete item.PasswordConfirmation;
             // Null out the old credential ID so UpdateMultiple knows this is a new record
@@ -360,7 +355,7 @@ namespace Vault {
             return encryptObject(item, base64ToUtf8(masterKey), excludes);
         });
 
-        ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function(): void {
+        ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), (): void => {
             // Just reload the whole page when we're done to force login
             window.location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
         }, null, 'application/json; charset=utf-8');
@@ -374,7 +369,7 @@ namespace Vault {
     // If null is passed as the credentialId, we set up the form for adding a new record
     function loadCredential(credentialId: string, masterKey: string): void {
         if (credentialId !== null) {
-            ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, function(data: Credential): void {
+            ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, (data: Credential): void => {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
                 showModal({
@@ -382,7 +377,7 @@ namespace Vault {
                     content: templates.credentialForm(data),
                     showAccept: true,
                     acceptText: 'Save',
-                    onaccept: function(): void {
+                    onaccept: (): void => {
                         $('#credential-form').submit();
                     }
                 });
@@ -396,7 +391,7 @@ namespace Vault {
                 content: templates.credentialForm({ UserID: internal.userId }),
                 showAccept: true,
                 acceptText: 'Save',
-                onaccept: function(): void {
+                onaccept: (): void => {
                     $('#credential-form').submit();
                 }
             });
@@ -410,10 +405,10 @@ namespace Vault {
         if (cachedList !== null && cachedList.length) {
             buildDataTable(cachedList, callback, masterKey, userId);
         } else {
-            ajaxPost(internal.basePath + 'Main/GetAll', { userId: userId }, function(data: Credential[]): void {
+            ajaxPost(internal.basePath + 'Main/GetAll', { userId: userId }, (data: Credential[]): void => {
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
-                const items: Credential[] = data.map(function(item: Credential): Credential {
+                const items: Credential[] = data.map((item: Credential): Credential => {
                     return decryptObject(item, masterKey, ['CredentialID', 'UserID']);
                 });
                 // Cache the whole (decrypted) list on the client
@@ -468,13 +463,13 @@ namespace Vault {
                 if (query === 'all') {
                     results = list;
                 } else if (query === 'weak') {
-                    results = list.filter(function(item: Credential): boolean {
+                    results = list.filter((item: Credential): boolean => {
                         const pwd: string = item.Password;
                         return pwd && Passpack.utils.getBits(pwd) <= weakPasswordThreshold;
                     });
                 }
             } else {
-                results = list.filter(function(item: Credential): boolean {
+                results = list.filter((item: Credential): boolean => {
                     return item[queryField].toLowerCase().indexOf(query) > -1;
                 });
             }
@@ -493,7 +488,7 @@ namespace Vault {
 
     // Show the read-only details modal
     function showDetail(credentialId: string, masterKey: string): void {
-        ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, function(data: Credential): void {
+        ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, (data: Credential): void => {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
             // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
@@ -518,8 +513,8 @@ namespace Vault {
                 content: detailHtml,
                 showEdit: true,
                 showDelete: true,
-                onedit: function(): void { loadCredential($(this).data('credentialid'), masterKey); },
-                ondelete: function(): void { confirmDelete($(this).data('credentialid'), masterKey); }
+                onedit: () => loadCredential(credentialId, masterKey),
+                ondelete: () => confirmDelete(credentialId, masterKey)
             });
         });
     }
@@ -579,8 +574,8 @@ namespace Vault {
         ui.modal.off('click', 'button.btn-delete');
         ui.modal.on('click', 'button.btn-accept', options.onaccept || defaultAcceptAction);
         ui.modal.on('click', 'button.btn-close', options.onclose || defaultCloseAction);
-        ui.modal.on('click', 'button.btn-edit', options.onedit || function(): void { window.alert('NOT BOUND'); });
-        ui.modal.on('click', 'button.btn-delete', options.ondelete || function(): void { window.alert('NOT BOUND'); });
+        ui.modal.on('click', 'button.btn-edit', options.onedit || ((): void => window.alert('NOT BOUND')));
+        ui.modal.on('click', 'button.btn-delete', options.ondelete || ((): void => window.alert('NOT BOUND')));
         ui.modal.modal();
     }
 
@@ -624,7 +619,7 @@ namespace Vault {
 
     // Sort credentials alphabetically by description
     function sortCredentials(credentials: Credential[]): void {
-        credentials.sort(function(a: Credential, b: Credential): number {
+        credentials.sort((a: Credential, b: Credential): number => {
             const desca: string = a.Description.toUpperCase();
             const descb: string = b.Description.toUpperCase();
             return desca < descb ? -1 : desca > descb ? 1 : 0;
@@ -707,7 +702,7 @@ namespace Vault {
                 base64ToUtf8: base64ToUtf8,
                 truncate: truncate,
                 search: search,
-                debounce: debounce,
+                rateLimit: rateLimit,
                 sortCredentials: sortCredentials,
                 init: init
             };
@@ -746,13 +741,13 @@ namespace Vault {
 
         Handlebars.registerPartial('copylink', templates.copyLink);
 
-        Handlebars.registerHelper('breaklines', function(text: string): hbs.SafeString {
+        Handlebars.registerHelper('breaklines', (text: string): hbs.SafeString => {
             text = Handlebars.Utils.escapeExpression(text);
             text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
             return new Handlebars.SafeString(text);
         });
 
-        Handlebars.registerHelper('truncate', function(text: string, size: number): hbs.SafeString {
+        Handlebars.registerHelper('truncate', (text: string, size: number): hbs.SafeString => {
             text = text.length > size ? text.substring(0, size - 3) + '...' : text;
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
@@ -760,40 +755,40 @@ namespace Vault {
 
         // Don't set up event handlers in test mode
         if (!testMode) {
-            ui.container.on('click', '.btn-credential-show-detail', function(e: Event): void {
+            ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
                 e.preventDefault();
-                const id: string = $(this).parent().parent().attr('id');
+                const id: string = $(e.currentTarget).parent().parent().attr('id');
                 showDetail(id, internal.masterKey);
             });
 
-            ui.newButton.on('click', function(e: Event): void {
+            ui.newButton.on('click', (e: Event): void => {
                 e.preventDefault();
                 loadCredential(null, internal.masterKey);
             });
 
-            ui.adminButton.on('click', function(e: Event): void {
+            ui.adminButton.on('click', (e: Event): void => {
                 e.preventDefault();
                 optionsDialog();
             });
 
-            ui.clearSearchButton.on('click', function(e: Event): void {
+            ui.clearSearchButton.on('click', (e: Event): void => {
                 e.preventDefault();
                 const results: Credential[] = search(null, cachedList);
-                buildDataTable(results, function(rows: CredentialSummary[]): void {
+                buildDataTable(results, (rows: CredentialSummary[]): void => {
                     ui.container.html(createCredentialTable(rows));
                 }, internal.masterKey, internal.userId);
                 ui.searchInput.val('').focus();
             });
 
-            ui.searchInput.on('keyup', debounce(function(): void {
-                const results: Credential[] = search(this.value, cachedList);
-                buildDataTable(results, function(rows: CredentialSummary[]): void {
+            ui.searchInput.on('keyup', rateLimit((e: Event): void => {
+                const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, cachedList);
+                buildDataTable(results, (rows: CredentialSummary[]): void => {
                     ui.container.html(createCredentialTable(rows));
                 }, internal.masterKey, internal.userId);
             }, 200));
 
             // Initialise globals and load data on correct login
-            ui.loginForm.on('submit', function(e: Event): void {
+            ui.loginForm.on('submit', (e: Event): void => {
                 e.preventDefault();
 
                 const username: string = ui.loginForm.find('#UN1209').val();
@@ -802,7 +797,7 @@ namespace Vault {
                 ajaxPost(basePath + 'Main/Login', {
                     UN1209: Passpack.utils.hashx(username),
                     PW9804: Passpack.utils.hashx(password)
-                }, function(data: any): void {
+                }, (data: any): void => {
                     // If the details were valid
                     if (data.result === 1 && data.id !== '') {
                         // Set some private variables so that we can reuse them for encryption during this session
@@ -810,7 +805,7 @@ namespace Vault {
                         internal.password = password;
                         internal.masterKey = utf8ToBase64(createMasterKey(internal.password));
 
-                        loadCredentials(internal.userId, internal.masterKey, function(): void {
+                        loadCredentials(internal.userId, internal.masterKey, (): void => {
                             // Successfully logged in. Hide the login form
                             ui.loginForm.hide();
                             ui.loginFormDialog.modal('hide');
@@ -822,10 +817,10 @@ namespace Vault {
             });
 
             // Save the new details on edit form submit
-            $('body').on('submit', '#credential-form', function(e: Event): void {
+            $('body').on('submit', '#credential-form', (e: Event): void => {
                 e.preventDefault();
 
-                const form: JQuery = $(this);
+                const form: JQuery = $(e.currentTarget);
                 const errorMsg: string[] = [];
 
                 $('#validation-message').remove();
@@ -834,7 +829,7 @@ namespace Vault {
                 const errors = validateRecord(form);
 
                 if (errors.length > 0) {
-                    errors.forEach(function(error: any): void {
+                    errors.forEach((error: any): void => {
                         errorMsg.push(error.msg);
                         error.field.parent().parent().addClass('has-error');
                     });
@@ -856,7 +851,7 @@ namespace Vault {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
-                ajaxPost(basePath + 'Main/Update', credential, function(data: Credential): void {
+                ajaxPost(basePath + 'Main/Update', credential, (data: Credential): void => {
                     const idx = findIndex(data.CredentialID, cachedList);
                     if (idx === -1) {
                         cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));
@@ -866,10 +861,10 @@ namespace Vault {
                     // Re-sort the list in case the order should change
                     sortCredentials(cachedList);
                     // For now we just reload the entire table in the background
-                    loadCredentials(internal.userId, internal.masterKey, function(): void {
+                    loadCredentials(internal.userId, internal.masterKey, (): void => {
                         const results: Credential[] = search(ui.searchInput.val(), cachedList);
                         ui.modal.modal('hide');
-                        buildDataTable(results, function(rows: CredentialSummary[]): void {
+                        buildDataTable(results, (rows: CredentialSummary[]): void => {
                             ui.container.html(createCredentialTable(rows));
                         }, internal.masterKey, internal.userId);
                     });
@@ -879,12 +874,12 @@ namespace Vault {
             });
 
             // Show password strength as it is typed
-            $('body').on('keyup', '#Password', debounce(function(): void {
-                showPasswordStrength($(this));
+            $('body').on('keyup', '#Password', rateLimit((e: Event): void => {
+                showPasswordStrength($(e.currentTarget));
             }));
 
             // Generate a nice strong password
-            $('body').on('click', 'button.generate-password', function(e: Event): void {
+            $('body').on('click', 'button.generate-password', (e: Event): void => {
                 e.preventDefault();
                 const passwordOptions = getPasswordGenerationOptions($('input.generate-password-option'), isChecked);
                 const passwordLength = getPasswordLength($('#len').val());
@@ -901,15 +896,15 @@ namespace Vault {
             });
 
             // Toggle password generation option UI visibility
-            $('body').on('click', 'a.generate-password-options-toggle', function(e: Event): void {
+            $('body').on('click', 'a.generate-password-options-toggle', (e: Event): void => {
                 e.preventDefault();
                 $('div.generate-password-options').toggle();
             });
 
             // Copy content to clipboard when copy icon is clicked
-            $('body').on('click', 'a.copy-link', function(e: Event): void {
+            $('body').on('click', 'a.copy-link', (e: Event): void => {
                 e.preventDefault();
-                const a: JQuery = $(this);
+                const a: JQuery = $(e.currentTarget);
                 $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
                 a.next('input.copy-content').select();
                 try {
@@ -922,15 +917,15 @@ namespace Vault {
 
             });
 
-            $('body').on('click', 'button.btn-credential-open', function(e: Event): void {
+            $('body').on('click', 'button.btn-credential-open', (e: Event): void => {
                 e.preventDefault();
-                window.open($(this).data('url'));
+                window.open($(e.currentTarget).data('url'));
             });
 
-            $('body').on('click', 'button.btn-credential-copy', function(e: Event): void {
+            $('body').on('click', 'button.btn-credential-copy', (e: Event): void => {
                 e.preventDefault();
                 const allButtons: JQuery = $('button.btn-credential-copy');
-                const button: JQuery = $(this);
+                const button: JQuery = $(e.currentTarget);
                 allButtons.removeClass('btn-success').addClass('btn-primary');
                 allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
                 button.next('input.copy-content').select();
@@ -945,13 +940,13 @@ namespace Vault {
             });
 
             // Automatically focus the search field if a key is pressed from the credential list
-            $('body').on('keydown', function(e: Event): void {
+            $('body').on('keydown', (e: Event): void => {
                 const event: KeyboardEvent = e as KeyboardEvent;
                 const eventTarget: HTMLElement = e.target as HTMLElement;
                 if (eventTarget.nodeName === 'BODY') {
                     e.preventDefault();
                     // Cancel the first mouseup event which will be fired after focus
-                    ui.searchInput.one('mouseup', function(me: Event): void {
+                    ui.searchInput.one('mouseup', (me: Event): void => {
                         me.preventDefault();
                     });
                     ui.searchInput.focus();
