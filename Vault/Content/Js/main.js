@@ -198,23 +198,17 @@ var Vault;
         return newCredential;
     }
     // Rate-limit calls to the supplied function
-    function rateLimit(func, wait, immediate) {
+    function rateLimit(func, wait) {
         var timeout;
         return function () {
             var context = this;
             var args = arguments;
             var later = function () {
                 timeout = null;
-                if (!immediate) {
-                    func.apply(context, args);
-                }
+                func.apply(context, args);
             };
-            var callNow = immediate && !timeout;
             window.clearTimeout(timeout);
             timeout = window.setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
         };
     }
     function decryptObject(obj, masterKey, excludes) {

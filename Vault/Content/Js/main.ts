@@ -222,23 +222,17 @@ namespace Vault {
     }
 
     // Rate-limit calls to the supplied function
-    function rateLimit(func: (e: Event) => void, wait?: number, immediate?: boolean): (e: Event) => void {
+    function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) => void {
         let timeout: number;
         return function(): void {
             const context = this;
             const args: IArguments = arguments;
             const later = (): void => {
                 timeout = null;
-                if (!immediate) {
-                    func.apply(context, args);
-                }
+                func.apply(context, args);
             };
-            const callNow: boolean = immediate && !timeout;
             window.clearTimeout(timeout);
             timeout = window.setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
         };
     }
 
