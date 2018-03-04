@@ -1,9 +1,9 @@
 ﻿declare class PasspackCharMatrix {
-    lcase: number[];
-    ucase: number[];
-    nums: number[];
-    symb: number[];
-    space: number[];
+    public lcase: number[];
+    public ucase: number[];
+    public nums: number[];
+    public symb: number[];
+    public space: number[];
 }
 
 interface IPasspackUtils {
