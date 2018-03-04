@@ -80,12 +80,12 @@ var Vault;
             $.ajax(options);
         }
         else {
-            window.setTimeout(function () { return $.ajax(options); }, 2000);
+            setTimeout(function () { return $.ajax(options); }, 2000);
         }
     }
     // Decode Base64 string
     function base64ToUtf8(str) {
-        return unescape(decodeURIComponent(window.atob(str)));
+        return unescape(decodeURIComponent(atob(str)));
     }
     // Build the data table
     function buildDataTable(data, callback, masterKey, userId) {
@@ -101,14 +101,14 @@ var Vault;
         var confirmationMsg = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
             + 'Are you SURE you want to change the master password?';
         if (newPassword === '') {
-            window.alert('Password cannot be left blank.');
+            alert('Password cannot be left blank.');
             return;
         }
         if (newPassword !== newPasswordConfirm) {
-            window.alert('Password confirmation does not match password.');
+            alert('Password confirmation does not match password.');
             return;
         }
-        if (!window.confirm(confirmationMsg)) {
+        if (!confirm(confirmationMsg)) {
             return;
         }
         var newPasswordHash = Passpack.utils.hashx(newPassword);
@@ -127,7 +127,7 @@ var Vault;
                     oldHash: Passpack.utils.hashx(internal.password)
                 }, function () {
                     // Just reload the whole page when we're done to force login
-                    window.location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+                    location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
                 });
             }, null, 'application/json; charset=utf-8');
         });
@@ -207,8 +207,8 @@ var Vault;
                 timeout = null;
                 func.apply(context, args);
             };
-            window.clearTimeout(timeout);
-            timeout = window.setTimeout(later, wait);
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
         };
     }
     function decryptObject(obj, masterKey, excludes) {
@@ -223,7 +223,7 @@ var Vault;
         ui.modal.modal('hide');
     }
     function defaultAjaxErrorCallback(ignore, status, error) {
-        return window.alert('Http Error: ' + status + ' - ' + error);
+        return alert('Http Error: ' + status + ' - ' + error);
     }
     // Default action for modal close button
     function defaultCloseAction(e) {
@@ -256,12 +256,12 @@ var Vault;
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
-            var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+            var exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
             if (exportWindow && exportWindow.top) {
                 exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
             }
             else {
-                window.alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
             }
         });
     }
@@ -313,7 +313,7 @@ var Vault;
         });
         ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
             // Just reload the whole page when we're done to force login
-            window.location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+            location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
         }, null, 'application/json; charset=utf-8');
     }
     Vault.importData = importData;
@@ -521,8 +521,8 @@ var Vault;
         ui.modal.off('click', 'button.btn-delete');
         ui.modal.on('click', 'button.btn-accept', options.onaccept || defaultAcceptAction);
         ui.modal.on('click', 'button.btn-close', options.onclose || defaultCloseAction);
-        ui.modal.on('click', 'button.btn-edit', options.onedit || (function () { return window.alert('NOT BOUND'); }));
-        ui.modal.on('click', 'button.btn-delete', options.ondelete || (function () { return window.alert('NOT BOUND'); }));
+        ui.modal.on('click', 'button.btn-edit', options.onedit || (function () { return alert('NOT BOUND'); }));
+        ui.modal.on('click', 'button.btn-delete', options.ondelete || (function () { return alert('NOT BOUND'); }));
         ui.modal.modal();
     }
     // Show password strength visually
@@ -587,7 +587,7 @@ var Vault;
     }
     // Encode string to Base64
     function utf8ToBase64(str) {
-        return window.btoa(encodeURIComponent(escape(str)));
+        return btoa(encodeURIComponent(escape(str)));
     }
     // Validate a credential record form
     function validateRecord(f) {
@@ -828,12 +828,12 @@ var Vault;
                     }
                 }
                 catch (ex) {
-                    window.alert('Copy operation is not supported by the current browser: ' + ex.message);
+                    alert('Copy operation is not supported by the current browser: ' + ex.message);
                 }
             });
             $('body').on('click', 'button.btn-credential-open', function (e) {
                 e.preventDefault();
-                window.open($(e.currentTarget).data('url'));
+                open($(e.currentTarget).data('url'));
             });
             $('body').on('click', 'button.btn-credential-copy', function (e) {
                 e.preventDefault();
@@ -849,7 +849,7 @@ var Vault;
                     }
                 }
                 catch (ex) {
-                    window.alert('Copy operation is not supported by the current browser: ' + ex.message);
+                    alert('Copy operation is not supported by the current browser: ' + ex.message);
                 }
             });
             // Automatically focus the search field if a key is pressed from the credential list

@@ -12,10 +12,10 @@ namespace Vault {
     let cachedList: Credential[] = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
 
     const internal: any = {
-        basePath: null,  // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
-        masterKey: '',  // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
-        password: '',   // Current user's password
-        userId: ''     // GUID identifying logged-in user
+        basePath: null,     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
+        masterKey: '',      // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
+        password: '',       // Current user's password
+        userId: ''          // GUID identifying logged-in user
     };
 
     // A map of the properties which can be searched for using the fieldName:query syntax
@@ -89,13 +89,13 @@ namespace Vault {
         if (!artificialAjaxDelay) {
             $.ajax(options);
         } else {
-            window.setTimeout(() => $.ajax(options), 2000);
+            setTimeout(() => $.ajax(options), 2000);
         }
     }
 
     // Decode Base64 string
     function base64ToUtf8(str: string): string {
-        return unescape(decodeURIComponent(window.atob(str)));
+        return unescape(decodeURIComponent(atob(str)));
     }
 
     // Build the data table
@@ -114,16 +114,16 @@ namespace Vault {
                 + 'Are you SURE you want to change the master password?';
 
         if (newPassword === '') {
-            window.alert('Password cannot be left blank.');
+            alert('Password cannot be left blank.');
             return;
         }
 
         if (newPassword !== newPasswordConfirm) {
-            window.alert('Password confirmation does not match password.');
+            alert('Password confirmation does not match password.');
             return;
         }
 
-        if (!window.confirm(confirmationMsg)) {
+        if (!confirm(confirmationMsg)) {
             return;
         }
 
@@ -145,7 +145,7 @@ namespace Vault {
                     oldHash: Passpack.utils.hashx(internal.password)
                 }, (): void  => {
                     // Just reload the whole page when we're done to force login
-                    window.location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+                    location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
                 });
             }, null, 'application/json; charset=utf-8');
         });
@@ -231,8 +231,8 @@ namespace Vault {
                 timeout = null;
                 func.apply(context, args);
             };
-            window.clearTimeout(timeout);
-            timeout = window.setTimeout(later, wait);
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
         };
     }
 
@@ -251,7 +251,7 @@ namespace Vault {
     }
 
     function defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {
-        return window.alert('Http Error: ' + status + ' - ' + error);
+        return alert('Http Error: ' + status + ' - ' + error);
     }
 
     // Default action for modal close button
@@ -288,11 +288,11 @@ namespace Vault {
                 return o;
             });
 
-            const exportWindow: Window = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+            const exportWindow: Window = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
             if (exportWindow && exportWindow.top) {
                 exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
             } else {
-                window.alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
             }
         });
     }
@@ -351,7 +351,7 @@ namespace Vault {
 
         ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), (): void => {
             // Just reload the whole page when we're done to force login
-            window.location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+            location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
         }, null, 'application/json; charset=utf-8');
     }
 
@@ -568,8 +568,8 @@ namespace Vault {
         ui.modal.off('click', 'button.btn-delete');
         ui.modal.on('click', 'button.btn-accept', options.onaccept || defaultAcceptAction);
         ui.modal.on('click', 'button.btn-close', options.onclose || defaultCloseAction);
-        ui.modal.on('click', 'button.btn-edit', options.onedit || ((): void => window.alert('NOT BOUND')));
-        ui.modal.on('click', 'button.btn-delete', options.ondelete || ((): void => window.alert('NOT BOUND')));
+        ui.modal.on('click', 'button.btn-edit', options.onedit || ((): void => alert('NOT BOUND')));
+        ui.modal.on('click', 'button.btn-delete', options.ondelete || ((): void => alert('NOT BOUND')));
         ui.modal.modal();
     }
 
@@ -632,7 +632,7 @@ namespace Vault {
 
     // Encode string to Base64
     function utf8ToBase64(str: string): string {
-        return window.btoa(encodeURIComponent(escape(str)));
+        return btoa(encodeURIComponent(escape(str)));
     }
 
     // Validate a credential record form
@@ -906,14 +906,14 @@ namespace Vault {
                         a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
                     }
                 } catch (ex) {
-                    window.alert('Copy operation is not supported by the current browser: ' + ex.message);
+                    alert('Copy operation is not supported by the current browser: ' + ex.message);
                 }
 
             });
 
             $('body').on('click', 'button.btn-credential-open', (e: Event): void => {
                 e.preventDefault();
-                window.open($(e.currentTarget).data('url'));
+                open($(e.currentTarget).data('url'));
             });
 
             $('body').on('click', 'button.btn-credential-copy', (e: Event): void => {
@@ -929,7 +929,7 @@ namespace Vault {
                         button.find('span').removeClass('fa-clone').addClass('fa-check-square');
                     }
                 } catch (ex) {
-                    window.alert('Copy operation is not supported by the current browser: ' + ex.message);
+                    alert('Copy operation is not supported by the current browser: ' + ex.message);
                 }
             });
 
