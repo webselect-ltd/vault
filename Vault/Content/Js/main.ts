@@ -702,8 +702,7 @@ namespace Vault {
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
-
-
+        
         ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
             e.preventDefault();
             const id: string = $(e.currentTarget).parent().parent().attr('id');
