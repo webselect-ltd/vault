@@ -37,7 +37,7 @@ QUnit.begin(function () {
 });
 
 QUnit.testStart(function () {
-    Vault.init(_BASE_URL, true, false);
+    console.log('start test');
 });
 
 QUnit.testDone(function () {
@@ -46,10 +46,6 @@ QUnit.testDone(function () {
 
 QUnit.done(function () {
     console.log('end tests');
-});
-
-QUnit.test('Got Vault', function (assert) {
-    assert.ok(typeof Vault !== 'undefined');
 });
 
 function checkEncryption(assert, credential) {
