@@ -275,15 +275,6 @@ var Vault;
         }
         return -1;
     }
-    // Generate standard hash for a password
-    function generatePasswordHash(password) {
-        return Passpack.utils.hashx(password);
-    }
-    // Generate 64-bit hash for a password
-    function generatePasswordHash64(password) {
-        // The hash is now a full 64 char string
-        return Passpack.utils.hashx(password, false, true);
-    }
     function getPasswordLength(val) {
         var len = parseInt(val, 10);
         return isNaN(len) ? 16 : len;

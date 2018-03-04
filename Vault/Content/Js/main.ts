@@ -307,17 +307,6 @@ namespace Vault {
         return -1;
     }
 
-    // Generate standard hash for a password
-    function generatePasswordHash(password: string): string {
-        return Passpack.utils.hashx(password);
-    }
-
-    // Generate 64-bit hash for a password
-    function generatePasswordHash64(password: string): string {
-        // The hash is now a full 64 char string
-        return Passpack.utils.hashx(password, false, true);
-    }
-
     function getPasswordLength(val: any): number {
         const len: number = parseInt(val, 10);
         return isNaN(len) ? 16 : len;
@@ -702,7 +691,7 @@ namespace Vault {
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
-        
+
         ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
             e.preventDefault();
             const id: string = $(e.currentTarget).parent().parent().attr('id');
