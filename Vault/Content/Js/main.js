@@ -86,7 +86,7 @@ var Vault;
         }
     }
     // Decode Base64 string
-    function b64_to_utf8(str) {
+    function base64ToUtf8(str) {
         return unescape(decodeURIComponent(window.atob(str)));
     }
     // Build the data table
@@ -116,13 +116,13 @@ var Vault;
             return;
         }
         var newPasswordHash = Passpack.utils.hashx(newPassword);
-        var newMasterKey = utf8_to_b64(createMasterKey(newPassword));
+        var newMasterKey = utf8ToBase64(createMasterKey(newPassword));
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
         ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
             var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
             var newData = data.map(function (item) {
-                return encryptObject(decryptObject(item, b64_to_utf8(masterKey), excludes), newMasterKey, excludes);
+                return encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes);
             });
             ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
                 // Store the new password in hashed form
@@ -194,7 +194,7 @@ var Vault;
         var newCredential = {};
         Object.keys(obj).forEach(function (k) {
             if (excludes.indexOf(k) === -1) {
-                newCredential[k] = action('AES', obj[k], b64_to_utf8(masterKey));
+                newCredential[k] = action('AES', obj[k], base64ToUtf8(masterKey));
             }
             else {
                 newCredential[k] = obj[k];
@@ -263,7 +263,7 @@ var Vault;
         // Get all the credentials, decrypt each one
         ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
             var exportItems = data.map(function (item) {
-                var o = decryptObject(item, b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
+                var o = decryptObject(item, base64ToUtf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
@@ -320,7 +320,7 @@ var Vault;
             item.CredentialID = null;
             // Set the user ID to the ID of the new (logged in) user
             item.UserID = userId;
-            return encryptObject(item, b64_to_utf8(masterKey), excludes);
+            return encryptObject(item, base64ToUtf8(masterKey), excludes);
         });
         ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
             // Just reload the whole page when we're done to force login
@@ -389,7 +389,7 @@ var Vault;
     function optionsDialog() {
         var dialogHtml = templates.optionsDialog({
             userid: internal.userId,
-            masterkey: utf8_to_b64(internal.masterKey)
+            masterkey: utf8ToBase64(internal.masterKey)
         });
         showModal({
             title: 'Admin',
@@ -597,7 +597,7 @@ var Vault;
         return $.extend({}, credential, properties);
     }
     // Encode string to Base64
-    function utf8_to_b64(str) {
+    function utf8ToBase64(str) {
         return window.btoa(encodeURIComponent(escape(str)));
     }
     // Validate a credential record form
@@ -653,8 +653,8 @@ var Vault;
                 createCredentialTable: createCredentialTable,
                 createCredentialDisplayData: createCredentialDisplayData,
                 validateRecord: validateRecord,
-                utf8_to_b64: utf8_to_b64,
-                b64_to_utf8: b64_to_utf8,
+                utf8ToBase64: utf8ToBase64,
+                base64ToUtf8: base64ToUtf8,
                 truncate: truncate,
                 search: search,
                 debounce: debounce,
@@ -744,7 +744,7 @@ var Vault;
                         // Set some private variables so that we can reuse them for encryption during this session
                         internal.userId = data.id;
                         internal.password = password;
-                        internal.masterKey = utf8_to_b64(createMasterKey(internal.password));
+                        internal.masterKey = utf8ToBase64(createMasterKey(internal.password));
                         loadCredentials(internal.userId, internal.masterKey, function () {
                             // Successfully logged in. Hide the login form
                             ui.loginForm.hide();
