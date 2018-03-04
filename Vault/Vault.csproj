@@ -152,6 +152,7 @@
   <ItemGroup>
     <Content Include="Content\Js\tsconfig.json" />
     <Content Include="package.json" />
+    <Content Include="tslint.json" />
     <None Include="Web.config.example">
       <SubType>Designer</SubType>
     </None>
