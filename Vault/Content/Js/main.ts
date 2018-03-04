@@ -3,7 +3,7 @@
 /// <reference types="handlebars" />
 /// <reference types="js-cookie" />
 /// <reference path="types/passpack.d.ts" />
-/// <reference path="types/vault.d.ts" />
+/// <reference path="types/hacks.d.ts" />
 
 namespace Vault {
     const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak

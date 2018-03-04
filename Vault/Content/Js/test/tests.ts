@@ -1,4 +1,5 @@
 ﻿/// <reference types="qunit" />
+/// <reference path="../types/hacks.d.ts" />
 
 ﻿/* tslint:disable:no-console */
 

@@ -115,7 +115,7 @@
     </Content>
     <Content Include="Views\Web.config" />
     <TypeScriptCompile Include="Content\Js\types\passpack.d.ts" />
-    <TypeScriptCompile Include="Content\Js\types\vault.d.ts" />
+    <TypeScriptCompile Include="Content\Js\types\hacks.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_CredentialForm.cshtml" />

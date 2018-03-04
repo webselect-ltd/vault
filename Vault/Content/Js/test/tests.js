@@ -1,4 +1,5 @@
 /// <reference types="qunit" />
+/// <reference path="../types/hacks.d.ts" />
 /* tslint:disable:no-console */
 var TestGlobals = {
     // Vault.utf8_to_b64(Vault.createMasterKey('test123'))
