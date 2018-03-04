@@ -22,7 +22,7 @@
         loginDialog.modal({ keyboard: false, backdrop: 'static' });
 
         $(function () {
-            Vault.init('@(Url.Action("Index", "Main", null))', false, @(System.Configuration.ConfigurationManager.AppSettings["DevMode"]));
+            Vault.init('@(Url.Action("Index", "Main", null))', @(System.Configuration.ConfigurationManager.AppSettings["DevMode"]));
         });
     </script>
 

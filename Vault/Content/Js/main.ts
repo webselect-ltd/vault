@@ -44,21 +44,21 @@ namespace Vault {
     };
 
     const templates: any = {
-            urlLink: null,
-            urlText: null,
-            detail: null,
-            credentialForm: null,
-            deleteConfirmationDialog: null,
-            optionsDialog: null,
-            credentialTable: null,
-            credentialTableRow: null,
-            validationMessage: null,
-            modalHeader: null,
-            modalBody: null,
-            modalFooter: null,
-            copyLink: null,
-            exportedDataWindow: null
-        };
+        urlLink: null,
+        urlText: null,
+        detail: null,
+        credentialForm: null,
+        deleteConfirmationDialog: null,
+        optionsDialog: null,
+        credentialTable: null,
+        credentialTableRow: null,
+        validationMessage: null,
+        modalHeader: null,
+        modalBody: null,
+        modalFooter: null,
+        copyLink: null,
+        exportedDataWindow: null
+    };
 
     function ajaxPost(url: string, data: any, successCallback: IXHRSuccess, errorCallback?: IXHRError, contentType?: string): void {
         ui.spinner.show();
@@ -111,7 +111,7 @@ namespace Vault {
         const newPassword: string = $('#NewPassword').val();
         const newPasswordConfirm: string = $('#NewPasswordConfirm').val();
         const confirmationMsg: string = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
-                + 'Are you SURE you want to change the master password?';
+            + 'Are you SURE you want to change the master password?';
 
         if (newPassword === '') {
             alert('Password cannot be left blank.');
@@ -143,7 +143,7 @@ namespace Vault {
                     newHash: newPasswordHash,
                     userid: userId,
                     oldHash: Passpack.utils.hashx(internal.password)
-                }, (): void  => {
+                }, (): void => {
                     // Just reload the whole page when we're done to force login
                     location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
                 });
@@ -224,7 +224,7 @@ namespace Vault {
     // Rate-limit calls to the supplied function
     function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) => void {
         let timeout: number;
-        return function(): void {
+        return function (): void {
             const context = this;
             const args: IArguments = arguments;
             const later = (): void => {
@@ -428,7 +428,7 @@ namespace Vault {
 
     // Remove the credential with a specific ID from an array
     function removeFromList(id: string, list: Credential[]): Credential[] {
-        return list.filter( item => item.CredentialID !== id);
+        return list.filter(item => item.CredentialID !== id);
     }
 
     // Hide credential rows which don't contain a particular string
@@ -537,15 +537,15 @@ namespace Vault {
         const showEdit: boolean = options.showEdit || false;
         const showDelete: boolean = options.showDelete || false;
         let html: string = templates.modalHeader({
-                title: options.title,
-                closeText: options.closeText || 'Close',
-                showAccept: showAccept,
-                showClose: showClose,
-                showEdit: showEdit,
-                showDelete: showDelete
-            }) + templates.modalBody({
-                content: options.content
-            });
+            title: options.title,
+            closeText: options.closeText || 'Close',
+            showAccept: showAccept,
+            showClose: showClose,
+            showEdit: showEdit,
+            showDelete: showDelete
+        }) + templates.modalBody({
+            content: options.content
+        });
 
         if (showAccept || showClose || showEdit || showDelete) {
             html += templates.modalFooter({
@@ -655,53 +655,9 @@ namespace Vault {
     }
 
     // Initialise the app
-    export function init(basePath: string, testMode: boolean, devMode: boolean): void {
+    export function init(basePath: string, devMode: boolean): void {
         // Set the base path for AJAX requests/redirects
         internal.basePath = basePath;
-        // Determine whether we're testing or not
-        if (testMode) {
-            const testMethods: any = {
-                createCredentialFromFormFields: createCredentialFromFormFields,
-                isChecked: isChecked,
-                checkIf: checkIf,
-                crypt: crypt,
-                encryptObject: encryptObject,
-                decryptObject: decryptObject,
-                getPasswordLength: getPasswordLength,
-                getPasswordGenerationOptions: getPasswordGenerationOptions,
-                findIndex: findIndex,
-                createMasterKey: createMasterKey,
-                removeFromList: removeFromList,
-                updateProperties: updateProperties,
-                defaultAjaxErrorCallback: defaultAjaxErrorCallback,
-                ajaxPost: ajaxPost,
-                loadCredentials: loadCredentials,
-                showDetail: showDetail,
-                defaultAcceptAction: defaultAcceptAction,
-                defaultCloseAction: defaultCloseAction,
-                showModal: showModal,
-                loadCredential: loadCredential,
-                deleteCredential: deleteCredential,
-                confirmDelete: confirmDelete,
-                generatePasswordHash: generatePasswordHash,
-                generatePasswordHash64: generatePasswordHash64,
-                changePassword: changePassword,
-                exportData: exportData,
-                options: optionsDialog,
-                buildDataTable: buildDataTable,
-                createCredentialTable: createCredentialTable,
-                createCredentialDisplayData: createCredentialDisplayData,
-                validateRecord: validateRecord,
-                utf8ToBase64: utf8ToBase64,
-                base64ToUtf8: base64ToUtf8,
-                truncate: truncate,
-                search: search,
-                rateLimit: rateLimit,
-                sortCredentials: sortCredentials,
-                init: init
-            };
-            // $.extend(_public, testMethods);
-        }
 
         // Cache UI selectors
         ui.loginFormDialog = $('#login-form-dialog');
@@ -747,220 +703,218 @@ namespace Vault {
             return new Handlebars.SafeString(text);
         });
 
-        // Don't set up event handlers in test mode
-        if (!testMode) {
-            ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
-                e.preventDefault();
-                const id: string = $(e.currentTarget).parent().parent().attr('id');
-                showDetail(id, internal.masterKey);
-            });
 
-            ui.newButton.on('click', (e: Event): void => {
-                e.preventDefault();
-                loadCredential(null, internal.masterKey);
-            });
+        ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
+            e.preventDefault();
+            const id: string = $(e.currentTarget).parent().parent().attr('id');
+            showDetail(id, internal.masterKey);
+        });
 
-            ui.adminButton.on('click', (e: Event): void => {
-                e.preventDefault();
-                optionsDialog();
-            });
+        ui.newButton.on('click', (e: Event): void => {
+            e.preventDefault();
+            loadCredential(null, internal.masterKey);
+        });
 
-            ui.clearSearchButton.on('click', (e: Event): void => {
-                e.preventDefault();
-                const results: Credential[] = search(null, cachedList);
-                buildDataTable(results, (rows: CredentialSummary[]): void => {
-                    ui.container.html(createCredentialTable(rows));
-                }, internal.masterKey, internal.userId);
-                ui.searchInput.val('').focus();
-            });
+        ui.adminButton.on('click', (e: Event): void => {
+            e.preventDefault();
+            optionsDialog();
+        });
 
-            ui.searchInput.on('keyup', rateLimit((e: Event): void => {
-                const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, cachedList);
-                buildDataTable(results, (rows: CredentialSummary[]): void => {
-                    ui.container.html(createCredentialTable(rows));
-                }, internal.masterKey, internal.userId);
-            }, 200));
+        ui.clearSearchButton.on('click', (e: Event): void => {
+            e.preventDefault();
+            const results: Credential[] = search(null, cachedList);
+            buildDataTable(results, (rows: CredentialSummary[]): void => {
+                ui.container.html(createCredentialTable(rows));
+            }, internal.masterKey, internal.userId);
+            ui.searchInput.val('').focus();
+        });
 
-            // Initialise globals and load data on correct login
-            ui.loginForm.on('submit', (e: Event): void => {
-                e.preventDefault();
+        ui.searchInput.on('keyup', rateLimit((e: Event): void => {
+            const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, cachedList);
+            buildDataTable(results, (rows: CredentialSummary[]): void => {
+                ui.container.html(createCredentialTable(rows));
+            }, internal.masterKey, internal.userId);
+        }, 200));
 
-                const username: string = ui.loginForm.find('#UN1209').val();
-                const password: string = ui.loginForm.find('#PW9804').val();
+        // Initialise globals and load data on correct login
+        ui.loginForm.on('submit', (e: Event): void => {
+            e.preventDefault();
 
-                ajaxPost(basePath + 'Main/Login', {
-                    UN1209: Passpack.utils.hashx(username),
-                    PW9804: Passpack.utils.hashx(password)
-                }, (data: any): void => {
-                    // If the details were valid
-                    if (data.result === 1 && data.id !== '') {
-                        // Set some private variables so that we can reuse them for encryption during this session
-                        internal.userId = data.id;
-                        internal.password = password;
-                        internal.masterKey = utf8ToBase64(createMasterKey(internal.password));
+            const username: string = ui.loginForm.find('#UN1209').val();
+            const password: string = ui.loginForm.find('#PW9804').val();
 
-                        loadCredentials(internal.userId, internal.masterKey, (): void => {
-                            // Successfully logged in. Hide the login form
-                            ui.loginForm.hide();
-                            ui.loginFormDialog.modal('hide');
-                            ui.controls.show();
-                            ui.searchInput.focus();
-                        });
-                    }
-                });
-            });
+            ajaxPost(basePath + 'Main/Login', {
+                UN1209: Passpack.utils.hashx(username),
+                PW9804: Passpack.utils.hashx(password)
+            }, (data: any): void => {
+                // If the details were valid
+                if (data.result === 1 && data.id !== '') {
+                    // Set some private variables so that we can reuse them for encryption during this session
+                    internal.userId = data.id;
+                    internal.password = password;
+                    internal.masterKey = utf8ToBase64(createMasterKey(internal.password));
 
-            // Save the new details on edit form submit
-            $('body').on('submit', '#credential-form', (e: Event): void => {
-                e.preventDefault();
-
-                const form: JQuery = $(e.currentTarget);
-                const errorMsg: string[] = [];
-
-                $('#validation-message').remove();
-                form.find('div.has-error').removeClass('has-error');
-
-                const errors = validateRecord(form);
-
-                if (errors.length > 0) {
-                    errors.forEach((error: any): void => {
-                        errorMsg.push(error.msg);
-                        error.field.parent().parent().addClass('has-error');
-                    });
-
-                    ui.modal.find('div.modal-body').prepend(templates.validationMessage({ errors: errorMsg.join('<br />') }));
-                    return;
-                }
-
-                let credential = createCredentialFromFormFields(form);
-
-                // Hold the modified properties so we can update the list if the update succeeds
-                const properties = {
-                    Description: form.find('#Description').val(),
-                    Username: form.find('#Username').val(),
-                    Password: form.find('#Password').val(),
-                    Url: form.find('#Url').val()
-                };
-
-                // CredentialID and UserID are not currently encrypted so don't try to decode them
-                credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
-
-                ajaxPost(basePath + 'Main/Update', credential, (data: Credential): void => {
-                    const idx = findIndex(data.CredentialID, cachedList);
-                    if (idx === -1) {
-                        cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));
-                    } else {
-                        cachedList[idx] = updateProperties(properties, cachedList[idx]);
-                    }
-                    // Re-sort the list in case the order should change
-                    sortCredentials(cachedList);
-                    // For now we just reload the entire table in the background
                     loadCredentials(internal.userId, internal.masterKey, (): void => {
-                        const results: Credential[] = search(ui.searchInput.val(), cachedList);
-                        ui.modal.modal('hide');
-                        buildDataTable(results, (rows: CredentialSummary[]): void => {
-                            ui.container.html(createCredentialTable(rows));
-                        }, internal.masterKey, internal.userId);
+                        // Successfully logged in. Hide the login form
+                        ui.loginForm.hide();
+                        ui.loginFormDialog.modal('hide');
+                        ui.controls.show();
+                        ui.searchInput.focus();
                     });
+                }
+            });
+        });
+
+        // Save the new details on edit form submit
+        $('body').on('submit', '#credential-form', (e: Event): void => {
+            e.preventDefault();
+
+            const form: JQuery = $(e.currentTarget);
+            const errorMsg: string[] = [];
+
+            $('#validation-message').remove();
+            form.find('div.has-error').removeClass('has-error');
+
+            const errors = validateRecord(form);
+
+            if (errors.length > 0) {
+                errors.forEach((error: any): void => {
+                    errorMsg.push(error.msg);
+                    error.field.parent().parent().addClass('has-error');
                 });
 
+                ui.modal.find('div.modal-body').prepend(templates.validationMessage({ errors: errorMsg.join('<br />') }));
                 return;
-            });
-
-            // Show password strength as it is typed
-            $('body').on('keyup', '#Password', rateLimit((e: Event): void => {
-                showPasswordStrength($(e.currentTarget));
-            }));
-
-            // Generate a nice strong password
-            $('body').on('click', 'button.generate-password', (e: Event): void => {
-                e.preventDefault();
-                const passwordOptions = getPasswordGenerationOptions($('input.generate-password-option'), isChecked);
-                const passwordLength = getPasswordLength($('#len').val());
-                const password: string = Passpack.utils.passGenerator(passwordOptions, passwordLength);
-                $('#Password').val(password);
-                $('#PasswordConfirmation').val(password);
-                const opts: any[] = [$('#len').val(),
-                isChecked($('#ucase')) ? 1 : 0,
-                isChecked($('#lcase')) ? 1 : 0,
-                isChecked($('#nums')) ? 1 : 0,
-                isChecked($('#symb')) ? 1 : 0];
-                $('#PwdOptions').val(opts.join('|'));
-                showPasswordStrength($('#Password'));
-            });
-
-            // Toggle password generation option UI visibility
-            $('body').on('click', 'a.generate-password-options-toggle', (e: Event): void => {
-                e.preventDefault();
-                $('div.generate-password-options').toggle();
-            });
-
-            // Copy content to clipboard when copy icon is clicked
-            $('body').on('click', 'a.copy-link', (e: Event): void => {
-                e.preventDefault();
-                const a: JQuery = $(e.currentTarget);
-                $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
-                a.next('input.copy-content').select();
-                try {
-                    if (document.execCommand('copy')) {
-                        a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
-                    }
-                } catch (ex) {
-                    alert('Copy operation is not supported by the current browser: ' + ex.message);
-                }
-
-            });
-
-            $('body').on('click', 'button.btn-credential-open', (e: Event): void => {
-                e.preventDefault();
-                open($(e.currentTarget).data('url'));
-            });
-
-            $('body').on('click', 'button.btn-credential-copy', (e: Event): void => {
-                e.preventDefault();
-                const allButtons: JQuery = $('button.btn-credential-copy');
-                const button: JQuery = $(e.currentTarget);
-                allButtons.removeClass('btn-success').addClass('btn-primary');
-                allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
-                button.next('input.copy-content').select();
-                try {
-                    if (document.execCommand('copy')) {
-                        button.addClass('btn-success').removeClass('btn-primary');
-                        button.find('span').removeClass('fa-clone').addClass('fa-check-square');
-                    }
-                } catch (ex) {
-                    alert('Copy operation is not supported by the current browser: ' + ex.message);
-                }
-            });
-
-            // Automatically focus the search field if a key is pressed from the credential list
-            $('body').on('keydown', (e: Event): void => {
-                const event: KeyboardEvent = e as KeyboardEvent;
-                const eventTarget: HTMLElement = e.target as HTMLElement;
-                if (eventTarget.nodeName === 'BODY') {
-                    e.preventDefault();
-                    // Cancel the first mouseup event which will be fired after focus
-                    ui.searchInput.one('mouseup', (me: Event): void => {
-                        me.preventDefault();
-                    });
-                    ui.searchInput.focus();
-                    const char: string = String.fromCharCode(event.keyCode);
-                    if (/[a-zA-Z0-9]/.test(char)) {
-                        ui.searchInput.val(event.shiftKey ? char : char.toLowerCase());
-                    } else {
-                        ui.searchInput.select();
-                    }
-                }
-            });
-
-            // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
-            if (devMode) {
-                ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
-                ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
-                ui.loginForm.submit();
-            } else {
-                ui.loginForm.find('#UN1209').focus();
             }
+
+            let credential = createCredentialFromFormFields(form);
+
+            // Hold the modified properties so we can update the list if the update succeeds
+            const properties = {
+                Description: form.find('#Description').val(),
+                Username: form.find('#Username').val(),
+                Password: form.find('#Password').val(),
+                Url: form.find('#Url').val()
+            };
+
+            // CredentialID and UserID are not currently encrypted so don't try to decode them
+            credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
+
+            ajaxPost(basePath + 'Main/Update', credential, (data: Credential): void => {
+                const idx = findIndex(data.CredentialID, cachedList);
+                if (idx === -1) {
+                    cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));
+                } else {
+                    cachedList[idx] = updateProperties(properties, cachedList[idx]);
+                }
+                // Re-sort the list in case the order should change
+                sortCredentials(cachedList);
+                // For now we just reload the entire table in the background
+                loadCredentials(internal.userId, internal.masterKey, (): void => {
+                    const results: Credential[] = search(ui.searchInput.val(), cachedList);
+                    ui.modal.modal('hide');
+                    buildDataTable(results, (rows: CredentialSummary[]): void => {
+                        ui.container.html(createCredentialTable(rows));
+                    }, internal.masterKey, internal.userId);
+                });
+            });
+
+            return;
+        });
+
+        // Show password strength as it is typed
+        $('body').on('keyup', '#Password', rateLimit((e: Event): void => {
+            showPasswordStrength($(e.currentTarget));
+        }));
+
+        // Generate a nice strong password
+        $('body').on('click', 'button.generate-password', (e: Event): void => {
+            e.preventDefault();
+            const passwordOptions = getPasswordGenerationOptions($('input.generate-password-option'), isChecked);
+            const passwordLength = getPasswordLength($('#len').val());
+            const password: string = Passpack.utils.passGenerator(passwordOptions, passwordLength);
+            $('#Password').val(password);
+            $('#PasswordConfirmation').val(password);
+            const opts: any[] = [$('#len').val(),
+            isChecked($('#ucase')) ? 1 : 0,
+            isChecked($('#lcase')) ? 1 : 0,
+            isChecked($('#nums')) ? 1 : 0,
+            isChecked($('#symb')) ? 1 : 0];
+            $('#PwdOptions').val(opts.join('|'));
+            showPasswordStrength($('#Password'));
+        });
+
+        // Toggle password generation option UI visibility
+        $('body').on('click', 'a.generate-password-options-toggle', (e: Event): void => {
+            e.preventDefault();
+            $('div.generate-password-options').toggle();
+        });
+
+        // Copy content to clipboard when copy icon is clicked
+        $('body').on('click', 'a.copy-link', (e: Event): void => {
+            e.preventDefault();
+            const a: JQuery = $(e.currentTarget);
+            $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
+            a.next('input.copy-content').select();
+            try {
+                if (document.execCommand('copy')) {
+                    a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
+                }
+            } catch (ex) {
+                alert('Copy operation is not supported by the current browser: ' + ex.message);
+            }
+
+        });
+
+        $('body').on('click', 'button.btn-credential-open', (e: Event): void => {
+            e.preventDefault();
+            open($(e.currentTarget).data('url'));
+        });
+
+        $('body').on('click', 'button.btn-credential-copy', (e: Event): void => {
+            e.preventDefault();
+            const allButtons: JQuery = $('button.btn-credential-copy');
+            const button: JQuery = $(e.currentTarget);
+            allButtons.removeClass('btn-success').addClass('btn-primary');
+            allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
+            button.next('input.copy-content').select();
+            try {
+                if (document.execCommand('copy')) {
+                    button.addClass('btn-success').removeClass('btn-primary');
+                    button.find('span').removeClass('fa-clone').addClass('fa-check-square');
+                }
+            } catch (ex) {
+                alert('Copy operation is not supported by the current browser: ' + ex.message);
+            }
+        });
+
+        // Automatically focus the search field if a key is pressed from the credential list
+        $('body').on('keydown', (e: Event): void => {
+            const event: KeyboardEvent = e as KeyboardEvent;
+            const eventTarget: HTMLElement = e.target as HTMLElement;
+            if (eventTarget.nodeName === 'BODY') {
+                e.preventDefault();
+                // Cancel the first mouseup event which will be fired after focus
+                ui.searchInput.one('mouseup', (me: Event): void => {
+                    me.preventDefault();
+                });
+                ui.searchInput.focus();
+                const char: string = String.fromCharCode(event.keyCode);
+                if (/[a-zA-Z0-9]/.test(char)) {
+                    ui.searchInput.val(event.shiftKey ? char : char.toLowerCase());
+                } else {
+                    ui.searchInput.select();
+                }
+            }
+        });
+
+        // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
+        if (devMode) {
+            ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
+            ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
+            ui.loginForm.submit();
+        } else {
+            ui.loginForm.find('#UN1209').focus();
         }
     }
 }
