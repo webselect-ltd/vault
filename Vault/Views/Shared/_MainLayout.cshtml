@@ -29,7 +29,7 @@
         <meta name="msapplication-config" content="~/Content/Img/browserconfig.xml">
         <meta name="theme-color" content="#7663de">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-        @Styles.Render("~/Content/Css/bundle")
+        @Styles.Render("~/Content/Css/main")
         @RenderSection("head", false)
 </head>
     <body>
@@ -37,7 +37,7 @@
             @RenderSection("main")
         </div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        @Scripts.Render("~/Content/Js/bundle")
+        @Scripts.Render("~/Content/Js/main")
         @RenderSection("foot", false)
     </body>
 </html>

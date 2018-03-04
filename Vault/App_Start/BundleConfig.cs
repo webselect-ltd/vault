@@ -8,25 +8,27 @@ namespace Vault
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptBundle("~/Content/Js/bundle").Include(
-                      "~/Content/Js/bootstrap.js",
-                      "~/Content/Js/passpack-v1.1.js",
-                      "~/Content/Js/handlebars-v4.0.5.js",
-                      "~/Content/Js/hide-address-bar.js",
-                      "~/Content/Js/js.cookie.js",
+            bundles.Add(new ScriptBundle("~/Content/Js/main").Include(
+                      "~/Content/Js/vendor/bootstrap.js",
+                      "~/Content/Js/vendor/passpack-v1.1.js",
+                      "~/Content/Js/vendor/handlebars-v4.0.5.js",
+                      "~/Content/Js/vendor/hide-address-bar.js",
+                      "~/Content/Js/vendor/js.cookie.js",
+                      "~/Content/Js/concrete/Credential.js",
+                      "~/Content/Js/concrete/CredentialSummary.js",
                       "~/Content/Js/main.js"));
 
-            bundles.Add(new ScriptBundle("~/Content/Js/test").Include(
-                      "~/Content/Js/qunit-2.5.1.js",
-                      "~/Content/Js/blanket.js",
-                      "~/Content/Js/tests.js"));
+            bundles.Add(new ScriptBundle("~/Content/Js/tests").Include(
+                      "~/Content/Js/test/qunit-2.5.1.js",
+                      "~/Content/Js/test/blanket.js",
+                      "~/Content/Js/test/tests.js"));
 
-            bundles.Add(new StyleBundle("~/Content/Css/bundle").Include(
-                      "~/Content/Css/bootstrap.css",
+            bundles.Add(new StyleBundle("~/Content/Css/main").Include(
+                      "~/Content/Css/vendor/bootstrap.css",
                       "~/Content/Css/main.css"));
 
-            bundles.Add(new StyleBundle("~/Content/Css/test").Include(
-                      "~/Content/Css/qunit-2.5.1.css"));
+            bundles.Add(new StyleBundle("~/Content/Css/tests").Include(
+                      "~/Content/Css/test/qunit-2.5.1.css"));
         }
     }
 }

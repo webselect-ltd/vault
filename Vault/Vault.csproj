@@ -90,21 +90,25 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Css\bootstrap.css" />
+    <Content Include="Content\Css\vendor\bootstrap.css" />
     <Content Include="Content\Css\main.css" />
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
-    <Content Include="Content\Js\blanket.js" />
-    <Content Include="Content\Js\bootstrap.js" />
-    <Content Include="Content\Js\handlebars-v4.0.5.js" />
-    <Content Include="Content\Js\hide-address-bar.js" />
-    <Content Include="Content\Js\js.cookie.js" />
+    <TypeScriptCompile Include="Content\Js\abstract\XHRSuccess.ts" />
+    <TypeScriptCompile Include="Content\Js\abstract\XHRError.ts" />
+    <Content Include="Content\Js\test\blanket.js" />
+    <Content Include="Content\Js\vendor\bootstrap.js" />
+    <Content Include="Content\Js\vendor\handlebars-v4.0.5.js" />
+    <Content Include="Content\Js\vendor\hide-address-bar.js" />
+    <Content Include="Content\Js\vendor\js.cookie.js" />
+    <TypeScriptCompile Include="Content\Js\concrete\CredentialSummary.ts" />
+    <TypeScriptCompile Include="Content\Js\concrete\Credential.ts" />
     <TypeScriptCompile Include="Content\Js\main.ts" />
-    <Content Include="Content\Js\passpack-v1.1.js" />
-    <Content Include="Content\Css\qunit-2.5.1.css" />
-    <Content Include="Content\Js\qunit-2.5.1.js" />
-    <Content Include="Content\Js\tests.js" />
+    <Content Include="Content\Js\vendor\passpack-v1.1.js" />
+    <Content Include="Content\Css\test\qunit-2.5.1.css" />
+    <Content Include="Content\Js\test\qunit-2.5.1.js" />
+    <TypeScriptCompile Include="Content\Js\test\tests.ts" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

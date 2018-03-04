@@ -87,6 +87,7 @@ var Vault;
     function base64ToUtf8(str) {
         return unescape(decodeURIComponent(atob(str)));
     }
+    Vault.base64ToUtf8 = base64ToUtf8;
     // Build the data table
     function buildDataTable(data, callback, masterKey, userId) {
         // Create a table row for each record and add it to the rows array
@@ -94,6 +95,7 @@ var Vault;
         // Fire the callback and pass it the array of rows
         callback(rows);
     }
+    Vault.buildDataTable = buildDataTable;
     // Change the password and re-encrypt all credentials with the new password
     function changePassword(userId, masterKey) {
         var newPassword = $('#NewPassword').val();
@@ -136,6 +138,7 @@ var Vault;
     function checkIf(el, condition) {
         el[0].checked = condition();
     }
+    Vault.checkIf = checkIf;
     // Show delete confirmation dialog
     function confirmDelete(id, masterKey) {
         showModal({
@@ -162,6 +165,7 @@ var Vault;
             weak: $.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < weakPasswordThreshold
         };
     }
+    Vault.createCredentialDisplayData = createCredentialDisplayData;
     function createCredentialFromFormFields(form) {
         var obj = {};
         // Serialize the form inputs into an object
@@ -170,13 +174,16 @@ var Vault;
         });
         return obj;
     }
+    Vault.createCredentialFromFormFields = createCredentialFromFormFields;
     // Create the credential table
     function createCredentialTable(rows) {
         return templates.credentialTable({ rows: rows });
     }
+    Vault.createCredentialTable = createCredentialTable;
     function createMasterKey(password) {
         return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
     }
+    Vault.createMasterKey = createMasterKey;
     /**
      * Encrypt/decrypt the properties of an object literal using Passpack.
      * @param {IPasspackCryptoFunction} action - The Passpack function to use for encryption/decryption
@@ -197,26 +204,15 @@ var Vault;
         });
         return newCredential;
     }
-    // Rate-limit calls to the supplied function
-    function rateLimit(func, wait) {
-        var timeout;
-        return function () {
-            var context = this;
-            var args = arguments;
-            var later = function () {
-                timeout = null;
-                func.apply(context, args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
+    Vault.crypt = crypt;
     function decryptObject(obj, masterKey, excludes) {
         return crypt(Passpack.decode, obj, masterKey, excludes);
     }
+    Vault.decryptObject = decryptObject;
     function encryptObject(obj, masterKey, excludes) {
         return crypt(Passpack.encode, obj, masterKey, excludes);
     }
+    Vault.encryptObject = encryptObject;
     // Default action for modal accept button
     function defaultAcceptAction(e) {
         e.preventDefault();
@@ -275,10 +271,12 @@ var Vault;
         }
         return -1;
     }
+    Vault.findIndex = findIndex;
     function getPasswordLength(val) {
         var len = parseInt(val, 10);
         return isNaN(len) ? 16 : len;
     }
+    Vault.getPasswordLength = getPasswordLength;
     function getPasswordGenerationOptions(inputs, predicate) {
         var options = {};
         inputs.each(function (i, el) {
@@ -289,6 +287,7 @@ var Vault;
         });
         return options;
     }
+    Vault.getPasswordGenerationOptions = getPasswordGenerationOptions;
     // Import unencrypted JSON credential data
     function importData(userId, masterKey, rawData) {
         var jsonImportData = JSON.parse(rawData);
@@ -311,6 +310,7 @@ var Vault;
     function isChecked(el) {
         return el[0].checked;
     }
+    Vault.isChecked = isChecked;
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
     function loadCredential(credentialId, masterKey) {
@@ -376,10 +376,26 @@ var Vault;
             content: dialogHtml
         });
     }
+    // Rate-limit calls to the supplied function
+    function rateLimit(func, wait) {
+        var timeout;
+        return function () {
+            var context = this;
+            var args = arguments;
+            var later = function () {
+                timeout = null;
+                func.apply(context, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    Vault.rateLimit = rateLimit;
     // Remove the credential with a specific ID from an array
     function removeFromList(id, list) {
         return list.filter(function (item) { return item.CredentialID !== id; });
     }
+    Vault.removeFromList = removeFromList;
     // Hide credential rows which don't contain a particular string
     function search(query, list) {
         var results = [];
@@ -421,6 +437,7 @@ var Vault;
         }
         return results;
     }
+    Vault.search = search;
     function setPasswordOptions(form, opts) {
         var optArray = opts.split('|');
         form.find('[name=len]').val(optArray[0]);
@@ -568,18 +585,22 @@ var Vault;
             return desca < descb ? -1 : desca > descb ? 1 : 0;
         });
     }
+    Vault.sortCredentials = sortCredentials;
     // Truncate a string at a specified length
     function truncate(str, len) {
         return str.length > len ? str.substring(0, len - 3) + '...' : str;
     }
+    Vault.truncate = truncate;
     // Update properties of the item with a specific ID in a list
     function updateProperties(properties, credential) {
         return $.extend({}, credential, properties);
     }
+    Vault.updateProperties = updateProperties;
     // Encode string to Base64
     function utf8ToBase64(str) {
         return btoa(encodeURIComponent(escape(str)));
     }
+    Vault.utf8ToBase64 = utf8ToBase64;
     // Validate a credential record form
     function validateRecord(f) {
         var errors = [];
@@ -595,10 +616,8 @@ var Vault;
         }
         return errors;
     }
-    // Initialise the app
-    function init(basePath, devMode) {
-        // Set the base path for AJAX requests/redirects
-        internal.basePath = basePath;
+    Vault.validateRecord = validateRecord;
+    function uiSetup() {
         // Cache UI selectors
         ui.loginFormDialog = $('#login-form-dialog');
         ui.loginForm = $('#login-form');
@@ -637,6 +656,13 @@ var Vault;
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
+    }
+    Vault.uiSetup = uiSetup;
+    // Initialise the app
+    function init(basePath, devMode) {
+        // Set the base path for AJAX requests/redirects
+        internal.basePath = basePath;
+        uiSetup();
         ui.container.on('click', '.btn-credential-show-detail', function (e) {
             e.preventDefault();
             var id = $(e.currentTarget).parent().parent().attr('id');

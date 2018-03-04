@@ -60,7 +60,7 @@ namespace Vault {
         exportedDataWindow: null
     };
 
-    function ajaxPost(url: string, data: any, successCallback: IXHRSuccess, errorCallback?: IXHRError, contentType?: string): void {
+    function ajaxPost(url: string, data: any, successCallback: XHRSuccess, errorCallback?: XHRError, contentType?: string): void {
         ui.spinner.show();
 
         if (!errorCallback) {
@@ -94,12 +94,12 @@ namespace Vault {
     }
 
     // Decode Base64 string
-    function base64ToUtf8(str: string): string {
+    export function base64ToUtf8(str: string): string {
         return unescape(decodeURIComponent(atob(str)));
     }
 
     // Build the data table
-    function buildDataTable(data: Credential[], callback: (c: CredentialSummary[]) => void, masterKey: string, userId: string) {
+    export function buildDataTable(data: Credential[], callback: (c: CredentialSummary[]) => void, masterKey: string, userId: string) {
         // Create a table row for each record and add it to the rows array
         const rows = data.map(item => createCredentialDisplayData(item, masterKey, userId));
         // Fire the callback and pass it the array of rows
@@ -151,7 +151,7 @@ namespace Vault {
         });
     }
 
-    function checkIf(el: JQuery, condition: () => boolean): void {
+    export function checkIf(el: JQuery, condition: () => boolean): void {
         (el[0] as HTMLInputElement).checked = condition();
     }
 
@@ -170,7 +170,7 @@ namespace Vault {
     }
 
     // Create a single table row for a credential
-    function createCredentialDisplayData(credential: Credential, masterKey: string, userId: string): CredentialSummary {
+    export function createCredentialDisplayData(credential: Credential, masterKey: string, userId: string): CredentialSummary {
         return {
             credentialid: credential.CredentialID,
             masterkey: masterKey,
@@ -183,7 +183,7 @@ namespace Vault {
         };
     }
 
-    function createCredentialFromFormFields(form: JQuery): Credential {
+    export function createCredentialFromFormFields(form: JQuery): Credential {
         const obj: any = {};
         // Serialize the form inputs into an object
         form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each((i, el): void => {
@@ -193,11 +193,11 @@ namespace Vault {
     }
 
     // Create the credential table
-    function createCredentialTable(rows: CredentialSummary[]): string {
+    export function createCredentialTable(rows: CredentialSummary[]): string {
         return templates.credentialTable({ rows: rows });
     }
 
-    function createMasterKey(password: string): string {
+    export function createMasterKey(password: string): string {
         return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
     }
 
@@ -209,7 +209,7 @@ namespace Vault {
      * @param {string[]} excludes - An array of object property names whose values should not be encrypted
      * @returns {Credential}
      */
-    function crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
+    export function crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
         const newCredential: any = {};
         Object.keys(obj).forEach((k: string): void => {
             if (excludes.indexOf(k) === -1) {
@@ -221,26 +221,11 @@ namespace Vault {
         return newCredential;
     }
 
-    // Rate-limit calls to the supplied function
-    function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) => void {
-        let timeout: number;
-        return function (): void {
-            const context = this;
-            const args: IArguments = arguments;
-            const later = (): void => {
-                timeout = null;
-                func.apply(context, args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    function decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+    export function decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
         return crypt(Passpack.decode, obj, masterKey, excludes);
     }
 
-    function encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+    export function encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
         return crypt(Passpack.encode, obj, masterKey, excludes);
     }
 
@@ -298,7 +283,7 @@ namespace Vault {
     }
 
     // Find the index of a credential within an array
-    function findIndex(id: string, list: Credential[]): number {
+    export function findIndex(id: string, list: Credential[]): number {
         for (let i = 0; i < list.length; i++) {
             if (list[i].CredentialID === id) {
                 return i;
@@ -307,12 +292,12 @@ namespace Vault {
         return -1;
     }
 
-    function getPasswordLength(val: any): number {
+    export function getPasswordLength(val: any): number {
         const len: number = parseInt(val, 10);
         return isNaN(len) ? 16 : len;
     }
 
-    function getPasswordGenerationOptions(inputs: JQuery, predicate: (element: JQuery) => boolean): any {
+    export function getPasswordGenerationOptions(inputs: JQuery, predicate: (element: JQuery) => boolean): any {
         const options: any = {};
         inputs.each((i, el): void => {
             const checkbox: JQuery = $(el);
@@ -344,7 +329,7 @@ namespace Vault {
         }, null, 'application/json; charset=utf-8');
     }
 
-    function isChecked(el: JQuery): boolean {
+    export function isChecked(el: JQuery): boolean {
         return (el[0] as HTMLInputElement).checked;
     }
 
@@ -415,13 +400,28 @@ namespace Vault {
         });
     }
 
+    // Rate-limit calls to the supplied function
+    export function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) => void {
+        let timeout: number;
+        return function(): void {
+            const context = this;
+            const args: IArguments = arguments;
+            const later = (): void => {
+                timeout = null;
+                func.apply(context, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
     // Remove the credential with a specific ID from an array
-    function removeFromList(id: string, list: Credential[]): Credential[] {
+    export function removeFromList(id: string, list: Credential[]): Credential[] {
         return list.filter(item => item.CredentialID !== id);
     }
 
     // Hide credential rows which don't contain a particular string
-    function search(query: string, list: Credential[]): Credential[] {
+    export function search(query: string, list: Credential[]): Credential[] {
         let results: Credential[] = [];
         let queryField: string;
         let queryData: string[];
@@ -601,7 +601,7 @@ namespace Vault {
     }
 
     // Sort credentials alphabetically by description
-    function sortCredentials(credentials: Credential[]): void {
+    export function sortCredentials(credentials: Credential[]): void {
         credentials.sort((a: Credential, b: Credential): number => {
             const desca: string = a.Description.toUpperCase();
             const descb: string = b.Description.toUpperCase();
@@ -610,22 +610,22 @@ namespace Vault {
     }
 
     // Truncate a string at a specified length
-    function truncate(str: string, len: number): string {
+    export function truncate(str: string, len: number): string {
         return str.length > len ? str.substring(0, len - 3) + '...' : str;
     }
 
     // Update properties of the item with a specific ID in a list
-    function updateProperties(properties: any, credential: Credential): Credential {
+    export function updateProperties(properties: any, credential: Credential): Credential {
         return $.extend({}, credential, properties);
     }
 
     // Encode string to Base64
-    function utf8ToBase64(str: string): string {
+    export function utf8ToBase64(str: string): string {
         return btoa(encodeURIComponent(escape(str)));
     }
 
     // Validate a credential record form
-    function validateRecord(f: JQuery): any[] {
+    export function validateRecord(f: JQuery): any[] {
         const errors: any[] = [];
         const description: JQuery = f.find('#Description');
         const password: JQuery = f.find('#Password');
@@ -643,11 +643,7 @@ namespace Vault {
         return errors;
     }
 
-    // Initialise the app
-    export function init(basePath: string, devMode: boolean): void {
-        // Set the base path for AJAX requests/redirects
-        internal.basePath = basePath;
-
+    export function uiSetup(): void {
         // Cache UI selectors
         ui.loginFormDialog = $('#login-form-dialog');
         ui.loginForm = $('#login-form');
@@ -691,6 +687,14 @@ namespace Vault {
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
+    }
+
+    // Initialise the app
+    export function init(basePath: string, devMode: boolean): void {
+        // Set the base path for AJAX requests/redirects
+        internal.basePath = basePath;
+
+        uiSetup();
 
         ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
             e.preventDefault();
