@@ -328,6 +328,7 @@ var Vault;
             });
         }
     }
+    Vault.loadCredentials = loadCredentials;
     // Show the options dialog
     function optionsDialog() {
         var dialogHtml = templates.optionsDialog({

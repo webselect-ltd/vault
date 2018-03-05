@@ -3,59 +3,58 @@
 
 ﻿/* tslint:disable:no-console */
 
-const TestGlobals = {
-    // Vault.utf8_to_b64(Vault.createMasterKey('test123'))
-    masterKey: 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==',
-    masterKeyDecoded: unescape(decodeURIComponent(window.atob('JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg=='))),
-    testCredential: {
-        CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
-        Description: 'Test Credential',
-        Notes: 'Test Notes:\n\nThese are test notes.',
-        Password: '8{s?(\'7.171h)3H',
-        PasswordConfirmation: '8{s?(\'7.171h)3H',
-        Url: 'http://www.test.com?id=23&param=TEST+VALUE',
-        UserDefined1: 'CUSTOM1',
-        UserDefined1Label: 'Custom 1',
-        UserDefined2: 'CUSTOM2',
-        UserDefined2Label: 'Custom 2',
-        UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
-        Username: '_testuser123'
-    },
-    testCredentialEncrypted: {
-        CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
-        Description: 'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
-        Notes: 'FcOPw4TDj0gBITAhITAhLcOJFBjCvcOzw43CtVxmwoJzw4pAw63CpcKRLSkDwpg5LiE0NSHCmwNTajjCmVbCtMKAwq0tw43CvQ==',
-        Password: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
-        PasswordConfirmation: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
-        Url: 'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
-        UserDefined1: 'FMOPw4TDj0gBITAhITAhLW88TTrDrEXDvw==',
-        UserDefined1Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
-        UserDefined2: 'FcOPw4TDj0gBITAhITAhLcOeJDjCncKcw47DqA==',
-        UserDefined2Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmA=',
-        UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
-        Username: 'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs='
-    }
-};
+const testCredentialPlainText = new Credential(
+    '361fe91a-3dca-4871-b69e-c41c31507c8c',
+    'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
+    'Test Credential',
+    '_testuser123',
+    '8{s?(\'7.171h)3H',
+    '8{s?(\'7.171h)3H',
+    'http://www.test.com?id=23&param=TEST+VALUE',
+    'Custom 1',
+    'CUSTOM1',
+    'Custom 2',
+    'CUSTOM2',
+    'Test Notes:\n\nThese are test notes.',
+    '16|1|1|1|1'
+);
 
-function checkEncryption(assert: Assert, credential: Credential) {
+const testCredentialEncrypted = new Credential(
+    '361fe91a-3dca-4871-b69e-c41c31507c8c',
+    'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
+    'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
+    'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs=',
+    'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
+    'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
+    'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
+    'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
+    'FMOPw4TDj0gBITAhITAhLW88TTrDrEXDvw==',
+    'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmA=',
+    'FcOPw4TDj0gBITAhITAhLcOeJDjCncKcw47DqA==',
+    'FcOPw4TDj0gBITAhITAhLcOJFBjCvcOzw43CtVxmwoJzw4pAw63CpcKRLSkDwpg5LiE0NSHCmwNTajjCmVbCtMKAwq0tw43CvQ==',
+    '16|1|1|1|1'
+);
+
+function checkEncryption(assert: Assert, credential: Credential, masterKeyPlainText: string) {
     assert.ok(credential.CredentialID === '361fe91a-3dca-4871-b69e-c41c31507c8c');
-    assert.ok(Passpack.decode('AES', credential.Description, TestGlobals.masterKeyDecoded) === 'Test Credential');
-    assert.ok(Passpack.decode('AES', credential.Notes, TestGlobals.masterKeyDecoded) === 'Test Notes:\n\nThese are test notes.');
-    assert.ok(Passpack.decode('AES', credential.Password, TestGlobals.masterKeyDecoded) === '8{s?(\'7.171h)3H');
-    assert.ok(Passpack.decode('AES', credential.PasswordConfirmation, TestGlobals.masterKeyDecoded) === '8{s?(\'7.171h)3H');
-    assert.ok(Passpack.decode('AES', credential.Url, TestGlobals.masterKeyDecoded) === 'http://www.test.com?id=23&param=TEST+VALUE');
-    assert.ok(Passpack.decode('AES', credential.UserDefined1, TestGlobals.masterKeyDecoded) === 'CUSTOM1');
-    assert.ok(Passpack.decode('AES', credential.UserDefined1Label, TestGlobals.masterKeyDecoded) === 'Custom 1');
-    assert.ok(Passpack.decode('AES', credential.UserDefined2, TestGlobals.masterKeyDecoded) === 'CUSTOM2');
-    assert.ok(Passpack.decode('AES', credential.UserDefined2Label, TestGlobals.masterKeyDecoded) === 'Custom 2');
     assert.ok(credential.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
-    assert.ok(Passpack.decode('AES', credential.Username, TestGlobals.masterKeyDecoded) === '_testuser123');
+    assert.ok(Passpack.decode('AES', credential.Description, masterKeyPlainText) === 'Test Credential');
+    assert.ok(Passpack.decode('AES', credential.Username, masterKeyPlainText) === '_testuser123');
+    assert.ok(Passpack.decode('AES', credential.Password, masterKeyPlainText) === '8{s?(\'7.171h)3H');
+    assert.ok(Passpack.decode('AES', credential.PasswordConfirmation, masterKeyPlainText) === '8{s?(\'7.171h)3H');
+    assert.ok(Passpack.decode('AES', credential.Url, masterKeyPlainText) === 'http://www.test.com?id=23&param=TEST+VALUE');
+    assert.ok(Passpack.decode('AES', credential.UserDefined1, masterKeyPlainText) === 'CUSTOM1');
+    assert.ok(Passpack.decode('AES', credential.UserDefined1Label, masterKeyPlainText) === 'Custom 1');
+    assert.ok(Passpack.decode('AES', credential.UserDefined2, masterKeyPlainText) === 'CUSTOM2');
+    assert.ok(Passpack.decode('AES', credential.UserDefined2Label, masterKeyPlainText) === 'Custom 2');
+    assert.ok(Passpack.decode('AES', credential.Notes, masterKeyPlainText) === 'Test Notes:\n\nThese are test notes.');
 }
 
 function checkDecryption(assert: Assert, credential: Credential) {
     assert.ok(credential.CredentialID === '361fe91a-3dca-4871-b69e-c41c31507c8c');
+    assert.ok(credential.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
     assert.ok(credential.Description === 'Test Credential');
-    assert.ok(credential.Notes === 'Test Notes:\n\nThese are test notes.');
+    assert.ok(credential.Username === '_testuser123');
     assert.ok(credential.Password === '8{s?(\'7.171h)3H');
     assert.ok(credential.PasswordConfirmation === '8{s?(\'7.171h)3H');
     assert.ok(credential.Url === 'http://www.test.com?id=23&param=TEST+VALUE');
@@ -63,33 +62,27 @@ function checkDecryption(assert: Assert, credential: Credential) {
     assert.ok(credential.UserDefined1Label === 'Custom 1');
     assert.ok(credential.UserDefined2 === 'CUSTOM2');
     assert.ok(credential.UserDefined2Label === 'Custom 2');
-    assert.ok(credential.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
-    assert.ok(credential.Username === '_testuser123');
+    assert.ok(credential.Notes === 'Test Notes:\n\nThese are test notes.');
 }
 
-function getTestCredentialList(): Credential[] {
-    return [
-        new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123'),
-        new Credential('cr2', 'user1', 'Dog', 'dog', 'dog123'),
-        new Credential('cr3', 'user1', 'Fish', 'fish', 'fish123'),
-        new Credential('cr4', 'user1', 'Catfish', 'catfish', 'catfish123'),
-        new Credential('cr5', 'user1', 'Dogfish', 'dogfish', 'dogfish123'),
-        new Credential('cr6', 'user1', 'Owl', 'owl', '_nT:NP?uovID8,TE')
+// Created with Vault.utf8ToBase64(Vault.createMasterKey('test123'))
+const testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
+const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
+
+let testCredentials: Credential[];
+
+QUnit.testStart(details => {
+    testCredentials = [
+        new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123', 'cat123', 'http://cat.com', 'Cat UD 1', 'catud1', 'Cat UD 1', 'catud1', 'Cat notes', '12|1|1|1|1'),
+        new Credential('cr2', 'user1', 'Dog', 'dog', 'dog123', 'dog123', 'http://dog.com', 'Dog UD 1', 'dogud1', 'Dog UD 1', 'dogud1', 'Dog notes', '12|1|1|1|1'),
+        new Credential('cr3', 'user1', 'Fish', 'fish', 'fish123', 'fish123', 'http://fish.com', 'Fish UD 1', 'fishud1', 'Fish UD 1', 'fishud1', 'Fish notes', '12|1|1|1|1'),
+        new Credential('cr4', 'user1', 'Catfish', 'catfish', 'catfish123', 'catfish123', 'http://catfish.com', 'Catfish UD 1', 'catfishud1', 'Catfish UD 1', 'catfishud1', 'Catfish notes', '12|1|1|1|1'),
+        new Credential('cr5', 'user1', 'Dogfish', 'dogfish', 'dogfish123', 'dogfish123', 'http://dogfish.com', 'Dogfish UD 1', 'dogfishud1', 'Dogfish UD 1', 'dogfishud1', 'Dogfish notes', '12|1|1|1|1'),
+        new Credential('cr6', 'user1', 'Owl', 'owl', '_nT:NP?uovID8,TE', '_nT:NP?uovID8,TE', 'http://owl.com', 'Owl UD 1', 'owlud1', 'Owl UD 1', 'owlud1', 'Owl notes', '12|1|1|1|1')
     ];
-}
 
-function getTestCredentialSummaryList(masterKey: string): CredentialSummary[] {
-    return getTestCredentialList().map(c => new CredentialSummary(
-        c.CredentialID,
-        masterKey,
-        c.UserID,
-        c.Description,
-        c.Username,
-        c.Password,
-        c.Url,
-        Passpack.utils.getBits(c.Password) < 40
-    ));
-}
+    Vault.repository = new FakeRepository(testCredentials, testMasterKeyBase64Encoded);
+});
 
 QUnit.test('base64ToUtf8', assert => {
     const utf8 = Vault.base64ToUtf8('VEVTVA==');
@@ -100,7 +93,7 @@ QUnit.test('buildDataTable', assert => {
     assert.expect(4);
     const masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
     const userId = 'user1';
-    const list = getTestCredentialList().slice(0, 3);
+    const list = testCredentials.slice(0, 3);
     const result = Vault.buildDataTable(list, rows => {
         assert.ok(rows.length === 3);
         assert.ok(rows[0].credentialid === 'cr1' && rows[0].description === 'Cat' && rows[0].masterkey === masterKey && rows[0].userid === 'user1');
@@ -177,7 +170,7 @@ QUnit.test('createCredentialFromFormFields', assert => {
 QUnit.test('createCredentialTable', assert => {
     Vault.uiSetup();
     const masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
-    const data = getTestCredentialSummaryList(masterKey);
+    const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, masterKey, 'user1'));
     const table = $(Vault.createCredentialTable(data));
     const rows = table.filter('.row');
     assert.ok(rows.length === 6);
@@ -190,25 +183,24 @@ QUnit.test('createMasterKey', assert => {
 });
 
 QUnit.test('crypt(Passpack.encode)', assert => {
-    const encrypted = Vault.crypt(Passpack.encode, TestGlobals.testCredential, TestGlobals.masterKey, ['CredentialID', 'UserID']);
-    checkEncryption(assert, encrypted);
+    const encrypted = Vault.crypt(Passpack.encode, testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+    checkEncryption(assert, encrypted, testMasterKeyPlainText);
 });
 
 QUnit.test('crypt(Passpack.decode)', assert => {
-    const decrypted = Vault.crypt(Passpack.decode, TestGlobals.testCredentialEncrypted, TestGlobals.masterKey, ['CredentialID', 'UserID']);
+    const decrypted = Vault.crypt(Passpack.decode, testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
     checkDecryption(assert, decrypted);
 });
 
 QUnit.test('encryptObject', assert => {
-    const encrypted = Vault.encryptObject(TestGlobals.testCredential, TestGlobals.masterKey, ['CredentialID', 'UserID']);
-    checkEncryption(assert, encrypted);
+    const encrypted = Vault.encryptObject(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+    checkEncryption(assert, encrypted, testMasterKeyPlainText);
 });
 
 QUnit.test('findIndex', assert => {
-    const data = getTestCredentialList();
-    const idx = Vault.findIndex('cr2', data);
+    const idx = Vault.findIndex('cr2', testCredentials);
     assert.ok(idx === 1);
-    const idx2 = Vault.findIndex('not-there', data);
+    const idx2 = Vault.findIndex('not-there', testCredentials);
     assert.ok(idx2 === -1);
 });
 
@@ -222,7 +214,7 @@ QUnit.test('rateLimit', assert => {
 });
 
 QUnit.test('decryptObject', assert => {
-    const decrypted = Vault.decryptObject(TestGlobals.testCredentialEncrypted, TestGlobals.masterKey, ['CredentialID', 'UserID']);
+    const decrypted = Vault.decryptObject(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
     checkDecryption(assert, decrypted);
 });
 
@@ -258,51 +250,55 @@ QUnit.test('isChecked', assert => {
     assert.ok(Vault.isChecked(checkbox2) === true);
 });
 
+QUnit.test('loadCredentials', assert => {
+    assert.expect(1);
+    Vault.loadCredentials('user1', testMasterKeyBase64Encoded, cs => {
+        assert.ok(cs.length == 6);
+    });
+});
+
 QUnit.test('removeFromList', assert => {
-    const list = getTestCredentialList();
-    const list2 = Vault.removeFromList('cr2', list);
+    const list2 = Vault.removeFromList('cr2', testCredentials);
     assert.ok(list2.length === 5);
     assert.ok(list2[0].Description === 'Cat');
     assert.ok(list2[1].Description === 'Fish');
 });
 
 QUnit.test('search', assert => {
-    const list = getTestCredentialList();
-    const noresults1 = Vault.search(null, list);
-    const noresults2 = Vault.search('', list);
-    const noresults3 = Vault.search('Z', list);
+    const noresults1 = Vault.search(null, testCredentials);
+    const noresults2 = Vault.search('', testCredentials);
+    const noresults3 = Vault.search('Z', testCredentials);
     assert.ok(noresults1.length === 0 && noresults2.length === 0 && noresults3.length === 0);
-    const results1 = Vault.search('do', list);
+    const results1 = Vault.search('do', testCredentials);
     assert.ok(results1.length === 2);
     assert.ok(results1[0].Description === 'Dog');
     assert.ok(results1[1].Description === 'Dogfish');
-    const results2 = Vault.search('username:dog', list);
+    const results2 = Vault.search('username:dog', testCredentials);
     assert.ok(results2.length === 2);
     assert.ok(results2[0].Description === 'Dog');
     assert.ok(results2[1].Description === 'Dogfish');
-    const results3 = Vault.search('password:cat', list);
+    const results3 = Vault.search('password:cat', testCredentials);
     assert.ok(results3.length === 2);
     assert.ok(results3[0].Description === 'Cat');
     assert.ok(results3[1].Description === 'Catfish');
-    const results4 = Vault.search('filter:all', list);
+    const results4 = Vault.search('filter:all', testCredentials);
     assert.ok(results4.length === 6);
     assert.ok(results4[0].Description === 'Cat');
     assert.ok(results4[5].Description === 'Owl');
-    const results5 = Vault.search('filter:weak', list);
+    const results5 = Vault.search('filter:weak', testCredentials);
     assert.ok(results5.length === 3);
     assert.ok(results5[0].Description === 'Cat');
     assert.ok(results5[2].Description === 'Fish');
 });
 
 QUnit.test('sortCredentials', assert => {
-    const list = getTestCredentialList();
-    Vault.sortCredentials(list);
-    assert.ok(list[0].Description === 'Cat');
-    assert.ok(list[1].Description === 'Catfish');
-    assert.ok(list[2].Description === 'Dog');
-    assert.ok(list[3].Description === 'Dogfish');
-    assert.ok(list[4].Description === 'Fish');
-    assert.ok(list[5].Description === 'Owl');
+    Vault.sortCredentials(testCredentials);
+    assert.ok(testCredentials[0].Description === 'Cat');
+    assert.ok(testCredentials[1].Description === 'Catfish');
+    assert.ok(testCredentials[2].Description === 'Dog');
+    assert.ok(testCredentials[3].Description === 'Dogfish');
+    assert.ok(testCredentials[4].Description === 'Fish');
+    assert.ok(testCredentials[5].Description === 'Owl');
 });
 
 QUnit.test('truncate', assert => {
@@ -312,12 +308,11 @@ QUnit.test('truncate', assert => {
 });
 
 QUnit.test('updateProperties', assert => {
-    const list = getTestCredentialList();
-    list[1] = Vault.updateProperties({ Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd', Url: 'http://test4.com' }, list[1]);
-    assert.ok(list[1].Description === 'ITEM2UPDATE');
-    assert.ok(list[1].Username === 'item2new');
-    assert.ok(list[1].Password === 'abcd');
-    assert.ok(list[1].Url === 'http://test4.com');
+    const updated = Vault.updateProperties({ Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd', Url: 'http://test4.com' }, testCredentials[1]);
+    assert.ok(updated.Description === 'ITEM2UPDATE');
+    assert.ok(updated.Username === 'item2new');
+    assert.ok(updated.Password === 'abcd');
+    assert.ok(updated.Url === 'http://test4.com');
 });
 
 QUnit.test('utf8ToBase64', assert => {

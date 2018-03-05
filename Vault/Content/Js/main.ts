@@ -329,7 +329,7 @@ namespace Vault {
     }
 
     // Load all records for a specific user
-    function loadCredentials(userId: string, masterKey: string, callback: (c: CredentialSummary[]) => void): void {
+    export function loadCredentials(userId: string, masterKey: string, callback: (c: CredentialSummary[]) => void): void {
         if (cachedList !== null && cachedList.length) {
             buildDataTable(cachedList, callback, masterKey, userId);
         } else {
