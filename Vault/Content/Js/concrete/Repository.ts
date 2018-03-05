@@ -21,7 +21,7 @@
         this.ajaxPost(this.basePath + 'Main/GetAllComplete', { userId: userId }, onLoad);
     }
 
-    public update(credential: Credential, onUpdated: (data: Credential) => void): void {
+    public updateCredential(credential: Credential, onUpdated: (data: Credential) => void): void {
         this.ajaxPost(this.basePath + 'Main/Update', credential, onUpdated);
     }
 
@@ -37,7 +37,7 @@
         this.ajaxPost(this.basePath + 'Main/UpdateMultiple', JSON.stringify(credentials), onUpdated, null, 'application/json; charset=utf-8');
     }
 
-    public delete(userId: string, credentialId: string, onDeleted: (data: any) => void) {
+    public deleteCredential(userId: string, credentialId: string, onDeleted: (data: any) => void) {
         this.ajaxPost(this.basePath + 'Main/Delete', {
             userId: userId,
             credentialId: credentialId

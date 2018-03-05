@@ -207,7 +207,7 @@ namespace Vault {
 
     // Delete a record
     function deleteCredential(credentialId: string, userId: string, masterKey: string): void {
-        repository.delete(userId, credentialId, data => {
+        repository.deleteCredential(userId, credentialId, data => {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 cachedList = removeFromList(credentialId, cachedList);
@@ -751,7 +751,7 @@ namespace Vault {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
-            repository.update(credential, data => {
+            repository.updateCredential(credential, data => {
                 const idx = findIndex(data.CredentialID, cachedList);
                 if (idx === -1) {
                     cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));

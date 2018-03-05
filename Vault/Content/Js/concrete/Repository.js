@@ -17,7 +17,7 @@ var Repository = (function () {
     Repository.prototype.loadCredentialsForUserFull = function (userId, onLoad) {
         this.ajaxPost(this.basePath + 'Main/GetAllComplete', { userId: userId }, onLoad);
     };
-    Repository.prototype.update = function (credential, onUpdated) {
+    Repository.prototype.updateCredential = function (credential, onUpdated) {
         this.ajaxPost(this.basePath + 'Main/Update', credential, onUpdated);
     };
     Repository.prototype.updatePassword = function (userId, oldHash, newHash, onUpdated) {
@@ -30,7 +30,7 @@ var Repository = (function () {
     Repository.prototype.updateMultiple = function (credentials, onUpdated) {
         this.ajaxPost(this.basePath + 'Main/UpdateMultiple', JSON.stringify(credentials), onUpdated, null, 'application/json; charset=utf-8');
     };
-    Repository.prototype["delete"] = function (userId, credentialId, onDeleted) {
+    Repository.prototype.deleteCredential = function (userId, credentialId, onDeleted) {
         this.ajaxPost(this.basePath + 'Main/Delete', {
             userId: userId,
             credentialId: credentialId

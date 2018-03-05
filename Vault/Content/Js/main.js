@@ -191,7 +191,7 @@ var Vault;
     }
     // Delete a record
     function deleteCredential(credentialId, userId, masterKey) {
-        Vault.repository["delete"](userId, credentialId, function (data) {
+        Vault.repository.deleteCredential(userId, credentialId, function (data) {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 cachedList = removeFromList(credentialId, cachedList);
@@ -702,7 +702,7 @@ var Vault;
             };
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
-            Vault.repository.update(credential, function (data) {
+            Vault.repository.updateCredential(credential, function (data) {
                 var idx = findIndex(data.CredentialID, cachedList);
                 if (idx === -1) {
                     cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));
