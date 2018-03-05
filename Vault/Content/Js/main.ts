@@ -7,9 +7,10 @@
 
 namespace Vault {
     const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak
-    const artificialAjaxDelay: boolean = false;    // Introduce an artificial delay for AJAX calls so we can test loaders locally
 
     let cachedList: Credential[] = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
+
+    export let repository: IRepository;
 
     const internal: any = {
         basePath: null,     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
@@ -60,39 +61,6 @@ namespace Vault {
         exportedDataWindow: null
     };
 
-    function ajaxPost(url: string, data: any, successCallback: XHRSuccess, errorCallback?: XHRError, contentType?: string): void {
-        ui.spinner.show();
-
-        if (!errorCallback) {
-            errorCallback = defaultAjaxErrorCallback;
-        }
-
-        const options: any = {
-            url: url,
-            data: data,
-            dataType: 'json',
-            type: 'POST',
-            success: (responseData: any, status: string, request: JQueryXHR): void => {
-                ui.spinner.hide();
-                successCallback(responseData, status, request);
-            },
-            error: (request: JQueryXHR, status: string, error: string): void => {
-                ui.spinner.hide();
-                errorCallback(request, status, error);
-            }
-        };
-
-        if (contentType) {
-            options.contentType = contentType;
-        }
-
-        if (!artificialAjaxDelay) {
-            $.ajax(options);
-        } else {
-            setTimeout(() => $.ajax(options), 2000);
-        }
-    }
-
     // Decode Base64 string
     export function base64ToUtf8(str: string): string {
         return unescape(decodeURIComponent(atob(str)));
@@ -132,22 +100,18 @@ namespace Vault {
 
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
-        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, (data: Credential[]): void => {
+        repository.loadCredentialsForUserFull(userId, data => {
             const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
             const reEncrypt = (item: Credential) => encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes);
             const newData: Credential[] = data.map(reEncrypt);
 
-            ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), (): void => {
+            repository.updateMultiple(newData, () => {
                 // Store the new password in hashed form
-                ajaxPost(internal.basePath + 'Main/UpdatePassword', {
-                    newHash: newPasswordHash,
-                    userid: userId,
-                    oldHash: Passpack.utils.hashx(internal.password)
-                }, (): void => {
+                repository.updatePassword(userId, Passpack.utils.hashx(internal.password), newPasswordHash, () => {
                     // Just reload the whole page when we're done to force login
                     location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
                 });
-            }, null, 'application/json; charset=utf-8');
+            });
         });
     }
 
@@ -235,10 +199,6 @@ namespace Vault {
         ui.modal.modal('hide');
     }
 
-    function defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {
-        return alert('Http Error: ' + status + ' - ' + error);
-    }
-
     // Default action for modal close button
     function defaultCloseAction(e: Event): void {
         e.preventDefault();
@@ -247,7 +207,7 @@ namespace Vault {
 
     // Delete a record
     function deleteCredential(credentialId: string, userId: string, masterKey: string): void {
-        ajaxPost(internal.basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, (data: any): void => {
+        repository.delete(userId, credentialId, data => {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 cachedList = removeFromList(credentialId, cachedList);
@@ -266,7 +226,7 @@ namespace Vault {
     // Export all credential data as JSON
     export function exportData(userId: string, masterKey: string): void {
         // Get all the credentials, decrypt each one
-        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, (data: Credential[]): void => {
+        repository.loadCredentialsForUserFull(userId, data => {
             const exportItems: Credential[] = data.map((item: Credential): Credential => {
                 const o: Credential = decryptObject(item, base64ToUtf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
@@ -323,10 +283,10 @@ namespace Vault {
             return encryptObject(item, base64ToUtf8(masterKey), excludes);
         });
 
-        ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), (): void => {
+        repository.updateMultiple(newData, () => {
             // Just reload the whole page when we're done to force login
             location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-        }, null, 'application/json; charset=utf-8');
+        });
     }
 
     export function isChecked(el: JQuery): boolean {
@@ -337,7 +297,7 @@ namespace Vault {
     // If null is passed as the credentialId, we set up the form for adding a new record
     function loadCredential(credentialId: string, masterKey: string): void {
         if (credentialId !== null) {
-            ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, (data: Credential): void => {
+            repository.loadCredential(credentialId, data => {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
                 showModal({
@@ -373,7 +333,7 @@ namespace Vault {
         if (cachedList !== null && cachedList.length) {
             buildDataTable(cachedList, callback, masterKey, userId);
         } else {
-            ajaxPost(internal.basePath + 'Main/GetAll', { userId: userId }, (data: Credential[]): void => {
+            repository.loadCredentialsForUser(userId, data => {
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
                 const items: Credential[] = data.map((item: Credential): Credential => {
@@ -471,7 +431,7 @@ namespace Vault {
 
     // Show the read-only details modal
     function showDetail(credentialId: string, masterKey: string): void {
-        ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, (data: Credential): void => {
+        repository.loadCredential(credentialId, data => {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
             // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
@@ -694,6 +654,8 @@ namespace Vault {
         // Set the base path for AJAX requests/redirects
         internal.basePath = basePath;
 
+        repository = new Repository(internal.basePath);
+
         uiSetup();
 
         ui.container.on('click', '.btn-credential-show-detail', (e: Event): void => {
@@ -735,10 +697,7 @@ namespace Vault {
             const username: string = ui.loginForm.find('#UN1209').val();
             const password: string = ui.loginForm.find('#PW9804').val();
 
-            ajaxPost(basePath + 'Main/Login', {
-                UN1209: Passpack.utils.hashx(username),
-                PW9804: Passpack.utils.hashx(password)
-            }, (data: any): void => {
+            repository.login(Passpack.utils.hashx(username), Passpack.utils.hashx(password), data => {
                 // If the details were valid
                 if (data.result === 1 && data.id !== '') {
                     // Set some private variables so that we can reuse them for encryption during this session
@@ -792,7 +751,7 @@ namespace Vault {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
-            ajaxPost(basePath + 'Main/Update', credential, (data: Credential): void => {
+            repository.update(credential, data => {
                 const idx = findIndex(data.CredentialID, cachedList);
                 if (idx === -1) {
                     cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));

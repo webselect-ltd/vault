@@ -7,7 +7,6 @@
 var Vault;
 (function (Vault) {
     var weakPasswordThreshold = 40; // Bit value below which password is deemed weak
-    var artificialAjaxDelay = false; // Introduce an artificial delay for AJAX calls so we can test loaders locally
     var cachedList = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
     var internal = {
         basePath: null,
@@ -54,35 +53,6 @@ var Vault;
         copyLink: null,
         exportedDataWindow: null
     };
-    function ajaxPost(url, data, successCallback, errorCallback, contentType) {
-        ui.spinner.show();
-        if (!errorCallback) {
-            errorCallback = defaultAjaxErrorCallback;
-        }
-        var options = {
-            url: url,
-            data: data,
-            dataType: 'json',
-            type: 'POST',
-            success: function (responseData, status, request) {
-                ui.spinner.hide();
-                successCallback(responseData, status, request);
-            },
-            error: function (request, status, error) {
-                ui.spinner.hide();
-                errorCallback(request, status, error);
-            }
-        };
-        if (contentType) {
-            options.contentType = contentType;
-        }
-        if (!artificialAjaxDelay) {
-            $.ajax(options);
-        }
-        else {
-            setTimeout(function () { return $.ajax(options); }, 2000);
-        }
-    }
     // Decode Base64 string
     function base64ToUtf8(str) {
         return unescape(decodeURIComponent(atob(str)));
@@ -117,21 +87,17 @@ var Vault;
         var newMasterKey = utf8ToBase64(createMasterKey(newPassword));
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
-        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
+        Vault.repository.loadCredentialsForUserFull(userId, function (data) {
             var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
             var reEncrypt = function (item) { return encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes); };
             var newData = data.map(reEncrypt);
-            ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
+            Vault.repository.updateMultiple(newData, function () {
                 // Store the new password in hashed form
-                ajaxPost(internal.basePath + 'Main/UpdatePassword', {
-                    newHash: newPasswordHash,
-                    userid: userId,
-                    oldHash: Passpack.utils.hashx(internal.password)
-                }, function () {
+                Vault.repository.updatePassword(userId, Passpack.utils.hashx(internal.password), newPasswordHash, function () {
                     // Just reload the whole page when we're done to force login
                     location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
                 });
-            }, null, 'application/json; charset=utf-8');
+            });
         });
     }
     Vault.changePassword = changePassword;
@@ -218,9 +184,6 @@ var Vault;
         e.preventDefault();
         ui.modal.modal('hide');
     }
-    function defaultAjaxErrorCallback(ignore, status, error) {
-        return alert('Http Error: ' + status + ' - ' + error);
-    }
     // Default action for modal close button
     function defaultCloseAction(e) {
         e.preventDefault();
@@ -228,7 +191,7 @@ var Vault;
     }
     // Delete a record
     function deleteCredential(credentialId, userId, masterKey) {
-        ajaxPost(internal.basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data) {
+        Vault.repository["delete"](userId, credentialId, function (data) {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 cachedList = removeFromList(credentialId, cachedList);
@@ -246,7 +209,7 @@ var Vault;
     // Export all credential data as JSON
     function exportData(userId, masterKey) {
         // Get all the credentials, decrypt each one
-        ajaxPost(internal.basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
+        Vault.repository.loadCredentialsForUserFull(userId, function (data) {
             var exportItems = data.map(function (item) {
                 var o = decryptObject(item, base64ToUtf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
@@ -301,10 +264,10 @@ var Vault;
             item.UserID = userId;
             return encryptObject(item, base64ToUtf8(masterKey), excludes);
         });
-        ajaxPost(internal.basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
+        Vault.repository.updateMultiple(newData, function () {
             // Just reload the whole page when we're done to force login
             location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-        }, null, 'application/json; charset=utf-8');
+        });
     }
     Vault.importData = importData;
     function isChecked(el) {
@@ -315,7 +278,7 @@ var Vault;
     // If null is passed as the credentialId, we set up the form for adding a new record
     function loadCredential(credentialId, masterKey) {
         if (credentialId !== null) {
-            ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, function (data) {
+            Vault.repository.loadCredential(credentialId, function (data) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
                 showModal({
@@ -352,7 +315,7 @@ var Vault;
             buildDataTable(cachedList, callback, masterKey, userId);
         }
         else {
-            ajaxPost(internal.basePath + 'Main/GetAll', { userId: userId }, function (data) {
+            Vault.repository.loadCredentialsForUser(userId, function (data) {
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
                 var items = data.map(function (item) {
@@ -448,7 +411,7 @@ var Vault;
     }
     // Show the read-only details modal
     function showDetail(credentialId, masterKey) {
-        ajaxPost(internal.basePath + 'Main/Load', { id: credentialId }, function (data) {
+        Vault.repository.loadCredential(credentialId, function (data) {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
             // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
@@ -662,6 +625,7 @@ var Vault;
     function init(basePath, devMode) {
         // Set the base path for AJAX requests/redirects
         internal.basePath = basePath;
+        Vault.repository = new Repository(internal.basePath);
         uiSetup();
         ui.container.on('click', '.btn-credential-show-detail', function (e) {
             e.preventDefault();
@@ -695,10 +659,7 @@ var Vault;
             e.preventDefault();
             var username = ui.loginForm.find('#UN1209').val();
             var password = ui.loginForm.find('#PW9804').val();
-            ajaxPost(basePath + 'Main/Login', {
-                UN1209: Passpack.utils.hashx(username),
-                PW9804: Passpack.utils.hashx(password)
-            }, function (data) {
+            Vault.repository.login(Passpack.utils.hashx(username), Passpack.utils.hashx(password), function (data) {
                 // If the details were valid
                 if (data.result === 1 && data.id !== '') {
                     // Set some private variables so that we can reuse them for encryption during this session
@@ -741,7 +702,7 @@ var Vault;
             };
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
-            ajaxPost(basePath + 'Main/Update', credential, function (data) {
+            Vault.repository.update(credential, function (data) {
                 var idx = findIndex(data.CredentialID, cachedList);
                 if (idx === -1) {
                     cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));

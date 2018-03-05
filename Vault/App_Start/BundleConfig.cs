@@ -16,6 +16,7 @@ namespace Vault
                       "~/Content/Js/vendor/js.cookie.js",
                       "~/Content/Js/concrete/Credential.js",
                       "~/Content/Js/concrete/CredentialSummary.js",
+                      "~/Content/Js/concrete/Repository.js",
                       "~/Content/Js/main.js"));
 
             bundles.Add(new ScriptBundle("~/Content/Js/tests").Include(
