@@ -36,6 +36,7 @@ var testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMj
 var testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
 var testCredentials;
 QUnit.testStart(function (details) {
+    /* tslint:disable:max-line-length */
     testCredentials = [
         new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123', 'cat123', 'http://cat.com', 'Cat UD 1', 'catud1', 'Cat UD 1', 'catud1', 'Cat notes', '12|1|1|1|1'),
         new Credential('cr2', 'user1', 'Dog', 'dog', 'dog123', 'dog123', 'http://dog.com', 'Dog UD 1', 'dogud1', 'Dog UD 1', 'dogud1', 'Dog notes', '12|1|1|1|1'),
@@ -44,6 +45,7 @@ QUnit.testStart(function (details) {
         new Credential('cr5', 'user1', 'Dogfish', 'dogfish', 'dogfish123', 'dogfish123', 'http://dogfish.com', 'Dogfish UD 1', 'dogfishud1', 'Dogfish UD 1', 'dogfishud1', 'Dogfish notes', '12|1|1|1|1'),
         new Credential('cr6', 'user1', 'Owl', 'owl', '_nT:NP?uovID8,TE', '_nT:NP?uovID8,TE', 'http://owl.com', 'Owl UD 1', 'owlud1', 'Owl UD 1', 'owlud1', 'Owl notes', '12|1|1|1|1')
     ];
+    /* tslint:enable:max-line-length */
     Vault.repository = new FakeRepository(testCredentials, testMasterKeyBase64Encoded);
 });
 QUnit.test('base64ToUtf8', function (assert) {
@@ -197,7 +199,7 @@ QUnit.test('isChecked', function (assert) {
 QUnit.test('loadCredentials', function (assert) {
     assert.expect(1);
     Vault.loadCredentials('user1', testMasterKeyBase64Encoded, function (cs) {
-        assert.ok(cs.length == 6);
+        assert.ok(cs.length === 6);
     });
 });
 QUnit.test('removeFromList', function (assert) {
@@ -247,7 +249,12 @@ QUnit.test('truncate', function (assert) {
     assert.ok(Vault.truncate(testString, 20) === 'This Is A Test');
 });
 QUnit.test('updateProperties', function (assert) {
-    var updated = Vault.updateProperties({ Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd', Url: 'http://test4.com' }, testCredentials[1]);
+    var updated = Vault.updateProperties({
+        Description: 'ITEM2UPDATE',
+        Username: 'item2new',
+        Password: 'abcd',
+        Url: 'http://test4.com'
+    }, testCredentials[1]);
     assert.ok(updated.Description === 'ITEM2UPDATE');
     assert.ok(updated.Username === 'item2new');
     assert.ok(updated.Password === 'abcd');
