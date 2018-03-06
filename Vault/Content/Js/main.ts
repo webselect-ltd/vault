@@ -75,26 +75,7 @@ namespace Vault {
     }
 
     // Change the password and re-encrypt all credentials with the new password
-    export function changePassword(userId: string, masterKey: string): void {
-        const newPassword: string = $('#NewPassword').val();
-        const newPasswordConfirm: string = $('#NewPasswordConfirm').val();
-        const confirmationMsg: string = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
-            + 'Are you SURE you want to change the master password?';
-
-        if (newPassword === '') {
-            alert('Password cannot be left blank.');
-            return;
-        }
-
-        if (newPassword !== newPasswordConfirm) {
-            alert('Password confirmation does not match password.');
-            return;
-        }
-
-        if (!confirm(confirmationMsg)) {
-            return;
-        }
-
+    export function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string, onUpdated: () => void): void {
         const newPasswordHash: string = Passpack.utils.hashx(newPassword);
         const newMasterKey: string = utf8ToBase64(createMasterKey(newPassword));
 
@@ -102,15 +83,12 @@ namespace Vault {
         // and re-encrypt it with the new one
         repository.loadCredentialsForUserFull(userId, data => {
             const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            const reEncrypt = (item: Credential) => encryptObject(decryptObject(item, base64ToUtf8(masterKey), excludes), newMasterKey, excludes);
+            const reEncrypt = (item: Credential) => encryptObject(decryptObject(item, masterKey, excludes), newMasterKey, excludes);
             const newData: Credential[] = data.map(reEncrypt);
 
             repository.updateMultiple(newData, () => {
                 // Store the new password in hashed form
-                repository.updatePassword(userId, Passpack.utils.hashx(internal.password), newPasswordHash, () => {
-                    // Just reload the whole page when we're done to force login
-                    location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-                });
+                repository.updatePassword(userId, Passpack.utils.hashx(oldPassword), newPasswordHash, onUpdated);
             });
         });
     }
@@ -857,6 +835,33 @@ namespace Vault {
                     ui.searchInput.select();
                 }
             }
+        });
+
+        $('body').on('click', '#change-password-button', e => {
+            const newPassword: string = $('#NewPassword').val();
+            const newPasswordConfirm: string = $('#NewPasswordConfirm').val();
+
+            const confirmationMsg = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
+                + 'Are you SURE you want to change the master password?';
+
+            if (newPassword === '') {
+                alert('Password cannot be left blank.');
+                return;
+            }
+
+            if (newPassword !== newPasswordConfirm) {
+                alert('Password confirmation does not match password.');
+                return;
+            }
+
+            if (!confirm(confirmationMsg)) {
+                return;
+            }
+            
+            changePassword(internal.userId, internal.masterKey, internal.password, newPassword, () => {
+                // Just reload the whole page when we're done to force login
+                location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+            });
         });
 
         // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
