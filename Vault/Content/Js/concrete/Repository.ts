@@ -37,7 +37,7 @@
         this.ajaxPost(this.basePath + 'Main/UpdateMultiple', JSON.stringify(credentials), onUpdated, null, 'application/json; charset=utf-8');
     }
 
-    public deleteCredential(userId: string, credentialId: string, onDeleted: (data: any) => void) {
+    public deleteCredential(userId: string, credentialId: string, onDeleted: () => void) {
         this.ajaxPost(this.basePath + 'Main/Delete', {
             userId: userId,
             credentialId: credentialId

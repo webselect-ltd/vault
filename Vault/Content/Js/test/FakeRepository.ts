@@ -34,7 +34,6 @@
         onUpdated();
     }
 
-    public deleteCredential(userId: string, credentialId: string, onDeleted: (data: any) => void) {
-        
+    public deleteCredential(userId: string, credentialId: string, onDeleted: () => void) {
     }
 }

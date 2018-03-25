@@ -9,5 +9,5 @@
     updatePassword(userId: string, oldHash: string, newHash: string, onUpdated: () => void): void;
     updateMultiple(credentials: Credential[], onUpdated: () => void): void;
 
-    deleteCredential(userId: string, credentialId: string, onDeleted: (data: any) => void): void;
+    deleteCredential(userId: string, credentialId: string, onDeleted: () => void): void;
 }
