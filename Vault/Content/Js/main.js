@@ -189,21 +189,15 @@ var Vault;
         });
     }
     // Export all credential data as JSON
-    function exportData(userId, masterKey) {
+    function exportData(userId, masterKey, onDecrypted) {
         // Get all the credentials, decrypt each one
         Vault.repository.loadCredentialsForUserFull(userId, function (data) {
             var exportItems = data.map(function (item) {
-                var o = decryptObject(item, base64ToUtf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
+                var o = decryptObject(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
-            var exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
-            if (exportWindow && exportWindow.top) {
-                exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
-            }
-            else {
-                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
-            }
+            onDecrypted(exportItems);
         });
     }
     Vault.exportData = exportData;
@@ -807,6 +801,19 @@ var Vault;
                 // Just reload the whole page when we're done to force login
                 location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
             });
+        });
+        var openExportPopup = function (data) {
+            var exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+            if (exportWindow && exportWindow.top) {
+                exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));
+            }
+            else {
+                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+            }
+        };
+        $('body').on('click', '#export-button', function (e) {
+            e.preventDefault();
+            exportData(internal.userId, internal.masterKey, openExportPopup);
         });
         // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
         if (devMode) {

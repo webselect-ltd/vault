@@ -218,6 +218,20 @@ QUnit.test('encryptObject', assert => {
     checkEncryption(assert, encrypted, testMasterKeyPlainText);
 });
 
+QUnit.test('exportData', assert => {
+    assert.expect(6);
+    const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
+        c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID == 'user1';
+    Vault.exportData('user1', testMasterKeyBase64Encoded, data => {
+        assert.ok(check(data[0], 'cr1', 'Cat', 'cat', 'cat123'));
+        assert.ok(check(data[1], 'cr2', 'Dog', 'dog', 'dog123'));
+        assert.ok(check(data[2], 'cr3', 'Fish', 'fish', 'fish123'));
+        assert.ok(check(data[3], 'cr4', 'Catfish', 'catfish', 'catfish123'));
+        assert.ok(check(data[4], 'cr5', 'Dogfish', 'dogfish', 'dogfish123'));
+        assert.ok(check(data[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
+    });
+});
+
 QUnit.test('findIndex', assert => {
     const idx = Vault.findIndex('cr2', testCredentials);
     assert.ok(idx === 1);
