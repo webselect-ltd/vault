@@ -84,6 +84,7 @@ QUnit.testStart(details => {
     ﻿/* tslint:enable:max-line-length */
 
     Vault.repository = new FakeRepository(testCredentials, testMasterKeyBase64Encoded);
+    Vault.cachedList = [];
 });
 
 QUnit.test('base64ToUtf8', assert => {

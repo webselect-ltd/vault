@@ -8,7 +8,7 @@
 namespace Vault {
     const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak
 
-    let cachedList: Credential[] = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
+    export let cachedList: Credential[] = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
 
     export let repository: IRepository;
 
