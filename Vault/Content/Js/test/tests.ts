@@ -214,6 +214,14 @@ QUnit.test('crypt(Passpack.decode)', assert => {
     checkDecryption(assert, decrypted);
 });
 
+QUnit.test('deleteCredential', assert => {
+    assert.expect(2);
+    Vault.deleteCredential('cr3', 'user1', testMasterKeyBase64Encoded, rows => {
+        assert.ok(rows.length === 5);
+        assert.ok(rows.filter(r => r.credentialid === 'cr3').length === 0);
+    });
+});
+
 QUnit.test('encryptObject', assert => {
     const encrypted = Vault.encryptObject(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
     checkEncryption(assert, encrypted, testMasterKeyPlainText);

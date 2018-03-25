@@ -35,5 +35,8 @@
     }
 
     public deleteCredential(userId: string, credentialId: string, onDeleted: () => void) {
+        this.credentials = this.credentials.filter(c => c.CredentialID !== credentialId);
+        this.encryptedCredentials = this.encryptedCredentials.filter(c => c.CredentialID !== credentialId);
+        onDeleted();
     }
 }

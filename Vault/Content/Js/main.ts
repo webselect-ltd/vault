@@ -106,7 +106,11 @@ namespace Vault {
             deleteText: 'Yes, Delete This Credential',
             ondelete: (e: Event): void => {
                 e.preventDefault();
-                deleteCredential(id, internal.userId, masterKey);
+                deleteCredential(id, internal.userId, masterKey, rows => {
+                    ui.modal.modal('hide');
+                    const results: Credential[] = search(ui.searchInput.val(), cachedList);
+                    buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
+                });
             }
         });
     }
@@ -184,20 +188,9 @@ namespace Vault {
     }
 
     // Delete a record
-    function deleteCredential(credentialId: string, userId: string, masterKey: string): void {
-        repository.deleteCredential(userId, credentialId, data => {
-            if (data.Success) {
-                // Remove the deleted item from the cached list before reload
-                cachedList = removeFromList(credentialId, cachedList);
-                // For now we just reload the entire table in the background
-                loadCredentials(userId, masterKey, (): void => {
-                    ui.modal.modal('hide');
-                    const results: Credential[] = search(ui.searchInput.val(), cachedList);
-                    buildDataTable(results, (rows: CredentialSummary[]): void => {
-                        ui.container.html(createCredentialTable(rows));
-                    }, masterKey, userId);
-                });
-            }
+    export function deleteCredential(credentialId: string, userId: string, masterKey: string, onDeleted: (rows: CredentialSummary[]) => void): void {
+        repository.deleteCredential(userId, credentialId, () => {
+            loadCredentials(userId, masterKey, onDeleted);
         });
     }
 
