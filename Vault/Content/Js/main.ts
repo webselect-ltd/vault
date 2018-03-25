@@ -316,6 +316,15 @@ namespace Vault {
         }
     }
 
+    export function openExportPopup(data: Credential[]): void {
+        const exportWindow: Window = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+        if (exportWindow && exportWindow.top) {
+            exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));
+        } else {
+            alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+        }
+    }
+
     // Show the options dialog
     function optionsDialog(): void {
         const dialogHtml: string = templates.optionsDialog({
@@ -342,6 +351,11 @@ namespace Vault {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
+    }
+
+    export function reloadApp(): void {
+        // Just reload the whole page when we're done to force login
+        location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
     }
 
     // Remove the credential with a specific ID from an array
@@ -570,11 +584,6 @@ namespace Vault {
         }
 
         return errors;
-    }
-
-    export function reloadApp(): void {
-        // Just reload the whole page when we're done to force login
-        location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
     }
 
     export function uiSetup(): void {
@@ -853,21 +862,12 @@ namespace Vault {
             if (!confirm(confirmationMsg)) {
                 return;
             }
-            
+
             changePassword(internal.userId, internal.masterKey, internal.password, newPassword, () => {
                 // Just reload the whole page when we're done to force login
                 location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
             });
         });
-
-        const openExportPopup = (data: Credential[]) => {
-            const exportWindow: Window = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
-            if (exportWindow && exportWindow.top) {
-                exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));
-            } else {
-                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
-            }
-        };
 
         $('body').on('click', '#export-button', e => {
             e.preventDefault();

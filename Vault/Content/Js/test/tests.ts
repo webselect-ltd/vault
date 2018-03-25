@@ -112,7 +112,7 @@ QUnit.test('changePassword', assert => {
     const newMasterKey = Vault.utf8ToBase64(Vault.createMasterKey(newPassword));
     const excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
     const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
-        c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID == 'user1';
+        c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID === 'user1';
     Vault.changePassword(userId, testMasterKeyBase64Encoded, 'test123', 'test321', () => {
         Vault.repository.loadCredentialsForUserFull(userId, data => {
             const decrypted = data.map(c => Vault.decryptObject(c, newMasterKey, excludes));
@@ -221,7 +221,7 @@ QUnit.test('encryptObject', assert => {
 QUnit.test('exportData', assert => {
     assert.expect(6);
     const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
-        c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID == 'user1';
+        c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID === 'user1';
     Vault.exportData('user1', testMasterKeyBase64Encoded, data => {
         assert.ok(check(data[0], 'cr1', 'Cat', 'cat', 'cat123'));
         assert.ok(check(data[1], 'cr2', 'Dog', 'dog', 'dog123'));
@@ -295,7 +295,7 @@ QUnit.test('parseImportData', assert => {
         "Notes": "",
         "PwdOptions": ""
     }]`;
-    let newData = Vault.parseImportData(userId, testMasterKeyBase64Encoded, importData);
+    const newData = Vault.parseImportData(userId, testMasterKeyBase64Encoded, importData);
     assert.ok(newData.length === 1);
     assert.ok(newData[0].UserID === userId);
     assert.ok(newData[0].CredentialID === null);

@@ -302,6 +302,16 @@ var Vault;
         }
     }
     Vault.loadCredentials = loadCredentials;
+    function openExportPopup(data) {
+        var exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+        if (exportWindow && exportWindow.top) {
+            exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));
+        }
+        else {
+            alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+        }
+    }
+    Vault.openExportPopup = openExportPopup;
     // Show the options dialog
     function optionsDialog() {
         var dialogHtml = templates.optionsDialog({
@@ -328,6 +338,11 @@ var Vault;
         };
     }
     Vault.rateLimit = rateLimit;
+    function reloadApp() {
+        // Just reload the whole page when we're done to force login
+        location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+    }
+    Vault.reloadApp = reloadApp;
     // Remove the credential with a specific ID from an array
     function removeFromList(id, list) {
         return list.filter(function (item) { return item.CredentialID !== id; });
@@ -554,11 +569,6 @@ var Vault;
         return errors;
     }
     Vault.validateRecord = validateRecord;
-    function reloadApp() {
-        // Just reload the whole page when we're done to force login
-        location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-    }
-    Vault.reloadApp = reloadApp;
     function uiSetup() {
         // Cache UI selectors
         ui.loginFormDialog = $('#login-form-dialog');
@@ -804,15 +814,6 @@ var Vault;
                 location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
             });
         });
-        var openExportPopup = function (data) {
-            var exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
-            if (exportWindow && exportWindow.top) {
-                exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));
-            }
-            else {
-                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
-            }
-        };
         $('body').on('click', '#export-button', function (e) {
             e.preventDefault();
             exportData(internal.userId, internal.masterKey, openExportPopup);
