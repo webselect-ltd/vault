@@ -98,7 +98,8 @@
     <TypeScriptCompile Include="Content\Js\abstract\IRepository.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\XHRSuccess.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\XHRError.ts" />
-    <Content Include="Content\Js\test\blanket.js" />
+    <Content Include="Content\Js\test\lib\blanket.js" />
+    <Content Include="Content\Js\test\lib\qunit-2.5.1.js" />
     <Content Include="Content\Js\vendor\bootstrap.js" />
     <Content Include="Content\Js\vendor\handlebars-v4.0.5.js" />
     <Content Include="Content\Js\vendor\hide-address-bar.js" />
@@ -109,7 +110,6 @@
     <TypeScriptCompile Include="Content\Js\main.ts" />
     <Content Include="Content\Js\vendor\passpack-v1.1.js" />
     <Content Include="Content\Css\test\qunit-2.5.1.css" />
-    <Content Include="Content\Js\test\qunit-2.5.1.js" />
     <TypeScriptCompile Include="Content\Js\test\FakeRepository.ts" />
     <TypeScriptCompile Include="Content\Js\test\tests.ts" />
     <Content Include="Global.asax" />

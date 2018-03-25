@@ -20,8 +20,8 @@ namespace Vault
                       "~/Content/Js/main.js"));
 
             bundles.Add(new ScriptBundle("~/Content/Js/tests").Include(
-                      "~/Content/Js/test/qunit-2.5.1.js",
-                      "~/Content/Js/test/blanket.js",
+                      "~/Content/Js/test/lib/qunit-2.5.1.js",
+                      "~/Content/Js/test/lib/blanket.js",
                       "~/Content/Js/test/FakeRepository.js",
                       "~/Content/Js/test/tests.js"));
 
