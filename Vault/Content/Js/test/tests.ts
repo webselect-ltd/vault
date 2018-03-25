@@ -93,7 +93,6 @@ QUnit.test('base64ToUtf8', assert => {
 
 QUnit.test('buildDataTable', assert => {
     assert.expect(4);
-    const masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
     const userId = 'user1';
     const list = testCredentials.slice(0, 3);
     const result = Vault.buildDataTable(list, rows => {
@@ -101,7 +100,7 @@ QUnit.test('buildDataTable', assert => {
         assert.ok(rows[0].credentialid === 'cr1' && rows[0].description === 'Cat' && rows[0].masterkey === masterKey && rows[0].userid === 'user1');
         assert.ok(rows[1].credentialid === 'cr2' && rows[1].description === 'Dog' && rows[1].masterkey === masterKey && rows[1].userid === 'user1');
         assert.ok(rows[2].credentialid === 'cr3' && rows[2].description === 'Fish' && rows[2].masterkey === masterKey && rows[2].userid === 'user1');
-    }, masterKey, userId);
+    }, testMasterKeyBase64Encoded, userId);
 });
 
 QUnit.test('checkIf', assert => {
@@ -114,14 +113,12 @@ QUnit.test('checkIf', assert => {
 });
 
 QUnit.test('createCredentialDisplayData', assert => {
-    // base64encode('test123' + passpackhash('test123'))
-    const masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
     const credential = new Credential('cr1', 'user1', 'Item Description');
-    const data = Vault.createCredentialDisplayData(credential, masterKey, 'user1');
+    const data = Vault.createCredentialDisplayData(credential, testMasterKeyBase64Encoded, 'user1');
     assert.ok(data.credentialid === 'cr1');
     assert.ok(data.description === 'Item Description');
     assert.ok(data.userid === 'user1');
-    assert.ok(data.masterkey === masterKey);
+    assert.ok(data.masterkey === testMasterKeyBase64Encoded);
 });
 
 QUnit.test('createCredentialFromFormFields', assert => {
@@ -171,8 +168,7 @@ QUnit.test('createCredentialFromFormFields', assert => {
 
 QUnit.test('createCredentialTable', assert => {
     Vault.uiSetup();
-    const masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
-    const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, masterKey, 'user1'));
+    const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
     const table = $(Vault.createCredentialTable(data));
     const rows = table.filter('.row');
     assert.ok(rows.length === 6);
