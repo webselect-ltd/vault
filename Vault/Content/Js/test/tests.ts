@@ -278,6 +278,30 @@ QUnit.test('getPasswordLength', assert => {
     assert.ok(val3 === 10);
 });
 
+QUnit.test('parseImportData', assert => {
+    const userId = 'user1';
+    const importData = `[{
+        "CredentialID": "NEW",
+        "UserID": "user1_old",
+        "Description": "IMPORTED",
+        "Username": "im1",
+        "Password": "im123",
+        "PasswordConfirmation": "im123",
+        "Url": "http://imported.com",
+        "UserDefined1Label": "",
+        "UserDefined1": "",
+        "UserDefined2Label": "",
+        "UserDefined2": "",
+        "Notes": "",
+        "PwdOptions": ""
+    }]`;
+    let newData = Vault.parseImportData(userId, testMasterKeyBase64Encoded, importData);
+    assert.ok(newData.length === 1);
+    assert.ok(newData[0].UserID === userId);
+    assert.ok(newData[0].CredentialID === null);
+    assert.ok(!newData[0].PasswordConfirmation);
+});
+
 QUnit.test('isChecked', assert => {
     const checkbox1 = $('<input type="checkbox">');
     const checkbox2 = $('<input type="checkbox" checked="checked">');

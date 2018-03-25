@@ -228,7 +228,7 @@ var Vault;
     }
     Vault.getPasswordGenerationOptions = getPasswordGenerationOptions;
     // Import unencrypted JSON credential data
-    function importData(userId, masterKey, rawData) {
+    function parseImportData(userId, masterKey, rawData) {
         var jsonImportData = JSON.parse(rawData);
         var excludes = ['CredentialID', 'UserID'];
         var newData = jsonImportData.map(function (item) {
@@ -238,14 +238,11 @@ var Vault;
             item.CredentialID = null;
             // Set the user ID to the ID of the new (logged in) user
             item.UserID = userId;
-            return encryptObject(item, base64ToUtf8(masterKey), excludes);
+            return encryptObject(item, masterKey, excludes);
         });
-        Vault.repository.updateMultiple(newData, function () {
-            // Just reload the whole page when we're done to force login
-            location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-        });
+        return newData;
     }
-    Vault.importData = importData;
+    Vault.parseImportData = parseImportData;
     function isChecked(el) {
         return el[0].checked;
     }
@@ -557,6 +554,11 @@ var Vault;
         return errors;
     }
     Vault.validateRecord = validateRecord;
+    function reloadApp() {
+        // Just reload the whole page when we're done to force login
+        location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+    }
+    Vault.reloadApp = reloadApp;
     function uiSetup() {
         // Cache UI selectors
         ui.loginFormDialog = $('#login-form-dialog');
@@ -814,6 +816,11 @@ var Vault;
         $('body').on('click', '#export-button', function (e) {
             e.preventDefault();
             exportData(internal.userId, internal.masterKey, openExportPopup);
+        });
+        $('body').on('click', '#import-button', function (e) {
+            e.preventDefault();
+            var newData = parseImportData(internal.userId, internal.masterKey, $('#import-data').val());
+            Vault.repository.updateMultiple(newData, reloadApp);
         });
         // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
         if (devMode) {

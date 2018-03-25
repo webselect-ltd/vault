@@ -241,7 +241,7 @@ namespace Vault {
     }
 
     // Import unencrypted JSON credential data
-    export function importData(userId: string, masterKey: string, rawData: string): void {
+    export function parseImportData(userId: string, masterKey: string, rawData: string): Credential[] {
         const jsonImportData: Credential[] = JSON.parse(rawData);
         const excludes: string[] = ['CredentialID', 'UserID'];
 
@@ -252,13 +252,10 @@ namespace Vault {
             item.CredentialID = null;
             // Set the user ID to the ID of the new (logged in) user
             item.UserID = userId;
-            return encryptObject(item, base64ToUtf8(masterKey), excludes);
+            return encryptObject(item, masterKey, excludes);
         });
 
-        repository.updateMultiple(newData, () => {
-            // Just reload the whole page when we're done to force login
-            location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-        });
+        return newData;
     }
 
     export function isChecked(el: JQuery): boolean {
@@ -575,6 +572,11 @@ namespace Vault {
         return errors;
     }
 
+    export function reloadApp(): void {
+        // Just reload the whole page when we're done to force login
+        location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
+    }
+
     export function uiSetup(): void {
         // Cache UI selectors
         ui.loginFormDialog = $('#login-form-dialog');
@@ -870,6 +872,12 @@ namespace Vault {
         $('body').on('click', '#export-button', e => {
             e.preventDefault();
             exportData(internal.userId, internal.masterKey, openExportPopup);
+        });
+
+        $('body').on('click', '#import-button', e => {
+            e.preventDefault();
+            const newData = parseImportData(internal.userId, internal.masterKey, $('#import-data').val());
+            repository.updateMultiple(newData, reloadApp);
         });
 
         // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
