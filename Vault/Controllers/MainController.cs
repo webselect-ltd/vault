@@ -94,15 +94,13 @@ namespace Vault.Controllers
         [HttpPost]
         public ActionResult Delete(string credentialId, string userId)
         {
-            var success = true;
-
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 conn.Execute("DELETE FROM Credentials WHERE UserID = @UserID AND CredentialID = @CredentialID", new { UserID = userId, CredentialID = credentialId });
             }
 
-            return Json(new { Success = success });
+            return Json(new { Success = true });
         }
 
         [HttpPost]
