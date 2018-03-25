@@ -95,11 +95,13 @@ QUnit.test('buildDataTable', assert => {
     assert.expect(4);
     const userId = 'user1';
     const list = testCredentials.slice(0, 3);
+    const check = (row: CredentialSummary, id: string, desc: string) =>
+        row.credentialid === id && row.description === desc && row.masterkey === testMasterKeyBase64Encoded && row.userid === 'user1';
     const result = Vault.buildDataTable(list, rows => {
         assert.ok(rows.length === 3);
-        assert.ok(rows[0].credentialid === 'cr1' && rows[0].description === 'Cat' && rows[0].masterkey === masterKey && rows[0].userid === 'user1');
-        assert.ok(rows[1].credentialid === 'cr2' && rows[1].description === 'Dog' && rows[1].masterkey === masterKey && rows[1].userid === 'user1');
-        assert.ok(rows[2].credentialid === 'cr3' && rows[2].description === 'Fish' && rows[2].masterkey === masterKey && rows[2].userid === 'user1');
+        assert.ok(check(rows[0], 'cr1', 'Cat'));
+        assert.ok(check(rows[1], 'cr2', 'Dog'));
+        assert.ok(check(rows[2], 'cr3', 'Fish'));
     }, testMasterKeyBase64Encoded, userId);
 });
 
