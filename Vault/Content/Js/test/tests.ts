@@ -105,6 +105,27 @@ QUnit.test('buildDataTable', assert => {
     }, testMasterKeyBase64Encoded, userId);
 });
 
+QUnit.test('changePassword', assert => {
+    assert.expect(6);
+    const userId = 'user1';
+    const newPassword = 'test321';
+    const newMasterKey = Vault.utf8ToBase64(Vault.createMasterKey(newPassword));
+    const excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+    const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
+        c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID == 'user1';
+    Vault.changePassword(userId, testMasterKeyBase64Encoded, 'test123', 'test321', () => {
+        Vault.repository.loadCredentialsForUserFull(userId, data => {
+            const decrypted = data.map(c => Vault.decryptObject(c, newMasterKey, excludes));
+            assert.ok(check(decrypted[0], 'cr1', 'Cat', 'cat', 'cat123'));
+            assert.ok(check(decrypted[1], 'cr2', 'Dog', 'dog', 'dog123'));
+            assert.ok(check(decrypted[2], 'cr3', 'Fish', 'fish', 'fish123'));
+            assert.ok(check(decrypted[3], 'cr4', 'Catfish', 'catfish', 'catfish123'));
+            assert.ok(check(decrypted[4], 'cr5', 'Dogfish', 'dogfish', 'dogfish123'));
+            assert.ok(check(decrypted[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
+        });
+    });
+});
+
 QUnit.test('checkIf', assert => {
     const checkbox1 = $('<input type="checkbox">');
     const checkbox2 = $('<input type="checkbox" checked="checked">');

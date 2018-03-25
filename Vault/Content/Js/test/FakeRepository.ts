@@ -26,11 +26,12 @@
     }
 
     public updatePassword(userId: string, oldHash: string, newHash: string, onUpdated: () => void): void {
-        
+        onUpdated();
     }
 
     public updateMultiple(credentials: Credential[], onUpdated: () => void): void {
-        
+        this.encryptedCredentials = credentials;
+        onUpdated();
     }
 
     public deleteCredential(userId: string, credentialId: string, onDeleted: (data: any) => void) {
