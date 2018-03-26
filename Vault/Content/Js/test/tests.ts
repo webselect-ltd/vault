@@ -83,12 +83,15 @@ QUnit.testStart(details => {
     ];
     ﻿/* tslint:enable:max-line-length */
 
-    Vault.repository = new FakeRepository(testCredentials, testMasterKeyBase64Encoded);
     Vault.cachedList = [];
+    const cryptoProvider = new CryptoProvider();
+
+    Vault.repository = new FakeRepository(testCredentials, cryptoProvider, testMasterKeyBase64Encoded);
+    Vault.cryptoProvider = cryptoProvider;
 });
 
 QUnit.test('base64ToUtf8', assert => {
-    const utf8 = Vault.base64ToUtf8('VEVTVA==');
+    const utf8 = new CryptoProvider().base64ToUtf8('VEVTVA==');
     assert.ok(utf8 === 'TEST');
 });
 
@@ -108,15 +111,16 @@ QUnit.test('buildDataTable', assert => {
 
 QUnit.test('changePassword', assert => {
     assert.expect(6);
+    const cryptoProvider = new CryptoProvider();
     const userId = 'user1';
     const newPassword = 'test321';
-    const newMasterKey = Vault.utf8ToBase64(Vault.createMasterKey(newPassword));
+    const newMasterKey = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(newPassword));
     const excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
     const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
         c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID === 'user1';
     Vault.changePassword(userId, testMasterKeyBase64Encoded, 'test123', 'test321', () => {
         Vault.repository.loadCredentialsForUserFull(userId, data => {
-            const decrypted = data.map(c => Vault.decryptObject(c, newMasterKey, excludes));
+            const decrypted = data.map(c => cryptoProvider.decryptCredential(c, newMasterKey, excludes));
             assert.ok(check(decrypted[0], 'cr1', 'Cat', 'cat', 'cat123'));
             assert.ok(check(decrypted[1], 'cr2', 'Dog', 'dog', 'dog123'));
             assert.ok(check(decrypted[2], 'cr3', 'Fish', 'fish', 'fish123'));
@@ -200,19 +204,20 @@ QUnit.test('createCredentialTable', assert => {
     assert.ok($(rows[1]).find('.full').text() === 'Dog');
 });
 
-QUnit.test('createMasterKey', assert => {
-    assert.ok(Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true) === Vault.createMasterKey('test123'));
+QUnit.test('generateMasterKey', assert => {
+    const k = Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true);
+    assert.ok(k === new CryptoProvider().generateMasterKey('test123'));
 });
 
-QUnit.test('crypt(Passpack.encode)', assert => {
-    const encrypted = Vault.crypt(Passpack.encode, testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-    checkEncryption(assert, encrypted, testMasterKeyPlainText);
-});
+//QUnit.test('crypt(Passpack.encode)', assert => {
+//    const encrypted = new CryptoProvider().crypt(Passpack.encode, testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+//    checkEncryption(assert, encrypted, testMasterKeyPlainText);
+//});
 
-QUnit.test('crypt(Passpack.decode)', assert => {
-    const decrypted = Vault.crypt(Passpack.decode, testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-    checkDecryption(assert, decrypted);
-});
+//QUnit.test('crypt(Passpack.decode)', assert => {
+//    const decrypted = new CryptoProvider().crypt(Passpack.decode, testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+//    checkDecryption(assert, decrypted);
+//});
 
 QUnit.test('deleteCredential', assert => {
     assert.expect(2);
@@ -223,7 +228,7 @@ QUnit.test('deleteCredential', assert => {
 });
 
 QUnit.test('encryptObject', assert => {
-    const encrypted = Vault.encryptObject(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+    const encrypted = new CryptoProvider().encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
     checkEncryption(assert, encrypted, testMasterKeyPlainText);
 });
 
@@ -258,12 +263,13 @@ QUnit.test('rateLimit', assert => {
 });
 
 QUnit.test('decryptObject', assert => {
-    const decrypted = Vault.decryptObject(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+    const decrypted = new CryptoProvider().decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
     checkDecryption(assert, decrypted);
 });
 
 QUnit.test('getPasswordGenerationOptions', assert => {
     const html = '<div>'
+        + '<input type="text" class="generate-password-option" id="len" name="len" value="32">'
         + '<input type="checkbox" class="generate-password-option" id="ucase" name="ucase" value="1" checked="checked">'
         + '<input type="checkbox" class="generate-password-option" id="lcase" name="lcase" value="1">'
         + '<input type="checkbox" class="generate-password-option" id="nums" name="nums" value="1" checked="checked">'
@@ -271,20 +277,12 @@ QUnit.test('getPasswordGenerationOptions', assert => {
         + '</div>';
 
     const el = $(html);
-    const options = Vault.getPasswordGenerationOptions(el.find('input.generate-password-option'), Vault.isChecked);
-    assert.ok(options.ucase === 1);
-    assert.ok(typeof options.lcase === 'undefined');
-    assert.ok(options.nums === 1);
-    assert.ok(typeof options.symb === 'undefined');
-});
-
-QUnit.test('getPasswordLength', assert => {
-    const val1 = Vault.getPasswordLength(null);
-    const val2 = Vault.getPasswordLength('');
-    const val3 = Vault.getPasswordLength('10');
-    assert.ok(val1 === 16);
-    assert.ok(val2 === 16);
-    assert.ok(val3 === 10);
+    const options = Vault.getPasswordGenerationOptionValues(el.find('input.generate-password-option'), Vault.isChecked);
+    assert.ok(options.length === 32);
+    assert.ok(options.upperCase);
+    assert.ok(!options.lowerCase);
+    assert.ok(options.numbers);
+    assert.ok(!options.symbols);
 });
 
 QUnit.test('parseImportData', assert => {
@@ -389,7 +387,7 @@ QUnit.test('updateProperties', assert => {
 });
 
 QUnit.test('utf8ToBase64', assert => {
-    const b64 = Vault.utf8ToBase64('TEST');
+    const b64 = new CryptoProvider().utf8ToBase64('TEST');
     assert.ok(b64 === 'VEVTVA==');
 });
 

@@ -1,4 +1,6 @@
-﻿declare class PasspackCharMatrix {
+﻿type PasspackCryptoFunction = (algorithm: string, text: string, key: string, pars?: any) => string;
+
+declare class PasspackCharMatrix {
     public lcase: number[];
     public ucase: number[];
     public nums: number[];
@@ -6,10 +8,18 @@
     public space: number[];
 }
 
+interface IPasspackCharOptions {
+    lcase?: number;
+    ucase?: number;
+    nums?: number;
+    symb?: number;
+    space?: number;
+}
+
 interface IPasspackUtils {
-    getBits(passphrase: string): number;
     charMatrix: PasspackCharMatrix;
-    passGenerator(chars: any, n: number): string;
+    getBits(passphrase: string): number;
+    passGenerator(chars: IPasspackCharOptions, n: number): string;
     simplePassGenerator(n: number): string;
     genRandomKey(x: number, salt: string): string;
     getArrayFromHexString(hexstr: string, n: number): number[];
@@ -18,13 +28,9 @@ interface IPasspackUtils {
 }
 
 interface IPasspack {
-    decode: IPasspackCryptoFunction;
-    encode: IPasspackCryptoFunction;
+    decode: PasspackCryptoFunction;
+    encode: PasspackCryptoFunction;
     utils: IPasspackUtils;
-}
-
-interface IPasspackCryptoFunction {
-    (algorithm: string, text: string, key: string, pars?: any): string;
 }
 
 declare var Passpack: IPasspack;

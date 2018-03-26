@@ -2,7 +2,6 @@
 /// <reference types="bootstrap" />
 /// <reference types="handlebars" />
 /// <reference types="js-cookie" />
-/// <reference path="types/passpack.d.ts" />
 /// <reference path="types/hacks.d.ts" />
 
 namespace Vault {
@@ -11,6 +10,7 @@ namespace Vault {
     export let cachedList: Credential[] = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
 
     export let repository: IRepository;
+    export let cryptoProvider: ICryptoProvider;
 
     const internal: any = {
         basePath: null,     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
@@ -61,11 +61,6 @@ namespace Vault {
         exportedDataWindow: null
     };
 
-    // Decode Base64 string
-    export function base64ToUtf8(str: string): string {
-        return unescape(decodeURIComponent(atob(str)));
-    }
-
     // Build the data table
     export function buildDataTable(data: Credential[], callback: (c: CredentialSummary[]) => void, masterKey: string, userId: string) {
         // Create a table row for each record and add it to the rows array
@@ -76,19 +71,22 @@ namespace Vault {
 
     // Change the password and re-encrypt all credentials with the new password
     export function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string, onUpdated: () => void): void {
-        const newPasswordHash: string = Passpack.utils.hashx(newPassword);
-        const newMasterKey: string = utf8ToBase64(createMasterKey(newPassword));
+        const newPasswordHash: string = cryptoProvider.hash(newPassword);
+        const newMasterKey: string = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(newPassword));
 
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
         repository.loadCredentialsForUserFull(userId, data => {
             const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            const reEncrypt = (item: Credential) => encryptObject(decryptObject(item, masterKey, excludes), newMasterKey, excludes);
+            const reEncrypt = (item: Credential) => {
+                const decrypted = cryptoProvider.decryptCredential(item, masterKey, excludes);
+                return cryptoProvider.encryptCredential(decrypted, newMasterKey, excludes);
+            };
             const newData: Credential[] = data.map(reEncrypt);
 
             repository.updateMultiple(newData, () => {
                 // Store the new password in hashed form
-                repository.updatePassword(userId, Passpack.utils.hashx(oldPassword), newPasswordHash, onUpdated);
+                repository.updatePassword(userId, cryptoProvider.hash(oldPassword), newPasswordHash, onUpdated);
             });
         });
     }
@@ -106,7 +104,7 @@ namespace Vault {
             deleteText: 'Yes, Delete This Credential',
             ondelete: (e: Event): void => {
                 e.preventDefault();
-                deleteCredential(id, internal.userId, masterKey, rows => {
+                deleteCredential(id, internal.userId, masterKey, () => {
                     ui.modal.modal('hide');
                     const results: Credential[] = search(ui.searchInput.val(), cachedList);
                     buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
@@ -125,7 +123,7 @@ namespace Vault {
             username: credential.Username,
             password: credential.Password,
             url: credential.Url,
-            weak: $.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < weakPasswordThreshold
+            weak: $.trim(credential.Password) !== '' && cryptoProvider.getPasswordBits(credential.Password) < weakPasswordThreshold
         };
     }
 
@@ -141,38 +139,6 @@ namespace Vault {
     // Create the credential table
     export function createCredentialTable(rows: CredentialSummary[]): string {
         return templates.credentialTable({ rows: rows });
-    }
-
-    export function createMasterKey(password: string): string {
-        return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
-    }
-
-    /**
-     * Encrypt/decrypt the properties of an object literal using Passpack.
-     * @param {IPasspackCryptoFunction} action - The Passpack function to use for encryption/decryption
-     * @param {any} obj - The object literal to be encrypted/decrypted
-     * @param {string} masterKey - A Passpack master key
-     * @param {string[]} excludes - An array of object property names whose values should not be encrypted
-     * @returns {Credential}
-     */
-    export function crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
-        const newCredential: any = {};
-        Object.keys(obj).forEach((k: string): void => {
-            if (excludes.indexOf(k) === -1) {
-                newCredential[k] = action('AES', obj[k], base64ToUtf8(masterKey));
-            } else {
-                newCredential[k] = obj[k];
-            }
-        });
-        return newCredential;
-    }
-
-    export function decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
-        return crypt(Passpack.decode, obj, masterKey, excludes);
-    }
-
-    export function encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
-        return crypt(Passpack.encode, obj, masterKey, excludes);
     }
 
     // Default action for modal accept button
@@ -199,7 +165,7 @@ namespace Vault {
         // Get all the credentials, decrypt each one
         repository.loadCredentialsForUserFull(userId, data => {
             const exportItems: Credential[] = data.map((item: Credential): Credential => {
-                const o: Credential = decryptObject(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
+                const o: Credential = cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
@@ -217,20 +183,15 @@ namespace Vault {
         return -1;
     }
 
-    export function getPasswordLength(val: any): number {
-        const len: number = parseInt(val, 10);
-        return isNaN(len) ? 16 : len;
-    }
-
-    export function getPasswordGenerationOptions(inputs: JQuery, predicate: (element: JQuery) => boolean): any {
-        const options: any = {};
-        inputs.each((i, el): void => {
-            const checkbox: JQuery = $(el);
-            if (predicate(checkbox)) {
-                options[checkbox.attr('name')] = 1;
-            }
-        });
-        return options;
+    export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (element: JQuery) => boolean): IPasswordSpecification {
+        const len: number = parseInt(inputs.filter('[name=len]').val(), 10);
+        return {
+            length: isNaN(len) ? 16 : len,
+            upperCase: predicate(inputs.filter('[name=ucase]')),
+            lowerCase: predicate(inputs.filter('[name=lcase]')),
+            numbers: predicate(inputs.filter('[name=nums]')),
+            symbols: predicate(inputs.filter('[name=symb]'))
+        };
     }
 
     // Import unencrypted JSON credential data
@@ -245,7 +206,7 @@ namespace Vault {
             item.CredentialID = null;
             // Set the user ID to the ID of the new (logged in) user
             item.UserID = userId;
-            return encryptObject(item, masterKey, excludes);
+            return cryptoProvider.encryptCredential(item, masterKey, excludes);
         });
 
         return newData;
@@ -261,7 +222,7 @@ namespace Vault {
         if (credentialId !== null) {
             repository.loadCredential(credentialId, data => {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
-                data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+                data = cryptoProvider.decryptCredential(data, masterKey, ['CredentialID', 'UserID']);
                 showModal({
                     title: 'Edit Credential',
                     content: templates.credentialForm(data),
@@ -299,7 +260,7 @@ namespace Vault {
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
                 const items: Credential[] = data.map((item: Credential): Credential => {
-                    return decryptObject(item, masterKey, ['CredentialID', 'UserID']);
+                    return cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID']);
                 });
                 // Cache the whole (decrypted) list on the client
                 cachedList = items;
@@ -322,7 +283,7 @@ namespace Vault {
     function optionsDialog(): void {
         const dialogHtml: string = templates.optionsDialog({
             userid: internal.userId,
-            masterkey: utf8ToBase64(internal.masterKey)
+            masterkey: cryptoProvider.utf8ToBase64(internal.masterKey)
         });
 
         showModal({
@@ -384,7 +345,7 @@ namespace Vault {
                 } else if (query === 'weak') {
                     results = list.filter((item: Credential): boolean => {
                         const pwd: string = item.Password;
-                        return pwd && Passpack.utils.getBits(pwd) <= weakPasswordThreshold;
+                        return pwd && cryptoProvider.getPasswordBits(pwd) <= weakPasswordThreshold;
                     });
                 }
             } else {
@@ -409,7 +370,7 @@ namespace Vault {
     function showDetail(credentialId: string, masterKey: string): void {
         repository.loadCredential(credentialId, data => {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
-            data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+            data = cryptoProvider.decryptCredential(data, masterKey, ['CredentialID', 'UserID']);
             // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
             const urlText: string = templates.urlText({ Url: data.Url });
             const urlHtml: string = data.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: data.Url, UrlText: urlText });
@@ -503,7 +464,7 @@ namespace Vault {
         const strengthIndicator: JQuery = field.next('div.password-strength');
         const status: JQuery = strengthIndicator.find('> span');
         const bar: JQuery = strengthIndicator.find('> div');
-        const strength: number = Passpack.utils.getBits(field.val());
+        const strength: number = cryptoProvider.getPasswordBits(field.val());
         bar.removeClass();
         if (strength === 0) {
             status.html('No Password');
@@ -553,11 +514,6 @@ namespace Vault {
     // Update properties of the item with a specific ID in a list
     export function updateProperties(properties: any, credential: Credential): Credential {
         return $.extend({}, credential, properties);
-    }
-
-    // Encode string to Base64
-    export function utf8ToBase64(str: string): string {
-        return btoa(encodeURIComponent(escape(str)));
     }
 
     // Validate a credential record form
@@ -631,6 +587,7 @@ namespace Vault {
         internal.basePath = basePath;
 
         repository = new Repository(internal.basePath);
+        cryptoProvider = new CryptoProvider();
 
         uiSetup();
 
@@ -673,13 +630,13 @@ namespace Vault {
             const username: string = ui.loginForm.find('#UN1209').val();
             const password: string = ui.loginForm.find('#PW9804').val();
 
-            repository.login(Passpack.utils.hashx(username), Passpack.utils.hashx(password), data => {
+            repository.login(cryptoProvider.hash(username), cryptoProvider.hash(password), data => {
                 // If the details were valid
                 if (data.result === 1 && data.id !== '') {
                     // Set some private variables so that we can reuse them for encryption during this session
                     internal.userId = data.id;
                     internal.password = password;
-                    internal.masterKey = utf8ToBase64(createMasterKey(internal.password));
+                    internal.masterKey = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(internal.password));
 
                     loadCredentials(internal.userId, internal.masterKey, (): void => {
                         // Successfully logged in. Hide the login form
@@ -725,7 +682,7 @@ namespace Vault {
             };
 
             // CredentialID and UserID are not currently encrypted so don't try to decode them
-            credential = encryptObject(credential, internal.masterKey, ['CredentialID', 'UserID']);
+            credential = cryptoProvider.encryptCredential(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
             repository.updateCredential(credential, data => {
                 const idx = findIndex(data.CredentialID, cachedList);
@@ -757,9 +714,8 @@ namespace Vault {
         // Generate a nice strong password
         $('body').on('click', 'button.generate-password', (e: Event): void => {
             e.preventDefault();
-            const passwordOptions = getPasswordGenerationOptions($('input.generate-password-option'), isChecked);
-            const passwordLength = getPasswordLength($('#len').val());
-            const password: string = Passpack.utils.passGenerator(passwordOptions, passwordLength);
+            const passwordSpecification = getPasswordGenerationOptionValues($('input.generate-password-option'), isChecked);
+            const password: string = cryptoProvider.generatePassword(passwordSpecification);
             $('#Password').val(password);
             $('#PasswordConfirmation').val(password);
             const opts: any[] = [$('#len').val(),
