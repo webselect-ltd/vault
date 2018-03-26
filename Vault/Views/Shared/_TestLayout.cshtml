@@ -19,6 +19,7 @@
         @Scripts.Render("~/Content/Js/main")
         <script type="text/javascript">
             $('script[src="/Content/Js/main.js"]').attr('data-cover', '');
+            $('script[src^="/Content/Js"]').filter((i, e) => $(e).attr('src').match(/concrete\/.*\.js/i)).attr('data-cover', '');
             var _BASE_URL = '@(Url.Action("Index", "Main", null))';
         </script>
         @Scripts.Render("~/Content/Js/tests")
