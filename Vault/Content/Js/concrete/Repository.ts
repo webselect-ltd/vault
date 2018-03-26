@@ -1,47 +1,60 @@
 ﻿class Repository implements IRepository {
+    private jsonContentType = 'application/json; charset=utf-8';
+
     constructor(private basePath: string) {
     }
 
-    public login(hashedUsername: string, hashedPassword: string, onLoad: (data: any) => void): void {
-        this.ajaxPost(this.basePath + 'Main/Login', {
+    public async login(hashedUsername: string, hashedPassword: string): Promise<any> {
+        const data = {
             UN1209: hashedUsername,
             PW9804: hashedPassword
-        }, onLoad);
+        };
+        return this.ajaxPostPromise<any>('Main/Login', data);
     }
 
-    public loadCredential(credentialId: string, onLoad: (data: Credential) => void): void {
-        this.ajaxPost(this.basePath + 'Main/Load', { id: credentialId }, onLoad);
+    public async loadCredential(credentialId: string): Promise<Credential> {
+        return this.ajaxPostPromise<Credential>('Main/Load', { id: credentialId });
     }
 
-    public loadCredentialsForUser(userId: string, onLoad: (data: Credential[]) => void): void {
-        this.ajaxPost(this.basePath + 'Main/GetAll', { userId: userId }, onLoad);
+    public async loadCredentialsForUser(userId: string): Promise<Credential[]> {
+        return this.ajaxPostPromise<Credential[]>('Main/GetAll', { userId: userId });
     }
 
-    public loadCredentialsForUserFull(userId: string, onLoad: (data: Credential[]) => void): void {
-        this.ajaxPost(this.basePath + 'Main/GetAllComplete', { userId: userId }, onLoad);
+    public async loadCredentialsForUserFull(userId: string): Promise<Credential[]> {
+        return this.ajaxPostPromise<Credential[]>('Main/GetAllComplete', { userId: userId });
     }
 
-    public updateCredential(credential: Credential, onUpdated: (data: Credential) => void): void {
-        this.ajaxPost(this.basePath + 'Main/Update', credential, onUpdated);
+    public async updateCredential(credential: Credential): Promise<Credential> {
+        return this.ajaxPostPromise<Credential>('Main/Update', credential);
     }
 
-    public updatePassword(userId: string, oldHash: string, newHash: string, onUpdated: () => void): void {
-        this.ajaxPost(this.basePath + 'Main/UpdatePassword', {
+    public async updatePassword(userId: string, oldHash: string, newHash: string): Promise<void> {
+        const data = {
             userid: userId,
             oldHash: oldHash,
             newHash: newHash
-        }, onUpdated);
+        };
+        return this.ajaxPostPromise<void>('Main/UpdatePassword', data);
     }
 
-    public updateMultiple(credentials: Credential[], onUpdated: () => void): void {
-        this.ajaxPost(this.basePath + 'Main/UpdateMultiple', JSON.stringify(credentials), onUpdated, null, 'application/json; charset=utf-8');
+    public async updateMultiple(credentials: Credential[]): Promise<void> {
+        return this.ajaxPostPromiseJson<void>('Main/UpdateMultiple', JSON.stringify(credentials));
     }
 
-    public deleteCredential(userId: string, credentialId: string, onDeleted: () => void) {
-        this.ajaxPost(this.basePath + 'Main/Delete', {
+    public async deleteCredential(userId: string, credentialId: string): Promise<void> {
+        const data = {
             userId: userId,
             credentialId: credentialId
-        }, onDeleted);
+        };
+        return this.ajaxPostPromise<void>('Main/Delete', data);
+    }
+
+    private ajaxPostPromise<T>(url: string, data: any, json: boolean = false): Promise<T> {
+        return new Promise<T>(resolve => this.ajaxPost(this.basePath + url, data, result => resolve(result)));
+    }
+
+    private ajaxPostPromiseJson<T>(url: string, data: any, json: boolean = false): Promise<T> {
+        return new Promise<T>(resolve => this.ajaxPost(this.basePath + url, data, result => resolve(result), null, this.jsonContentType));
     }
 
     private defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {

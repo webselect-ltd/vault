@@ -68,25 +68,25 @@ namespace Vault {
     }
 
     // Change the password and re-encrypt all credentials with the new password
-    export function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string, onUpdated: () => void): void {
+    export async function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string): Promise<void> {
         const newPasswordHash: string = cryptoProvider.hash(newPassword);
         const newMasterKey: string = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(newPassword));
 
-        // Get all the credentials, decrypt each with the old password
-        // and re-encrypt it with the new one
-        repository.loadCredentialsForUserFull(userId, data => {
-            const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            const reEncrypt = (item: Credential) => {
-                const decrypted = cryptoProvider.decryptCredential(item, masterKey, excludes);
-                return cryptoProvider.encryptCredential(decrypted, newMasterKey, excludes);
-            };
-            const newData: Credential[] = data.map(reEncrypt);
+        // Get all the user's credentials, decrypt each with the old password and re-encrypt it with the new one
+        const credentials = await repository.loadCredentialsForUserFull(userId);
 
-            repository.updateMultiple(newData, () => {
-                // Store the new password in hashed form
-                repository.updatePassword(userId, cryptoProvider.hash(oldPassword), newPasswordHash, onUpdated);
-            });
-        });
+        const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+
+        const reEncrypt = (item: Credential) => {
+            const decrypted = cryptoProvider.decryptCredential(item, masterKey, excludes);
+            return cryptoProvider.encryptCredential(decrypted, newMasterKey, excludes);
+        };
+
+        const newData: Credential[] = credentials.map(reEncrypt);
+
+        await repository.updateMultiple(newData);
+
+        await repository.updatePassword(userId, cryptoProvider.hash(oldPassword), newPasswordHash);
     }
 
     export function checkIf(el: JQuery, condition: () => boolean): void {
@@ -100,16 +100,17 @@ namespace Vault {
             content: templates.deleteConfirmationDialog(),
             showDelete: true,
             deleteText: 'Yes, Delete This Credential',
-            ondelete: (e: Event): void => {
+            ondelete: async (e: Event) => {
                 e.preventDefault();
-                repository.deleteCredential(internal.userId, id, () => {
-                    ui.modal.modal('hide');
-                    repository.loadCredentialsForUser(internal.userId, data => {
-                        const decrypted = cryptoProvider.decryptCredentials(data, internal.masterKey, ['CredentialID', 'UserID']);
-                        const results: Credential[] = search(ui.searchInput.val(), decrypted);
-                        buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
-                    });
-                });
+                await repository.deleteCredential(internal.userId, id);
+
+                const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
+
+                const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
+                const results: Credential[] = search(ui.searchInput.val(),  decrypted);
+                buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
+
+                ui.modal.modal('hide');
             }
         });
     }
@@ -155,16 +156,16 @@ namespace Vault {
     }
 
     // Export all credential data as JSON
-    export function exportData(userId: string, masterKey: string, onDecrypted: (data: Credential[]) => void): void {
-        // Get all the credentials, decrypt each one
-        repository.loadCredentialsForUserFull(userId, data => {
-            const exportItems: Credential[] = data.map((item: Credential): Credential => {
-                const o: Credential = cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
-                delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
-                return o;
-            });
-            onDecrypted(exportItems);
+    export async function exportData(userId: string, masterKey: string): Promise<Credential[]> {
+        const credentials = await repository.loadCredentialsForUserFull(userId);
+
+        const exportItems: Credential[] = credentials.map((item: Credential): Credential => {
+            const o: Credential = cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
+            delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
+            return o;
         });
+
+        return exportItems;
     }
 
     // Find the index of a credential within an array
@@ -212,24 +213,23 @@ namespace Vault {
 
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
-    function loadCredential(credentialId: string, masterKey: string): void {
+    async function loadCredential(credentialId: string, masterKey: string): Promise<void> {
         if (credentialId !== null) {
-            repository.loadCredential(credentialId, data => {
-                // CredentialID and UserID are not currently encrypted so don't try to decode them
-                data = cryptoProvider.decryptCredential(data, masterKey, ['CredentialID', 'UserID']);
-                showModal({
-                    title: 'Edit Credential',
-                    content: templates.credentialForm(data),
-                    showAccept: true,
-                    acceptText: 'Save',
-                    onaccept: (): void => {
-                        $('#credential-form').submit();
-                    }
-                });
-                ui.modal.find('#Description').focus();
-                showPasswordStrength(ui.modal.find('#Password'));
-                setPasswordOptions(ui.modal, data.PwdOptions);
+            const encryptedCredential = await repository.loadCredential(credentialId);
+            // CredentialID and UserID are not currently encrypted so don't try to decode them
+            const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, ['CredentialID', 'UserID']);
+            showModal({
+                title: 'Edit Credential',
+                content: templates.credentialForm(credential),
+                showAccept: true,
+                acceptText: 'Save',
+                onaccept: (): void => {
+                    $('#credential-form').submit();
+                }
             });
+            ui.modal.find('#Description').focus();
+            showPasswordStrength(ui.modal.find('#Password'));
+            setPasswordOptions(ui.modal, credential.PwdOptions);
         } else { // New record setup
             showModal({
                 title: 'Add Credential',
@@ -342,35 +342,36 @@ namespace Vault {
     }
 
     // Show the read-only details modal
-    function showDetail(credentialId: string, masterKey: string): void {
-        repository.loadCredential(credentialId, data => {
-            // CredentialID and UserID are not currently encrypted so don't try to decode them
-            data = cryptoProvider.decryptCredential(data, masterKey, ['CredentialID', 'UserID']);
-            // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
-            const urlText: string = templates.urlText({ Url: data.Url });
-            const urlHtml: string = data.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: data.Url, UrlText: urlText });
+    async function showDetail(credentialId: string, masterKey: string): Promise<void> {
+        const encryptedCredential = await repository.loadCredential(credentialId);
 
-            const detailHtml: string = templates.detail({
-                Url: data.Url,
-                UrlHtml: urlHtml,
-                Username: data.Username,
-                Password: data.Password,
-                UserDefined1: data.UserDefined1,
-                UserDefined1Label: data.UserDefined1Label,
-                UserDefined2: data.UserDefined2,
-                UserDefined2Label: data.UserDefined2Label,
-                Notes: data.Notes
-            });
+        // CredentialID and UserID are not currently encrypted so don't try to decode them
+        const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, ['CredentialID', 'UserID']);
 
-            showModal({
-                credentialId: credentialId,
-                title: data.Description,
-                content: detailHtml,
-                showEdit: true,
-                showDelete: true,
-                onedit: () => loadCredential(credentialId, masterKey),
-                ondelete: () => confirmDelete(credentialId, masterKey)
-            });
+        // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
+        const urlText: string = templates.urlText({ Url: credential.Url });
+        const urlHtml: string = credential.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: credential.Url, UrlText: urlText });
+
+        const detailHtml: string = templates.detail({
+            Url: credential.Url,
+            UrlHtml: urlHtml,
+            Username: credential.Username,
+            Password: credential.Password,
+            UserDefined1: credential.UserDefined1,
+            UserDefined1Label: credential.UserDefined1Label,
+            UserDefined2: credential.UserDefined2,
+            UserDefined2Label: credential.UserDefined2Label,
+            Notes: credential.Notes
+        });
+
+        showModal({
+            credentialId: credentialId,
+            title: credential.Description,
+            content: detailHtml,
+            showEdit: true,
+            showDelete: true,
+            onedit: () => loadCredential(credentialId, masterKey),
+            ondelete: () => confirmDelete(credentialId, masterKey)
         });
     }
 
@@ -582,56 +583,53 @@ namespace Vault {
             optionsDialog();
         });
 
-        ui.clearSearchButton.on('click', (e: Event): void => {
+        ui.clearSearchButton.on('click', async (e: Event): Promise<void> => {
             e.preventDefault();
-            repository.loadCredentialsForUser(internal.userId, data => {
-                const decrypted = cryptoProvider.decryptCredentials(data, internal.masterKey, ['CredentialID', 'UserID']);
-                const results: Credential[] = search(null, decrypted);
-                buildDataTable(results, (rows: CredentialSummary[]): void => {
-                    ui.container.html(createCredentialTable(rows));
-                    ui.searchInput.val('').focus();
-                }, internal.masterKey, internal.userId);
-            });
+            const credentials = await repository.loadCredentialsForUser(internal.userId);
+            const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
+            const results: Credential[] = search(null, decrypted);
+            buildDataTable(results, (rows: CredentialSummary[]): void => {
+                ui.container.html(createCredentialTable(rows));
+                ui.searchInput.val('').focus();
+            }, internal.masterKey, internal.userId);
         });
 
-        ui.searchInput.on('keyup', rateLimit((e: Event): void => {
-            repository.loadCredentialsForUser(internal.userId, data => {
-                const decrypted = cryptoProvider.decryptCredentials(data, internal.masterKey, ['CredentialID', 'UserID']);
-                const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, decrypted);
-                buildDataTable(results, (rows: CredentialSummary[]): void => {
-                    ui.container.html(createCredentialTable(rows));
-                }, internal.masterKey, internal.userId);
-            });
+        ui.searchInput.on('keyup', rateLimit(async (e: Event): Promise<void> => {
+            const credentials = await repository.loadCredentialsForUser(internal.userId);
+            const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
+            const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, decrypted);
+            buildDataTable(results, (rows: CredentialSummary[]): void => {
+                ui.container.html(createCredentialTable(rows));
+            }, internal.masterKey, internal.userId);
         }, 200));
 
         // Initialise globals and load data on correct login
-        ui.loginForm.on('submit', (e: Event): void => {
+        ui.loginForm.on('submit', async (e: Event): Promise<void> => {
             e.preventDefault();
 
             const username: string = ui.loginForm.find('#UN1209').val();
             const password: string = ui.loginForm.find('#PW9804').val();
 
-            repository.login(cryptoProvider.hash(username), cryptoProvider.hash(password), data => {
-                // If the details were valid
-                if (data.result === 1 && data.id !== '') {
-                    // Set some private variables so that we can reuse them for encryption during this session
-                    internal.userId = data.id;
-                    internal.password = password;
-                    internal.masterKey = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(internal.password));
+            const loginResult = await repository.login(cryptoProvider.hash(username), cryptoProvider.hash(password));
 
-                    repository.loadCredentialsForUser(internal.userId, data2 => {
-                        // Successfully logged in. Hide the login form
-                        ui.loginForm.hide();
-                        ui.loginFormDialog.modal('hide');
-                        ui.controls.show();
-                        ui.searchInput.focus();
-                    });
-                }
-            });
+            // If the details were valid
+            if (loginResult.result === 1 && loginResult.id !== '') {
+                // Set some private variables so that we can reuse them for encryption during this session
+                internal.userId = loginResult.id;
+                internal.password = password;
+                internal.masterKey = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(internal.password));
+
+                await repository.loadCredentialsForUser(internal.userId);
+                // Successfully logged in. Hide the login form
+                ui.loginForm.hide();
+                ui.loginFormDialog.modal('hide');
+                ui.controls.show();
+                ui.searchInput.focus();
+            }
         });
 
         // Save the new details on edit form submit
-        $('body').on('submit', '#credential-form', (e: Event): void => {
+        $('body').on('submit', '#credential-form', async (e: Event): Promise<void> => {
             e.preventDefault();
 
             const form: JQuery = $(e.currentTarget);
@@ -665,16 +663,18 @@ namespace Vault {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             credential = cryptoProvider.encryptCredential(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
-            repository.updateCredential(credential, data => {
-                repository.loadCredentialsForUser(internal.userId, data2 => {
-                    const decrypted = cryptoProvider.decryptCredentials(data2, internal.masterKey, ['CredentialID', 'UserID']);
-                    const results: Credential[] = search(ui.searchInput.val(), decrypted);
-                    ui.modal.modal('hide');
-                    buildDataTable(results, (rows: CredentialSummary[]): void => {
-                        ui.container.html(createCredentialTable(rows));
-                    }, internal.masterKey, internal.userId);
-                });
-            });
+            await repository.updateCredential(credential);
+
+            const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
+
+            const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
+            const results: Credential[] = search(ui.searchInput.val(), decrypted);
+
+            ui.modal.modal('hide');
+
+            buildDataTable(results, (rows: CredentialSummary[]): void => {
+                ui.container.html(createCredentialTable(rows));
+            }, internal.masterKey, internal.userId);
 
             return;
         });
@@ -719,7 +719,6 @@ namespace Vault {
             } catch (ex) {
                 alert('Copy operation is not supported by the current browser: ' + ex.message);
             }
-
         });
 
         $('body').on('click', 'button.btn-credential-open', (e: Event): void => {
@@ -785,21 +784,23 @@ namespace Vault {
                 return;
             }
 
-            changePassword(internal.userId, internal.masterKey, internal.password, newPassword, () => {
+            changePassword(internal.userId, internal.masterKey, internal.password, newPassword).then(() => {
                 // Just reload the whole page when we're done to force login
                 location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
             });
         });
 
-        $('body').on('click', '#export-button', e => {
+        $('body').on('click', '#export-button', async e => {
             e.preventDefault();
-            exportData(internal.userId, internal.masterKey, openExportPopup);
+            const exportedData = await exportData(internal.userId, internal.masterKey);
+            openExportPopup(exportedData);
         });
 
-        $('body').on('click', '#import-button', e => {
+        $('body').on('click', '#import-button', async e => {
             e.preventDefault();
             const newData = parseImportData(internal.userId, internal.masterKey, $('#import-data').val());
-            repository.updateMultiple(newData, reloadApp);
+            await repository.updateMultiple(newData);
+            reloadApp();
         });
 
         // If we're in dev mode, automatically log in with a cookie manually created on the dev machine

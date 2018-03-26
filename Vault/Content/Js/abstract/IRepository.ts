@@ -1,13 +1,13 @@
 ﻿interface IRepository {
-    login(hashedUsername: string, hashedPassword: string, onLogin: (data: any) => void): void;
+    login(hashedUsername: string, hashedPassword: string): Promise<any>;
 
-    loadCredential(credentialId: string, onLoad: (data: Credential) => void): void;
-    loadCredentialsForUser(userId: string, onLoad: (data: Credential[]) => void): void;
-    loadCredentialsForUserFull(userId: string, onLoad: (data: Credential[]) => void): void;
+    loadCredential(credentialId: string): Promise<Credential>;
+    loadCredentialsForUser(userId: string): Promise<Credential[]>;
+    loadCredentialsForUserFull(userId: string): Promise<Credential[]>;
 
-    updateCredential(credential: Credential, onUpdated: (data: Credential) => void): void;
-    updatePassword(userId: string, oldHash: string, newHash: string, onUpdated: () => void): void;
-    updateMultiple(credentials: Credential[], onUpdated: () => void): void;
+    updateCredential(credential: Credential): Promise<Credential>;
+    updatePassword(userId: string, oldHash: string, newHash: string): Promise<void>;
+    updateMultiple(credentials: Credential[]): Promise<void>;
 
-    deleteCredential(userId: string, credentialId: string, onDeleted: () => void): void;
+    deleteCredential(userId: string, credentialId: string): Promise<void>;
 }

@@ -8,36 +8,38 @@
         this.encryptedCredentials = cryptoProvider.encryptCredentials(credentials, masterKey, ['CredentialID', 'UserID']);
     }
 
-    public login(hashedUsername: string, hashedPassword: string, onLoad: (data: any) => void): void {
+    public async login(hashedUsername: string, hashedPassword: string): Promise<any> {
+        // TODO: Implement
     }
 
-    public loadCredential(credentialId: string, onLoad: (data: Credential) => void): void {
-        onLoad(this.encryptedCredentials.filter(c => c.CredentialID === credentialId)[0]);
+    public async loadCredential(credentialId: string): Promise<Credential> {
+        return this.encryptedCredentials.filter(c => c.CredentialID === credentialId)[0];
     }
 
-    public loadCredentialsForUser(userId: string, onLoad: (data: Credential[]) => void): void {
-        onLoad(this.encryptedCredentials.filter(c => c.UserID === userId));
+    public async loadCredentialsForUser(userId: string): Promise<Credential[]> {
+        return this.encryptedCredentials.filter(c => c.UserID === userId);
     }
 
-    public loadCredentialsForUserFull(userId: string, onLoad: (data: Credential[]) => void): void {
-        onLoad(this.encryptedCredentials.filter(c => c.UserID === userId));
+    public async loadCredentialsForUserFull(userId: string): Promise<Credential[]> {
+        return new Promise<Credential[]>(resolve => resolve(this.encryptedCredentials.filter(c => c.UserID === userId)));
     }
 
-    public updateCredential(credential: Credential, onUpdated: (data: Credential) => void): void {
+    public async updateCredential(credential: Credential): Promise<Credential> {
+        return new Promise<Credential>(resolve => resolve());
     }
 
-    public updatePassword(userId: string, oldHash: string, newHash: string, onUpdated: () => void): void {
-        onUpdated();
+    public async updatePassword(userId: string, oldHash: string, newHash: string): Promise<void> {
+        return new Promise<void>(resolve => resolve());
     }
 
-    public updateMultiple(credentials: Credential[], onUpdated: () => void): void {
+    public async updateMultiple(credentials: Credential[]): Promise<void> {
         this.encryptedCredentials = credentials;
-        onUpdated();
+        return new Promise<void>(resolve => resolve());
     }
 
-    public deleteCredential(userId: string, credentialId: string, onDeleted: () => void) {
+    public async deleteCredential(userId: string, credentialId: string): Promise<void> {
         this.credentials = this.credentials.filter(c => c.CredentialID !== credentialId);
         this.encryptedCredentials = this.encryptedCredentials.filter(c => c.CredentialID !== credentialId);
-        onDeleted();
+        return new Promise<void>(resolve => resolve());
     }
 }

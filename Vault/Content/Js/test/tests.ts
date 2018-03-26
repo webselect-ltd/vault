@@ -108,7 +108,7 @@ QUnit.test('buildDataTable', assert => {
     }, testMasterKeyBase64Encoded, userId);
 });
 
-QUnit.test('changePassword', assert => {
+QUnit.test('changePassword', async assert => {
     assert.expect(6);
     const cryptoProvider = new CryptoProvider();
     const userId = 'user1';
@@ -117,17 +117,19 @@ QUnit.test('changePassword', assert => {
     const excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
     const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
         c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID === 'user1';
-    Vault.changePassword(userId, testMasterKeyBase64Encoded, 'test123', 'test321', () => {
-        Vault.repository.loadCredentialsForUserFull(userId, data => {
-            const decrypted = data.map(c => cryptoProvider.decryptCredential(c, newMasterKey, excludes));
-            assert.ok(check(decrypted[0], 'cr1', 'Cat', 'cat', 'cat123'));
-            assert.ok(check(decrypted[1], 'cr2', 'Dog', 'dog', 'dog123'));
-            assert.ok(check(decrypted[2], 'cr3', 'Fish', 'fish', 'fish123'));
-            assert.ok(check(decrypted[3], 'cr4', 'Catfish', 'catfish', 'catfish123'));
-            assert.ok(check(decrypted[4], 'cr5', 'Dogfish', 'dogfish', 'dogfish123'));
-            assert.ok(check(decrypted[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
-        });
-    });
+
+    await Vault.changePassword(userId, testMasterKeyBase64Encoded, 'test123', 'test321');
+
+    const credentials = await Vault.repository.loadCredentialsForUserFull(userId);
+
+    const decrypted = credentials.map(c => cryptoProvider.decryptCredential(c, newMasterKey, excludes));
+
+    assert.ok(check(decrypted[0], 'cr1', 'Cat', 'cat', 'cat123'));
+    assert.ok(check(decrypted[1], 'cr2', 'Dog', 'dog', 'dog123'));
+    assert.ok(check(decrypted[2], 'cr3', 'Fish', 'fish', 'fish123'));
+    assert.ok(check(decrypted[3], 'cr4', 'Catfish', 'catfish', 'catfish123'));
+    assert.ok(check(decrypted[4], 'cr5', 'Dogfish', 'dogfish', 'dogfish123'));
+    assert.ok(check(decrypted[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
 });
 
 QUnit.test('checkIf', assert => {
@@ -213,18 +215,17 @@ QUnit.test('encryptObject', assert => {
     checkEncryption(assert, encrypted, testMasterKeyPlainText);
 });
 
-QUnit.test('exportData', assert => {
+QUnit.test('exportData', async assert => {
     assert.expect(6);
     const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
         c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID === 'user1';
-    Vault.exportData('user1', testMasterKeyBase64Encoded, data => {
-        assert.ok(check(data[0], 'cr1', 'Cat', 'cat', 'cat123'));
-        assert.ok(check(data[1], 'cr2', 'Dog', 'dog', 'dog123'));
-        assert.ok(check(data[2], 'cr3', 'Fish', 'fish', 'fish123'));
-        assert.ok(check(data[3], 'cr4', 'Catfish', 'catfish', 'catfish123'));
-        assert.ok(check(data[4], 'cr5', 'Dogfish', 'dogfish', 'dogfish123'));
-        assert.ok(check(data[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
-    });
+    const exportedData = await Vault.exportData('user1', testMasterKeyBase64Encoded);
+    assert.ok(check(exportedData[0], 'cr1', 'Cat', 'cat', 'cat123'));
+    assert.ok(check(exportedData[1], 'cr2', 'Dog', 'dog', 'dog123'));
+    assert.ok(check(exportedData[2], 'cr3', 'Fish', 'fish', 'fish123'));
+    assert.ok(check(exportedData[3], 'cr4', 'Catfish', 'catfish', 'catfish123'));
+    assert.ok(check(exportedData[4], 'cr5', 'Dogfish', 'dogfish', 'dogfish123'));
+    assert.ok(check(exportedData[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
 });
 
 QUnit.test('findIndex', assert => {
