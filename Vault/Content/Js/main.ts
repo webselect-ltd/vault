@@ -7,8 +7,6 @@
 namespace Vault {
     const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak
 
-    export let cachedList: Credential[] = []; // Hold the credential summary list in memory to avoid requerying/decrypting after save
-
     export let repository: IRepository;
     export let cryptoProvider: ICryptoProvider;
 
@@ -104,10 +102,13 @@ namespace Vault {
             deleteText: 'Yes, Delete This Credential',
             ondelete: (e: Event): void => {
                 e.preventDefault();
-                deleteCredential(id, internal.userId, masterKey, () => {
+                repository.deleteCredential(internal.userId, id, () => {
                     ui.modal.modal('hide');
-                    const results: Credential[] = search(ui.searchInput.val(), cachedList);
-                    buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
+                    repository.loadCredentialsForUser(internal.userId, data => {
+                        const decrypted = cryptoProvider.decryptCredentials(data, internal.masterKey, ['CredentialID', 'UserID']);
+                        const results: Credential[] = search(ui.searchInput.val(), decrypted);
+                        buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
+                    });
                 });
             }
         });
@@ -151,13 +152,6 @@ namespace Vault {
     function defaultCloseAction(e: Event): void {
         e.preventDefault();
         ui.modal.modal('hide');
-    }
-
-    // Delete a record
-    export function deleteCredential(credentialId: string, userId: string, masterKey: string, onDeleted: (rows: CredentialSummary[]) => void): void {
-        repository.deleteCredential(userId, credentialId, () => {
-            loadCredentials(userId, masterKey, onDeleted);
-        });
     }
 
     // Export all credential data as JSON
@@ -248,25 +242,6 @@ namespace Vault {
             });
             ui.modal.find('#Description').focus();
             showPasswordStrength(ui.modal.find('#Password'));
-        }
-    }
-
-    // Load all records for a specific user
-    export function loadCredentials(userId: string, masterKey: string, callback: (c: CredentialSummary[]) => void): void {
-        if (cachedList !== null && cachedList.length) {
-            buildDataTable(cachedList, callback, masterKey, userId);
-        } else {
-            repository.loadCredentialsForUser(userId, data => {
-                // At this point we only actually need to decrypt a few things for display/search
-                // which speeds up client-side table construction time dramatically
-                const items: Credential[] = data.map((item: Credential): Credential => {
-                    return cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID']);
-                });
-                // Cache the whole (decrypted) list on the client
-                cachedList = items;
-                sortCredentials(cachedList);
-                buildDataTable(cachedList, callback, masterKey, userId);
-            });
         }
     }
 
@@ -609,18 +584,24 @@ namespace Vault {
 
         ui.clearSearchButton.on('click', (e: Event): void => {
             e.preventDefault();
-            const results: Credential[] = search(null, cachedList);
-            buildDataTable(results, (rows: CredentialSummary[]): void => {
-                ui.container.html(createCredentialTable(rows));
-            }, internal.masterKey, internal.userId);
-            ui.searchInput.val('').focus();
+            repository.loadCredentialsForUser(internal.userId, data => {
+                const decrypted = cryptoProvider.decryptCredentials(data, internal.masterKey, ['CredentialID', 'UserID']);
+                const results: Credential[] = search(null, decrypted);
+                buildDataTable(results, (rows: CredentialSummary[]): void => {
+                    ui.container.html(createCredentialTable(rows));
+                    ui.searchInput.val('').focus();
+                }, internal.masterKey, internal.userId);
+            });
         });
 
         ui.searchInput.on('keyup', rateLimit((e: Event): void => {
-            const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, cachedList);
-            buildDataTable(results, (rows: CredentialSummary[]): void => {
-                ui.container.html(createCredentialTable(rows));
-            }, internal.masterKey, internal.userId);
+            repository.loadCredentialsForUser(internal.userId, data => {
+                const decrypted = cryptoProvider.decryptCredentials(data, internal.masterKey, ['CredentialID', 'UserID']);
+                const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, decrypted);
+                buildDataTable(results, (rows: CredentialSummary[]): void => {
+                    ui.container.html(createCredentialTable(rows));
+                }, internal.masterKey, internal.userId);
+            });
         }, 200));
 
         // Initialise globals and load data on correct login
@@ -638,7 +619,7 @@ namespace Vault {
                     internal.password = password;
                     internal.masterKey = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(internal.password));
 
-                    loadCredentials(internal.userId, internal.masterKey, (): void => {
+                    repository.loadCredentialsForUser(internal.userId, data2 => {
                         // Successfully logged in. Hide the login form
                         ui.loginForm.hide();
                         ui.loginFormDialog.modal('hide');
@@ -685,17 +666,9 @@ namespace Vault {
             credential = cryptoProvider.encryptCredential(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
             repository.updateCredential(credential, data => {
-                const idx = findIndex(data.CredentialID, cachedList);
-                if (idx === -1) {
-                    cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: internal.userId }, properties));
-                } else {
-                    cachedList[idx] = updateProperties(properties, cachedList[idx]);
-                }
-                // Re-sort the list in case the order should change
-                sortCredentials(cachedList);
-                // For now we just reload the entire table in the background
-                loadCredentials(internal.userId, internal.masterKey, (): void => {
-                    const results: Credential[] = search(ui.searchInput.val(), cachedList);
+                repository.loadCredentialsForUser(internal.userId, data2 => {
+                    const decrypted = cryptoProvider.decryptCredentials(data2, internal.masterKey, ['CredentialID', 'UserID']);
+                    const results: Credential[] = search(ui.searchInput.val(), decrypted);
                     ui.modal.modal('hide');
                     buildDataTable(results, (rows: CredentialSummary[]): void => {
                         ui.container.html(createCredentialTable(rows));

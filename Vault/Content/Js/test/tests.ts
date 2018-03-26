@@ -83,7 +83,6 @@ QUnit.testStart(details => {
     ];
     ﻿/* tslint:enable:max-line-length */
 
-    Vault.cachedList = [];
     const cryptoProvider = new CryptoProvider();
 
     Vault.repository = new FakeRepository(testCredentials, cryptoProvider, testMasterKeyBase64Encoded);
@@ -209,24 +208,6 @@ QUnit.test('generateMasterKey', assert => {
     assert.ok(k === new CryptoProvider().generateMasterKey('test123'));
 });
 
-//QUnit.test('crypt(Passpack.encode)', assert => {
-//    const encrypted = new CryptoProvider().crypt(Passpack.encode, testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-//    checkEncryption(assert, encrypted, testMasterKeyPlainText);
-//});
-
-//QUnit.test('crypt(Passpack.decode)', assert => {
-//    const decrypted = new CryptoProvider().crypt(Passpack.decode, testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-//    checkDecryption(assert, decrypted);
-//});
-
-QUnit.test('deleteCredential', assert => {
-    assert.expect(2);
-    Vault.deleteCredential('cr3', 'user1', testMasterKeyBase64Encoded, rows => {
-        assert.ok(rows.length === 5);
-        assert.ok(rows.filter(r => r.credentialid === 'cr3').length === 0);
-    });
-});
-
 QUnit.test('encryptObject', assert => {
     const encrypted = new CryptoProvider().encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
     checkEncryption(assert, encrypted, testMasterKeyPlainText);
@@ -314,13 +295,6 @@ QUnit.test('isChecked', assert => {
     const checkbox2 = $('<input type="checkbox" checked="checked">');
     assert.ok(Vault.isChecked(checkbox1) === false);
     assert.ok(Vault.isChecked(checkbox2) === true);
-});
-
-QUnit.test('loadCredentials', assert => {
-    assert.expect(1);
-    Vault.loadCredentials('user1', testMasterKeyBase64Encoded, cs => {
-        assert.ok(cs.length === 6);
-    });
 });
 
 QUnit.test('removeFromList', assert => {
