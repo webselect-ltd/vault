@@ -182,8 +182,8 @@ namespace Vault {
         const len: number = parseInt(inputs.filter('[name=len]').val(), 10);
         return {
             length: isNaN(len) ? 16 : len,
-            upperCase: predicate(inputs.filter('[name=ucase]')),
             lowerCase: predicate(inputs.filter('[name=lcase]')),
+            upperCase: predicate(inputs.filter('[name=ucase]')),
             numbers: predicate(inputs.filter('[name=nums]')),
             symbols: predicate(inputs.filter('[name=symb]'))
         };

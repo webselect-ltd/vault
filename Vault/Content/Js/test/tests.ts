@@ -3,6 +3,8 @@
 
 ﻿/* tslint:disable:no-console */
 
+const { module, testStart, testDone, test } = QUnit;
+
 const testCredentialPlainText = new Credential(
     '361fe91a-3dca-4871-b69e-c41c31507c8c',
     'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
@@ -71,7 +73,73 @@ const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBas
 
 let testCredentials: Credential[];
 
-QUnit.testStart(details => {
+module('CryptoProvider');
+
+test('base64ToUtf8', assert => {
+    const utf8 = new CryptoProvider().base64ToUtf8('VEVTVA==');
+    assert.ok(utf8 === 'TEST');
+});
+
+test('decryptObject', assert => {
+    const decrypted = new CryptoProvider().decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+    checkDecryption(assert, decrypted);
+});
+
+test('encryptObject', assert => {
+    const encrypted = new CryptoProvider().encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+    checkEncryption(assert, encrypted, testMasterKeyPlainText);
+});
+
+test('generateMasterKey', assert => {
+    const k = Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true);
+    assert.ok(k === new CryptoProvider().generateMasterKey('test123'));
+});
+
+test('generatePassword', assert => {
+    const cp = new CryptoProvider();
+
+    const spec: IPasswordSpecification = {
+        length: 0,
+        lowerCase: false,
+        upperCase: false,
+        numbers: false,
+        symbols: false
+    };
+
+    const empty = cp.generatePassword(spec);
+    spec.length = 32;
+    const empty2 = cp.generatePassword(spec);
+    assert.ok(empty === null);
+    assert.ok(empty2 === null);
+
+    spec.lowerCase = true;
+    const lc = cp.generatePassword(spec);
+    assert.ok(lc.toLowerCase() === lc);
+
+    spec.lowerCase = false;
+    spec.upperCase = true;
+    const uc = cp.generatePassword(spec);
+    assert.ok(uc.toUpperCase() === uc);
+
+    spec.upperCase = false;
+    spec.numbers = true;
+    const nums = cp.generatePassword(spec);
+    assert.ok(nums.match(/\d+/gi));
+
+    spec.numbers = false;
+    spec.symbols = true;
+    const sym = cp.generatePassword(spec);
+    assert.ok(sym.match(/[^a-z0-9]+/gi));
+});
+
+test('utf8ToBase64', assert => {
+    const b64 = new CryptoProvider().utf8ToBase64('TEST');
+    assert.ok(b64 === 'VEVTVA==');
+});
+
+module('Vault');
+
+testStart(details => {
     ﻿/* tslint:disable:max-line-length */
     testCredentials = [
         new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123', 'cat123', 'http://cat.com', 'Cat UD 1', 'catud1', 'Cat UD 1', 'catud1', 'Cat notes', '12|1|1|1|1'),
@@ -89,12 +157,7 @@ QUnit.testStart(details => {
     Vault.cryptoProvider = cryptoProvider;
 });
 
-QUnit.test('base64ToUtf8', assert => {
-    const utf8 = new CryptoProvider().base64ToUtf8('VEVTVA==');
-    assert.ok(utf8 === 'TEST');
-});
-
-QUnit.test('buildDataTable', assert => {
+test('buildDataTable', assert => {
     assert.expect(4);
     const userId = 'user1';
     const list = testCredentials.slice(0, 3);
@@ -108,7 +171,7 @@ QUnit.test('buildDataTable', assert => {
     }, testMasterKeyBase64Encoded, userId);
 });
 
-QUnit.test('changePassword', async assert => {
+test('changePassword', async assert => {
     assert.expect(6);
     const cryptoProvider = new CryptoProvider();
     const userId = 'user1';
@@ -132,7 +195,7 @@ QUnit.test('changePassword', async assert => {
     assert.ok(check(decrypted[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
 });
 
-QUnit.test('checkIf', assert => {
+test('checkIf', assert => {
     const checkbox1 = $('<input type="checkbox">');
     const checkbox2 = $('<input type="checkbox" checked="checked">');
     Vault.checkIf(checkbox1, () => true);
@@ -141,7 +204,7 @@ QUnit.test('checkIf', assert => {
     assert.ok((checkbox2[0] as HTMLInputElement).checked === false);
 });
 
-QUnit.test('createCredentialDisplayData', assert => {
+test('createCredentialDisplayData', assert => {
     const credential = new Credential('cr1', 'user1', 'Item Description');
     const data = Vault.createCredentialDisplayData(credential, testMasterKeyBase64Encoded, 'user1');
     assert.ok(data.credentialid === 'cr1');
@@ -150,7 +213,7 @@ QUnit.test('createCredentialDisplayData', assert => {
     assert.ok(data.masterkey === testMasterKeyBase64Encoded);
 });
 
-QUnit.test('createCredentialFromFormFields', assert => {
+test('createCredentialFromFormFields', assert => {
     const html = '<form>'
         + '<input type="text" name="CredentialID" value="CredentialID">'
         + '<input type="text" name="UserID" value="UserID">'
@@ -195,7 +258,7 @@ QUnit.test('createCredentialFromFormFields', assert => {
     assert.ok(typeof obj.submit === 'undefined');
 });
 
-QUnit.test('createCredentialTable', assert => {
+test('createCredentialTable', assert => {
     Vault.uiSetup();
     const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
     const table = $(Vault.createCredentialTable(data));
@@ -205,17 +268,7 @@ QUnit.test('createCredentialTable', assert => {
     assert.ok($(rows[1]).find('.full').text() === 'Dog');
 });
 
-QUnit.test('generateMasterKey', assert => {
-    const k = Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true);
-    assert.ok(k === new CryptoProvider().generateMasterKey('test123'));
-});
-
-QUnit.test('encryptObject', assert => {
-    const encrypted = new CryptoProvider().encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-    checkEncryption(assert, encrypted, testMasterKeyPlainText);
-});
-
-QUnit.test('exportData', async assert => {
+test('exportData', async assert => {
     assert.expect(6);
     const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
         c.CredentialID === id && c.Description === desc && c.Username === uname && c.Password === pwd && c.UserID === 'user1';
@@ -228,14 +281,14 @@ QUnit.test('exportData', async assert => {
     assert.ok(check(exportedData[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
 });
 
-QUnit.test('findIndex', assert => {
+test('findIndex', assert => {
     const idx = Vault.findIndex('cr2', testCredentials);
     assert.ok(idx === 1);
     const idx2 = Vault.findIndex('not-there', testCredentials);
     assert.ok(idx2 === -1);
 });
 
-QUnit.test('rateLimit', assert => {
+test('rateLimit', assert => {
     const done = assert.async();
     const func = Vault.rateLimit(() => {
         assert.ok(true);
@@ -244,12 +297,7 @@ QUnit.test('rateLimit', assert => {
     func(new Event('click'));
 });
 
-QUnit.test('decryptObject', assert => {
-    const decrypted = new CryptoProvider().decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-    checkDecryption(assert, decrypted);
-});
-
-QUnit.test('getPasswordGenerationOptions', assert => {
+test('getPasswordGenerationOptions', assert => {
     const html = '<div>'
         + '<input type="text" class="generate-password-option" id="len" name="len" value="32">'
         + '<input type="checkbox" class="generate-password-option" id="ucase" name="ucase" value="1" checked="checked">'
@@ -267,7 +315,7 @@ QUnit.test('getPasswordGenerationOptions', assert => {
     assert.ok(!options.symbols);
 });
 
-QUnit.test('parseImportData', assert => {
+test('parseImportData', assert => {
     const userId = 'user1';
     const importData = `[{
         "CredentialID": "NEW",
@@ -291,21 +339,21 @@ QUnit.test('parseImportData', assert => {
     assert.ok(!newData[0].PasswordConfirmation);
 });
 
-QUnit.test('isChecked', assert => {
+test('isChecked', assert => {
     const checkbox1 = $('<input type="checkbox">');
     const checkbox2 = $('<input type="checkbox" checked="checked">');
     assert.ok(Vault.isChecked(checkbox1) === false);
     assert.ok(Vault.isChecked(checkbox2) === true);
 });
 
-QUnit.test('removeFromList', assert => {
+test('removeFromList', assert => {
     const list2 = Vault.removeFromList('cr2', testCredentials);
     assert.ok(list2.length === 5);
     assert.ok(list2[0].Description === 'Cat');
     assert.ok(list2[1].Description === 'Fish');
 });
 
-QUnit.test('search', assert => {
+test('search', assert => {
     const noresults1 = Vault.search(null, testCredentials);
     const noresults2 = Vault.search('', testCredentials);
     const noresults3 = Vault.search('Z', testCredentials);
@@ -332,7 +380,7 @@ QUnit.test('search', assert => {
     assert.ok(results5[2].Description === 'Fish');
 });
 
-QUnit.test('sortCredentials', assert => {
+test('sortCredentials', assert => {
     Vault.sortCredentials(testCredentials);
     assert.ok(testCredentials[0].Description === 'Cat');
     assert.ok(testCredentials[1].Description === 'Catfish');
@@ -342,13 +390,13 @@ QUnit.test('sortCredentials', assert => {
     assert.ok(testCredentials[5].Description === 'Owl');
 });
 
-QUnit.test('truncate', assert => {
+test('truncate', assert => {
     const testString = 'This Is A Test';
     assert.ok(Vault.truncate(testString, 10) === 'This Is...');
     assert.ok(Vault.truncate(testString, 20) === 'This Is A Test');
 });
 
-QUnit.test('updateProperties', assert => {
+test('updateProperties', assert => {
     const updated = Vault.updateProperties({
         Description: 'ITEM2UPDATE',
         Username: 'item2new',
@@ -361,12 +409,7 @@ QUnit.test('updateProperties', assert => {
     assert.ok(updated.Url === 'http://test4.com');
 });
 
-QUnit.test('utf8ToBase64', assert => {
-    const b64 = new CryptoProvider().utf8ToBase64('TEST');
-    assert.ok(b64 === 'VEVTVA==');
-});
-
-QUnit.test('validateRecord', assert => {
+test('validateRecord', assert => {
     const form = $('<form><input id="Description" name="Description" />' +
         '<input id="Password" name="Password" />' +
         '<input id="PasswordConfirmation" name="PasswordConfirmation" /></form>');

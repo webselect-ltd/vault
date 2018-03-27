@@ -1,13 +1,10 @@
 ﻿/// <reference path="../types/passpack.d.ts" />
 
 class CryptoProvider implements ICryptoProvider {
-
-    // Decode Base64 string
     public base64ToUtf8(str: string): string {
         return unescape(decodeURIComponent(atob(str)));
     }
 
-    // Encode string to Base64
     public utf8ToBase64(str: string): string {
         return btoa(encodeURIComponent(escape(str)));
     }
@@ -21,6 +18,17 @@ class CryptoProvider implements ICryptoProvider {
     }
 
     public generatePassword(specification: IPasswordSpecification): string {
+        if (specification.length === 0) {
+            return null;
+        }
+
+        if (specification.lowerCase === false
+            && specification.upperCase === false
+            && specification.numbers === false
+            && specification.symbols === false) {
+            return null;
+        }
+
         const options: IPasspackCharOptions = {};
 
         if (specification.lowerCase) {
