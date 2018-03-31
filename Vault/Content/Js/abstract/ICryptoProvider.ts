@@ -1,4 +1,7 @@
-﻿interface ICryptoProvider {
+﻿import { Credential } from '../Concrete';
+import { IPasswordSpecification } from './IPasswordSpecification';
+
+export interface ICryptoProvider {
     base64ToUtf8(str: string): string;
     utf8ToBase64(str: string): string;
     generatePassword(specification: IPasswordSpecification): string;

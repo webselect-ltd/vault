@@ -256,11 +256,4 @@ paket-files/
 *.sqlite
 Vault/Web.config
 !db/releases
-Vault/Content/Js/main.js
-Vault/Content/Js/main.js.map
-Vault/Content/Js/abstract/*.js
-Vault/Content/Js/abstract/*.map
-Vault/Content/Js/concrete/*.js
-Vault/Content/Js/concrete/*.map
-Vault/Content/Js/test/*.js
-Vault/Content/Js/test/*.map
+Vault/Content/Js/dist/*

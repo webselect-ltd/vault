@@ -1,7 +1,9 @@
-﻿/// <reference types="qunit" />
-/// <reference path="../types/hacks.d.ts" />
+﻿import { IPasswordSpecification, IRepository } from '../Abstract';
+import { Credential, CredentialSummary, CryptoProvider } from '../Concrete';
+import * as Vault from '../Vault';
+import { FakeRepository } from './FakeRepository';
 
-﻿/* tslint:disable:no-console */
+/* tslint:disable:no-console */
 
 const { module, testStart, testDone, test } = QUnit;
 
@@ -72,6 +74,7 @@ const testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUcl
 const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
 
 let testCredentials: Credential[];
+let testRepository: IRepository;
 
 module('CryptoProvider');
 
@@ -152,9 +155,9 @@ testStart(details => {
     ﻿/* tslint:enable:max-line-length */
 
     const cryptoProvider = new CryptoProvider();
+    testRepository = new FakeRepository(testCredentials, cryptoProvider, testMasterKeyBase64Encoded);
 
-    Vault.repository = new FakeRepository(testCredentials, cryptoProvider, testMasterKeyBase64Encoded);
-    Vault.cryptoProvider = cryptoProvider;
+    Vault.testInit(testRepository, cryptoProvider);
 });
 
 test('buildDataTable', assert => {
@@ -183,7 +186,7 @@ test('changePassword', async assert => {
 
     await Vault.changePassword(userId, testMasterKeyBase64Encoded, 'test123', 'test321');
 
-    const credentials = await Vault.repository.loadCredentialsForUserFull(userId);
+    const credentials = await testRepository.loadCredentialsForUserFull(userId);
 
     const decrypted = credentials.map(c => cryptoProvider.decryptCredential(c, newMasterKey, excludes));
 

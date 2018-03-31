@@ -1,4 +1,4 @@
-﻿class CredentialSummary {
+﻿export class CredentialSummary {
     constructor(
         public credentialid: string,
         public masterkey: string,

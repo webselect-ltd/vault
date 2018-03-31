@@ -1,4 +1,6 @@
-﻿interface IRepository {
+﻿import { Credential } from '../Concrete';
+
+export interface IRepository {
     login(hashedUsername: string, hashedPassword: string): Promise<any>;
 
     loadCredential(credentialId: string): Promise<Credential>;

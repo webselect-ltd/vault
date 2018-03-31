@@ -1,4 +1,7 @@
 {
+    "include": [
+        "./**/*.ts"
+    ],
     "compilerOptions": {
         "target": "es5",
         "sourceMap": true,
@@ -8,12 +11,9 @@
             "dom",
             "es5",
             "es2015",
+            "es2015.iterable",
             "es2015.promise"
         ]
     },
-    "compileOnSave": true,
-    "exclude": [
-        "node_modules",
-        "**/*.d.ts"
-    ]
+    "compileOnSave": false
 }

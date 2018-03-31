@@ -1,6 +1,8 @@
-﻿/// <reference path="../types/passpack.d.ts" />
+﻿import { ICryptoProvider, IPasswordSpecification } from '../Abstract';
+import '../vendor/passpack-v1.1.js';
+import { Credential } from './Credential';
 
-class CryptoProvider implements ICryptoProvider {
+export class CryptoProvider implements ICryptoProvider {
     public base64ToUtf8(str: string): string {
         return unescape(decodeURIComponent(atob(str)));
     }

@@ -1,4 +1,7 @@
-﻿class FakeRepository implements IRepository {
+﻿import { ICryptoProvider, IRepository } from '../Abstract';
+import { Credential } from '../Concrete';
+
+export class FakeRepository implements IRepository {
     private cryptoProvider: ICryptoProvider;
     private credentials: Credential[];
     private encryptedCredentials: Credential[];

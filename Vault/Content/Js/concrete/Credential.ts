@@ -1,4 +1,4 @@
-﻿class Credential {
+﻿export class Credential {
     public CredentialID: string;
     public UserID: string;
     public Description: string;

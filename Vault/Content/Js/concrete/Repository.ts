@@ -1,4 +1,7 @@
-﻿class Repository implements IRepository {
+﻿import { IRepository, XHRError, XHRSuccess } from '../Abstract';
+import { Credential } from './Credential';
+
+export class Repository implements IRepository {
     private jsonContentType = 'application/json; charset=utf-8';
 
     constructor(private basePath: string) {

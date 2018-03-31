@@ -22,6 +22,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <TypeScriptToolsVersion>2.7</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -72,6 +73,8 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <TypeScriptCompile Include="Content\Js\Concrete.ts" />
+    <TypeScriptCompile Include="Content\Js\Abstract.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\IPasswordSpecification.ts" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Global.asax.cs">
@@ -96,22 +99,17 @@
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
+    <Content Include="webpack.config.js" />
     <TypeScriptCompile Include="Content\Js\abstract\ICryptoProvider.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\IRepository.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\XHRSuccess.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\XHRError.ts" />
     <TypeScriptCompile Include="Content\Js\concrete\CryptoProvider.ts" />
-    <Content Include="Content\Js\test\lib\blanket.js" />
-    <Content Include="Content\Js\test\lib\qunit-2.5.1.js" />
-    <Content Include="Content\Js\vendor\bootstrap.js" />
-    <Content Include="Content\Js\vendor\handlebars-v4.0.5.js" />
-    <Content Include="Content\Js\vendor\js.cookie.js" />
     <TypeScriptCompile Include="Content\Js\concrete\CredentialSummary.ts" />
     <TypeScriptCompile Include="Content\Js\concrete\Credential.ts" />
     <TypeScriptCompile Include="Content\Js\concrete\Repository.ts" />
-    <TypeScriptCompile Include="Content\Js\main.ts" />
+    <TypeScriptCompile Include="Content\Js\Vault.ts" />
     <Content Include="Content\Js\vendor\passpack-v1.1.js" />
-    <Content Include="Content\Css\test\qunit-2.5.1.css" />
     <TypeScriptCompile Include="Content\Js\test\FakeRepository.ts" />
     <TypeScriptCompile Include="Content\Js\test\tests.ts" />
     <Content Include="Global.asax" />
@@ -360,4 +358,11 @@
     </When>
   </Choose>
   <Import Project="..\packages\System.Data.SQLite.Core\build\$(__paket__System_Data_SQLite_Core_targets).targets" Condition="Exists('..\packages\System.Data.SQLite.Core\build\$(__paket__System_Data_SQLite_Core_targets).targets')" Label="Paket" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>npm run build$(ConfigurationName)</PreBuildEvent>
+  </PropertyGroup>
 </Project>
