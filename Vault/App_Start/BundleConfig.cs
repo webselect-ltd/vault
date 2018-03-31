@@ -12,7 +12,6 @@ namespace Vault
                       "~/Content/Js/vendor/bootstrap.js",
                       "~/Content/Js/vendor/passpack-v1.1.js",
                       "~/Content/Js/vendor/handlebars-v4.0.5.js",
-                      "~/Content/Js/vendor/hide-address-bar.js",
                       "~/Content/Js/vendor/js.cookie.js",
                       "~/Content/Js/concrete/Credential.js",
                       "~/Content/Js/concrete/CredentialSummary.js",

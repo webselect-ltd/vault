@@ -105,7 +105,6 @@
     <Content Include="Content\Js\test\lib\qunit-2.5.1.js" />
     <Content Include="Content\Js\vendor\bootstrap.js" />
     <Content Include="Content\Js\vendor\handlebars-v4.0.5.js" />
-    <Content Include="Content\Js\vendor\hide-address-bar.js" />
     <Content Include="Content\Js\vendor\js.cookie.js" />
     <TypeScriptCompile Include="Content\Js\concrete\CredentialSummary.ts" />
     <TypeScriptCompile Include="Content\Js\concrete\Credential.ts" />
