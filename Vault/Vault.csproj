@@ -144,12 +144,6 @@
     <Content Include="Views\Shared\_ClientTemplates.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Main\Tests.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Shared\_TestLayout.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Content\Fonts\glyphicons-halflings-regular.woff2" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +153,7 @@
     <Content Include="Content\Js\tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="tslint.json" />
+    <Content Include="Views\Main\Tests.cshtml" />
     <None Include="Web.config.example">
       <SubType>Designer</SubType>
     </None>

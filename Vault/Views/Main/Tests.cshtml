@@ -1,23 +1,30 @@
-﻿@model dynamic
-
-@{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_TestLayout.cshtml";
+﻿@{
+    Layout = null;
 }
-
-@section tests {
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Test Suite</title>
+    <link rel="shortcut icon" href="/content/img/favicon.ico" />
+    @Styles.Render("~/Content/Css/main")
+    <link rel="stylesheet" type="text/css" href="~/node_modules/qunit/qunit/qunit.css" />
+</head>
+<body>
     <div id="qunit"></div>
     <div id="qunit-fixture"></div>
+    <div class="container">
+        @{Html.RenderPartial("_LoginForm", new LoginViewModel());}
 
-}
+        @{Html.RenderPartial("_StaticHtml");}
 
-@section main {
-
-    @{Html.RenderPartial("_LoginForm", new LoginViewModel());}
-
-    @{Html.RenderPartial("_StaticHtml");}
-    
-    @{Html.RenderPartial("_ClientTemplates");}
-
-}
+        @{Html.RenderPartial("_ClientTemplates");}
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="~/node_modules/qunit/qunit/qunit.js"></script>
+    <script src="~/node_modules/blanket/dist/qunit/blanket.js"></script>
+    <script src="~/Content/Js/dist/tests.js" data-cover></script>
+</body>
+</html>
