@@ -3,11 +3,7 @@ var webpack = require("webpack");
 module.exports = {
     output: {
         filename: "[name].js",
-        path: __dirname + "/Content/Js/dist",
-        // Assigns the module output to a global variable
-        // You can use substitutions in the library name as well
-        // library: "[name]"
-        library: "Vault"
+        path: __dirname + "/Content/Js/dist"
     },
     // Enable sourcemaps for debugging webpack's output
     devtool: "source-map",

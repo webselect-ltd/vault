@@ -5,16 +5,13 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Test Suite</title>
     <link rel="shortcut icon" href="/content/img/favicon.ico" />
     @Styles.Render("~/Content/Css/main")
-    <link rel="stylesheet" type="text/css" href="~/node_modules/qunit/qunit/qunit.css" />
+    <link rel="stylesheet" type="text/css" href="~/node_modules/mocha/mocha.css" />
 </head>
 <body>
-    <div id="qunit"></div>
-    <div id="qunit-fixture"></div>
+    <div id="mocha"></div>
     <div class="container">
         @{Html.RenderPartial("_LoginForm", new LoginViewModel());}
 
@@ -26,8 +23,14 @@
     <script src="~/node_modules/handlebars/dist/handlebars.js"></script>
     <script src="~/node_modules/bootstrap/js/modal.js"></script>
     <script src="~/node_modules/js-cookie/src/js.cookie.js"></script>
-    <script src="~/node_modules/qunit/qunit/qunit.js"></script>
-    <script src="~/node_modules/blanket/dist/qunit/blanket.js"></script>
-    <script src="~/Content/Js/dist/tests.js" data-cover></script>
+    <script src="~/node_modules/mocha/mocha.js"></script>
+    <script src="~/node_modules/chai/chai.js"></script>
+    <script>mocha.setup('tdd');</script>
+    <script src="~/Content/Js/dist/tests.js"></script>
+    <script>
+        //mocha.checkLeaks();
+        //mocha.globals(['jQuery']);
+        mocha.run();
+    </script>
 </body>
 </html>

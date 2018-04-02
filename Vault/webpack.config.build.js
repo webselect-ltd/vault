@@ -6,5 +6,8 @@ module.exports = merge(common, {
     // The entry points for building page-specific bundles
     entry: {
         vault: "./Content/Js/Vault.ts"
+    },
+    output: {
+        library: "Vault"
     }
 });

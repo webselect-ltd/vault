@@ -7,8 +7,11 @@ module.exports = merge(common, {
     entry: {
         tests: "./Content/Js/test/tests.ts"
     },
+    output: {
+        library: "Tests"
+    },
     externals: {
-        mocha: "mocha",
+        mocha: "Mocha",
         chai: "chai"
     }
 });
