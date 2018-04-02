@@ -33,4 +33,4 @@ interface IPasspack {
     utils: IPasspackUtils;
 }
 
-declare var Passpack: IPasspack;
+declare const Passpack: IPasspack;
