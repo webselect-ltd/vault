@@ -25,7 +25,7 @@ module.exports = {
     },
     module: {
         rules: [
-            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'
+            // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'
             { test: /\.tsx?$/, loader: "ts-loader" },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
@@ -36,6 +36,8 @@ module.exports = {
     // This is important because it allows us to avoid bundling all of our
     // dependencies, which allows browsers to cache those libraries between build
     externals: {
-         jquery: "jQuery"
+        jquery: "jQuery",
+        handlebars: "Handlebars",
+        "js-cookie": "Cookies"
     }
 };

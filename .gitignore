@@ -257,3 +257,5 @@ paket-files/
 Vault/Web.config
 !db/releases
 Vault/Content/Js/dist/*
+Vault/.nyc_output
+Vault/coverage

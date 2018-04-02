@@ -99,6 +99,7 @@
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
+    <Content Include="Content\Js\test\setup.js" />
     <Content Include="webpack.config.build.js" />
     <Content Include="webpack.config.test.js" />
     <Content Include="webpack.config.common.js" />
@@ -110,10 +111,11 @@
     <TypeScriptCompile Include="Content\Js\concrete\CredentialSummary.ts" />
     <TypeScriptCompile Include="Content\Js\concrete\Credential.ts" />
     <TypeScriptCompile Include="Content\Js\concrete\Repository.ts" />
+    <TypeScriptCompile Include="Content\Js\test\tests.ts" />
     <TypeScriptCompile Include="Content\Js\Vault.ts" />
     <Content Include="Content\Js\vendor\passpack-v1.1.js" />
     <TypeScriptCompile Include="Content\Js\test\FakeRepository.ts" />
-    <TypeScriptCompile Include="Content\Js\test\tests.ts" />
+    <TypeScriptCompile Include="Content\Js\test\tests.old.ts" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -156,6 +158,7 @@
     <Content Include="package.json" />
     <Content Include="tslint.json" />
     <Content Include="Views\Main\Tests.cshtml" />
+    <Content Include="Content\Js\test\mocha.opts" />
     <None Include="Web.config.example">
       <SubType>Designer</SubType>
     </None>

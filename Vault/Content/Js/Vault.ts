@@ -1,4 +1,4 @@
-﻿import 'bootstrap/js/modal.js';
+﻿import * as $ from 'jquery';
 import * as Handlebars from 'handlebars';
 import * as Cookies from 'js-cookie';
 import { ICryptoProvider, IPasswordSpecification, IRepository } from './Abstract';
