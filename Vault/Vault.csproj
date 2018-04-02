@@ -99,7 +99,9 @@
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
-    <Content Include="webpack.config.js" />
+    <Content Include="webpack.config.build.js" />
+    <Content Include="webpack.config.test.js" />
+    <Content Include="webpack.config.common.js" />
     <TypeScriptCompile Include="Content\Js\abstract\ICryptoProvider.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\IRepository.ts" />
     <TypeScriptCompile Include="Content\Js\abstract\XHRSuccess.ts" />
