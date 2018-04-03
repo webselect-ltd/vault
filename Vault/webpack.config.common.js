@@ -1,4 +1,7 @@
-var webpack = require("webpack");
+const webpack = require("webpack");
+const ProvidePlugin = require("webpack").ProvidePlugin;
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     output: {
@@ -8,12 +11,21 @@ module.exports = {
     // Enable sourcemaps for debugging webpack's output
     devtool: "source-map",
     plugins: [
+        // Remove the output folder before build
+        // new CleanWebpackPlugin(['Content/Js/dist']),
         // This automatically adds aliases to the application scope for the specified packages
         // So packages which look for the 'jQuery' global alias still work within our app closure
-        new webpack.ProvidePlugin({
+        new ProvidePlugin({
             $: "jquery",
             jQuery: "jquery"
-        })
+        }),
+        // Copy the external dependencies into the output folder
+        new CopyWebpackPlugin([
+            { from: 'node_modules/jquery/dist/jquery.min.js', to: 'vendor' },
+            { from: 'node_modules/handlebars/dist/handlebars.min.js', to: 'vendor' },
+            { from: 'node_modules/js-cookie/src/js.cookie.js', to: 'vendor' },
+            { from: 'node_modules/bootstrap/js/modal.js', to: 'vendor' }
+        ])
     ],
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
