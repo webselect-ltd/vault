@@ -261,15 +261,15 @@ suite('Vault', () => {
         assert.equal(typeof obj.submit, 'undefined');
     });
 
-    test('createCredentialTable', () => {
-        Vault.uiSetup();
-        const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
-        const table = $(Vault.createCredentialTable(data));
-        const rows = table.filter('.row');
-        assert.lengthOf(rows, 6);
-        assert.equal($(rows[0]).attr('id'), 'cr1');
-        assert.equal($(rows[1]).find('.full').text(), 'Dog');
-    });
+    //test('createCredentialTable', () => {
+    //    Vault.uiSetup();
+    //    const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
+    //    const table = $(Vault.createCredentialTable(data));
+    //    const rows = table.filter('.row');
+    //    assert.lengthOf(rows, 6);
+    //    assert.equal($(rows[0]).attr('id'), 'cr1');
+    //    assert.equal($(rows[1]).find('.full').text(), 'Dog');
+    //});
 
     test('exportData', async () => {
         const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
