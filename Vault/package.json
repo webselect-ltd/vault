@@ -45,6 +45,8 @@
         ],
         "exclude": [
             "**/tests.ts",
+            "**/Abstract.ts",
+            "**/Concrete.ts",
             "**/Fake*.ts"
         ],
         "extension": [

@@ -293,7 +293,7 @@ suite('Vault', () => {
     });
 
     test('rateLimit', function (done) {
-        this.slow(200);
+        this.slow(1000);
         // TODO: Does this actually test the function?
         const func = Vault.rateLimit(() => {
             assert.ok(true);
