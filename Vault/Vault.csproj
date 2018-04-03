@@ -99,6 +99,12 @@
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
+    <Content Include="Content\Js\dist\tests.js" />
+    <Content Include="Content\Js\dist\vault.js" />
+    <Content Include="Content\Js\dist\vendor\handlebars.min.js" />
+    <Content Include="Content\Js\dist\vendor\jquery.min.js" />
+    <Content Include="Content\Js\dist\vendor\js.cookie.js" />
+    <Content Include="Content\Js\dist\vendor\modal.js" />
     <Content Include="Content\Js\test\setup.js" />
     <Content Include="webpack.config.build.js" />
     <Content Include="webpack.config.test.js" />
