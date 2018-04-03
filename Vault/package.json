@@ -44,7 +44,8 @@
             "**/*.ts"
         ],
         "exclude": [
-            "**/tests.ts"
+            "**/tests.ts",
+            "**/Fake*.ts"
         ],
         "extension": [
             ".ts"
