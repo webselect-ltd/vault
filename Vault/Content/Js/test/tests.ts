@@ -285,4 +285,153 @@ suite('Vault', () => {
         assert.ok(check(exportedData[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
     });
 
+    test('findIndex', () => {
+        const idx = Vault.findIndex('cr2', testCredentials);
+        assert.equal(idx, 1);
+        const idx2 = Vault.findIndex('not-there', testCredentials);
+        assert.equal(idx2, -1);
+    });
+
+    test('rateLimit', function (done) {
+        this.slow(200);
+        // TODO: Does this actually test the function?
+        const func = Vault.rateLimit(() => {
+            assert.ok(true);
+            done();
+        }, 100);
+        func(new Event('click'));
+    });
+
+    test('getPasswordGenerationOptions', () => {
+        const html = '<div>'
+            + '<input type="text" class="generate-password-option" id="len" name="len" value="32">'
+            + '<input type="checkbox" class="generate-password-option" id="ucase" name="ucase" value="1" checked="checked">'
+            + '<input type="checkbox" class="generate-password-option" id="lcase" name="lcase" value="1">'
+            + '<input type="checkbox" class="generate-password-option" id="nums" name="nums" value="1" checked="checked">'
+            + '<input type="checkbox" class="generate-password-option" id="symb" name="symb" value="1">'
+            + '</div>';
+
+        const el = $(html);
+        const options = Vault.getPasswordGenerationOptionValues(el.find('input.generate-password-option'), Vault.isChecked);
+        assert.equal(options.length, 32);
+        assert.isTrue(options.upperCase);
+        assert.isFalse(options.lowerCase);
+        assert.isTrue(options.numbers);
+        assert.isFalse(options.symbols);
+    });
+
+    test('parseImportData', () => {
+        const userId = 'user1';
+        const importData = `[{
+        "CredentialID": "NEW",
+        "UserID": "user1_old",
+        "Description": "IMPORTED",
+        "Username": "im1",
+        "Password": "im123",
+        "PasswordConfirmation": "im123",
+        "Url": "http://imported.com",
+        "UserDefined1Label": "",
+        "UserDefined1": "",
+        "UserDefined2Label": "",
+        "UserDefined2": "",
+        "Notes": "",
+        "PwdOptions": ""
+    }]`;
+        const newData = Vault.parseImportData(userId, testMasterKeyBase64Encoded, importData);
+        assert.lengthOf(newData, 1);
+        assert.equal(newData[0].UserID, userId);
+        assert.isNull(newData[0].CredentialID);
+        assert.isUndefined(newData[0].PasswordConfirmation);
+    });
+
+    test('isChecked', () => {
+        const checkbox1 = $('<input type="checkbox">');
+        const checkbox2 = $('<input type="checkbox" checked="checked">');
+        assert.isFalse(Vault.isChecked(checkbox1));
+        assert.isTrue(Vault.isChecked(checkbox2));
+    });
+
+    test('removeFromList', () => {
+        const list2 = Vault.removeFromList('cr2', testCredentials);
+        assert.lengthOf(list2, 5);
+        assert.equal(list2[0].Description, 'Cat');
+        assert.equal(list2[1].Description, 'Fish');
+    });
+
+    test('search', () => {
+        const noresults1 = Vault.search(null, testCredentials);
+        const noresults2 = Vault.search('', testCredentials);
+        const noresults3 = Vault.search('Z', testCredentials);
+        assert.lengthOf(noresults1, 0);
+        assert.lengthOf(noresults2, 0);
+        assert.lengthOf(noresults3, 0);
+        const results1 = Vault.search('do', testCredentials);
+        assert.lengthOf(results1, 2);
+        assert.equal(results1[0].Description, 'Dog');
+        assert.equal(results1[1].Description, 'Dogfish');
+        const results2 = Vault.search('username:dog', testCredentials);
+        assert.lengthOf(results2, 2);
+        assert.equal(results2[0].Description, 'Dog');
+        assert.equal(results2[1].Description, 'Dogfish');
+        const results3 = Vault.search('password:cat', testCredentials);
+        assert.lengthOf(results3, 2);
+        assert.equal(results3[0].Description, 'Cat');
+        assert.equal(results3[1].Description, 'Catfish');
+        const results4 = Vault.search('filter:all', testCredentials);
+        assert.lengthOf(results4, 6);
+        assert.equal(results4[0].Description, 'Cat');
+        assert.equal(results4[5].Description, 'Owl');
+        const results5 = Vault.search('filter:weak', testCredentials);
+        assert.lengthOf(results5, 3);
+        assert.equal(results5[0].Description, 'Cat');
+        assert.equal(results5[2].Description, 'Fish');
+    });
+
+    test('sortCredentials', () => {
+        Vault.sortCredentials(testCredentials);
+        assert.equal(testCredentials[0].Description, 'Cat');
+        assert.equal(testCredentials[1].Description, 'Catfish');
+        assert.equal(testCredentials[2].Description, 'Dog');
+        assert.equal(testCredentials[3].Description, 'Dogfish');
+        assert.equal(testCredentials[4].Description, 'Fish');
+        assert.equal(testCredentials[5].Description, 'Owl');
+    });
+
+    test('truncate', () => {
+        const testString = 'This Is A Test';
+        assert.equal(Vault.truncate(testString, 10), 'This Is...');
+        assert.equal(Vault.truncate(testString, 20), 'This Is A Test');
+    });
+
+    test('updateProperties', () => {
+        const updated = Vault.updateProperties({
+            Description: 'ITEM2UPDATE',
+            Username: 'item2new',
+            Password: 'abcd',
+            Url: 'http://test4.com'
+        }, testCredentials[1]);
+        assert.equal(updated.Description, 'ITEM2UPDATE');
+        assert.equal(updated.Username, 'item2new');
+        assert.equal(updated.Password, 'abcd');
+        assert.equal(updated.Url, 'http://test4.com');
+    });
+
+    test('validateRecord', () => {
+        const form = $('<form><input id="Description" name="Description" />' +
+            '<input id="Password" name="Password" />' +
+            '<input id="PasswordConfirmation" name="PasswordConfirmation" /></form>');
+        form.find('#Password').val('A');
+        const noDesc = Vault.validateRecord(form);
+        form.find('#Description').val('A');
+        const passwordNoMatch = Vault.validateRecord(form);
+        form.find('#PasswordConfirmation').val('A');
+        const valid = Vault.validateRecord(form);
+        assert.lengthOf(noDesc, 2);
+        assert.equal(noDesc[0].field.attr('id'), 'Description')
+        assert.equal(noDesc[1].field.attr('id'), 'PasswordConfirmation');
+        assert.lengthOf(passwordNoMatch, 1);
+        assert.equal(passwordNoMatch[0].field.attr('id'), 'PasswordConfirmation');
+        assert.lengthOf(valid, 0);
+    });
+
 });

@@ -115,7 +115,6 @@
     <TypeScriptCompile Include="Content\Js\Vault.ts" />
     <Content Include="Content\Js\vendor\passpack-v1.1.js" />
     <TypeScriptCompile Include="Content\Js\test\FakeRepository.ts" />
-    <TypeScriptCompile Include="Content\Js\test\tests.old.ts" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
