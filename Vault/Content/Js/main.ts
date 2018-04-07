@@ -1,8 +1,8 @@
-﻿import * as $ from 'jquery';
-import * as Handlebars from 'handlebars';
+﻿import * as Handlebars from 'handlebars';
+import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
-import { ICryptoProvider, IPasswordSpecification, IRepository } from './Abstract';
-import { Credential, CredentialSummary, CryptoProvider, Repository } from './Concrete';
+import { CryptoProvider, Repository } from './modules/all';
+import { Credential, CredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository } from './types/all';
 
 const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak
 

@@ -12,6 +12,7 @@
         "chai": "4.1.2",
         "clean-webpack-plugin": "0.1.19",
         "copy-webpack-plugin": "4.5.1",
+        "del-cli": "1.1.0",
         "istanbul": "0.4.5",
         "jsdom": "11.7.0",
         "jsdom-global": "3.0.2",
@@ -35,10 +36,10 @@
         "tslib": "1.9.0"
     },
     "scripts": {
-        "buildDebug": "webpack --config=webpack.config.build --mode=development --display-modules && webpack --config=webpack.config.test --mode=development --display-modules",
-        "buildRelease": "webpack --config=webpack.config.build --mode=production --display-modules && webpack --config=webpack.config.test --mode=development --display-modules",
-        "test": "mocha --opts ./Content/Js/test/mocha.opts",
-        "coverage": "nyc mocha --opts ./Content/Js/test/mocha.opts"
+        "clean": "del-cli ./Content/js/dist",
+        "build": "npm run clean && webpack --config=webpack.config.build --mode=development --display-modules && webpack --config=webpack.config.test --mode=development --display-modules",
+        "test": "mocha --opts ./Content/Js/tests/mocha.opts",
+        "coverage": "nyc mocha --opts ./Content/Js/tests/mocha.opts"
     },
     "nyc": {
         "include": [

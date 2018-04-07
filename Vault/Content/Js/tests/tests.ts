@@ -1,8 +1,8 @@
-﻿import { suite, test, beforeEach } from 'mocha';
-import { assert } from 'chai';
-import { CryptoProvider, Credential, CredentialSummary } from '../Concrete';
-import { IPasswordSpecification, IRepository } from '../Abstract';
-import * as Vault from '../Vault';
+﻿import { assert } from 'chai';
+import { beforeEach, suite, test } from 'mocha';
+import * as Vault from '../main';
+import { CryptoProvider } from '../modules/all';
+import { Credential, CredentialSummary, IPasswordSpecification, IRepository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
 const testCredentialPlainText = new Credential(
@@ -292,7 +292,7 @@ suite('Vault', () => {
         assert.equal(idx2, -1);
     });
 
-    test('rateLimit', function (done) {
+    test('rateLimit', function(done) {
         this.slow(1000);
         // TODO: Does this actually test the function?
         const func = Vault.rateLimit(() => {
@@ -427,7 +427,7 @@ suite('Vault', () => {
         form.find('#PasswordConfirmation').val('A');
         const valid = Vault.validateRecord(form);
         assert.lengthOf(noDesc, 2);
-        assert.equal(noDesc[0].field.attr('id'), 'Description')
+        assert.equal(noDesc[0].field.attr('id'), 'Description');
         assert.equal(noDesc[1].field.attr('id'), 'PasswordConfirmation');
         assert.lengthOf(passwordNoMatch, 1);
         assert.equal(passwordNoMatch[0].field.attr('id'), 'PasswordConfirmation');

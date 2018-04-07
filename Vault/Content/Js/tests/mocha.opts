@@ -1,7 +1,7 @@
 --require jsdom-global/register
---require Content/js/test/setup.js
+--require Content/js/tests/setup.js
 --require ts-node/register
 --require source-map-support/register
 --full-trace
 --bail
-Content/js/test/tests.ts
+Content/js/tests/tests.ts

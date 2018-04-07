@@ -1,5 +1,4 @@
-﻿import { IRepository, XHRError, XHRSuccess } from '../Abstract';
-import { Credential } from './Credential';
+﻿import { Credential, IRepository, XHRError, XHRSuccess } from '../types/all';
 
 export class Repository implements IRepository {
     private jsonContentType = 'application/json; charset=utf-8';

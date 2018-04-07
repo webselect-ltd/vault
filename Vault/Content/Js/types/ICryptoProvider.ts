@@ -1,5 +1,4 @@
-﻿import { Credential } from '../Concrete';
-import { IPasswordSpecification } from './IPasswordSpecification';
+﻿import { Credential, IPasswordSpecification } from './all';
 
 export interface ICryptoProvider {
     base64ToUtf8(str: string): string;

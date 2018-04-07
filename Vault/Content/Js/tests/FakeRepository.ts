@@ -1,5 +1,4 @@
-﻿import { ICryptoProvider, IRepository } from '../Abstract';
-import { Credential } from '../Concrete';
+﻿import { Credential, ICryptoProvider, IRepository } from '../types/all';
 
 export class FakeRepository implements IRepository {
     private cryptoProvider: ICryptoProvider;

@@ -1,4 +1,4 @@
-﻿import { Credential } from '../Concrete';
+﻿import { Credential } from './all';
 
 export interface IRepository {
     login(hashedUsername: string, hashedPassword: string): Promise<any>;

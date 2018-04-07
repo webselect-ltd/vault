@@ -73,9 +73,10 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <TypeScriptCompile Include="Content\Js\Concrete.ts" />
-    <TypeScriptCompile Include="Content\Js\Abstract.ts" />
-    <TypeScriptCompile Include="Content\Js\abstract\IPasswordSpecification.ts" />
+    <TypeScriptCompile Include="Content\Js\main.ts" />
+    <TypeScriptCompile Include="Content\Js\modules\all.ts" />
+    <TypeScriptCompile Include="Content\Js\types\all.ts" />
+    <TypeScriptCompile Include="Content\Js\types\IPasswordSpecification.ts" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -99,35 +100,29 @@
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
-    <Content Include="Content\Js\dist\tests.js" />
-    <Content Include="Content\Js\dist\vault.js" />
-    <Content Include="Content\Js\dist\vendor\handlebars.min.js" />
-    <Content Include="Content\Js\dist\vendor\jquery.min.js" />
-    <Content Include="Content\Js\dist\vendor\js.cookie.js" />
-    <Content Include="Content\Js\dist\vendor\modal.js" />
-    <Content Include="Content\Js\test\setup.js" />
+    <Content Include="Content\Js\tests\setup.js" />
     <Content Include="webpack.config.build.js" />
     <Content Include="webpack.config.test.js" />
     <Content Include="webpack.config.common.js" />
-    <TypeScriptCompile Include="Content\Js\abstract\ICryptoProvider.ts" />
-    <TypeScriptCompile Include="Content\Js\abstract\IRepository.ts" />
-    <TypeScriptCompile Include="Content\Js\abstract\XHRSuccess.ts" />
-    <TypeScriptCompile Include="Content\Js\abstract\XHRError.ts" />
-    <TypeScriptCompile Include="Content\Js\concrete\CryptoProvider.ts" />
-    <TypeScriptCompile Include="Content\Js\concrete\CredentialSummary.ts" />
-    <TypeScriptCompile Include="Content\Js\concrete\Credential.ts" />
-    <TypeScriptCompile Include="Content\Js\concrete\Repository.ts" />
-    <TypeScriptCompile Include="Content\Js\test\tests.ts" />
-    <TypeScriptCompile Include="Content\Js\Vault.ts" />
-    <Content Include="Content\Js\vendor\passpack-v1.1.js" />
-    <TypeScriptCompile Include="Content\Js\test\FakeRepository.ts" />
+    <TypeScriptCompile Include="Content\Js\types\ICryptoProvider.ts" />
+    <TypeScriptCompile Include="Content\Js\types\IRepository.ts" />
+    <TypeScriptCompile Include="Content\Js\types\XHRSuccess.ts" />
+    <TypeScriptCompile Include="Content\Js\types\XHRError.ts" />
+    <TypeScriptCompile Include="Content\Js\modules\CryptoProvider.ts" />
+    <TypeScriptCompile Include="Content\Js\types\CredentialSummary.ts" />
+    <TypeScriptCompile Include="Content\Js\types\Credential.ts" />
+    <TypeScriptCompile Include="Content\Js\modules\Repository.ts" />
+    <TypeScriptCompile Include="Content\Js\tests\tests.ts" />
+    <TypeScriptCompile Include="Content\Js\modules\Vault.ts" />
+    <Content Include="Content\Js\legacy\passpack-v1.1.js" />
+    <TypeScriptCompile Include="Content\Js\tests\FakeRepository.ts" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config" />
-    <TypeScriptCompile Include="Content\Js\types\passpack.d.ts" />
-    <TypeScriptCompile Include="Content\Js\types\hacks.d.ts" />
+    <TypeScriptCompile Include="Content\Js\legacy\passpack.d.ts" />
+    <TypeScriptCompile Include="Content\Js\legacy\hacks.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_CredentialForm.cshtml" />
@@ -163,7 +158,7 @@
     <Content Include="package.json" />
     <Content Include="tslint.json" />
     <Content Include="Views\Main\Tests.cshtml" />
-    <Content Include="Content\Js\test\mocha.opts" />
+    <Content Include="Content\Js\tests\mocha.opts" />
     <None Include="Web.config.example">
       <SubType>Designer</SubType>
     </None>
@@ -368,6 +363,6 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>npm run build$(ConfigurationName)</PreBuildEvent>
+    <PreBuildEvent>npm run build</PreBuildEvent>
   </PropertyGroup>
 </Project>

@@ -1,6 +1,5 @@
-﻿import { ICryptoProvider, IPasswordSpecification } from '../Abstract';
-import '../vendor/passpack-v1.1.js';
-import { Credential } from './Credential';
+﻿import '../legacy/passpack-v1.1.js';
+import { Credential, ICryptoProvider, IPasswordSpecification } from '../types/all';
 
 export class CryptoProvider implements ICryptoProvider {
     public base64ToUtf8(str: string): string {

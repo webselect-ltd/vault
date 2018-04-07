@@ -1,9 +1,9 @@
 const webpack = require("webpack");
 const ProvidePlugin = require("webpack").ProvidePlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
+    // Specify the output file name and location
     output: {
         filename: "[name].js",
         path: __dirname + "/Content/Js/dist"
@@ -11,8 +11,6 @@ module.exports = {
     // Enable sourcemaps for debugging webpack's output
     devtool: "source-map",
     plugins: [
-        // Remove the output folder before build
-        // new CleanWebpackPlugin(['Content/Js/dist']),
         // This automatically adds aliases to the application scope for the specified packages
         // So packages which look for the 'jQuery' global alias still work within our app closure
         new ProvidePlugin({
@@ -39,10 +37,8 @@ module.exports = {
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
         ]
     },
-    // When importing a module whose path matches one of the following, just
-    // assume a corresponding global variable exists and use that instead
-    // This is important because it allows us to avoid bundling all of our
-    // dependencies, which allows browsers to cache those libraries between build
+    // When importing a module whose path matches one of the following keys, just
+    // assume a global variable named <value> exists and use that instead
     externals: {
         jquery: "jQuery",
         handlebars: "Handlebars",
