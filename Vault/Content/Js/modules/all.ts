@@ -1,3 +1,4 @@
 ﻿export { CryptoProvider } from './CryptoProvider';
 export { Repository } from './Repository';
-export { search } from './Vault';
+export { Vault } from './Vault';
+export { trim, truncate } from './Common';

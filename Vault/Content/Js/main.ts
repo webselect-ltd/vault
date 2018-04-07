@@ -1,18 +1,13 @@
 ﻿import * as Handlebars from 'handlebars';
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
-import { CryptoProvider, Repository, search } from './modules/all';
+import { CryptoProvider, Repository, truncate, Vault } from './modules/all';
 import { Credential, CredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository } from './types/all';
 
-const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak
-
-const isWeakPassword = (item: Credential): boolean => {
-    const pwd: string = item.Password;
-    return pwd && cryptoProvider.getPasswordBits(pwd) <= weakPasswordThreshold;
-};
-
 let repository: IRepository;
-let cryptoProvider: ICryptoProvider;
+const cryptoProvider = new CryptoProvider();
+
+const vault = new Vault(cryptoProvider);
 
 const internal: any = {
     basePath: null,     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
@@ -101,7 +96,7 @@ function confirmDelete(id: string, masterKey: string): void {
             const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
             const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
-            const results: Credential[] = search(ui.searchInput.val(), decrypted, isWeakPassword);
+            const results: Credential[] = vault.search(ui.searchInput.val(), decrypted);
             buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
 
             ui.modal.modal('hide');
@@ -119,7 +114,7 @@ export function createCredentialDisplayData(credential: Credential, masterKey: s
         username: credential.Username,
         password: credential.Password,
         url: credential.Url,
-        weak: $.trim(credential.Password) !== '' && cryptoProvider.getPasswordBits(credential.Password) < weakPasswordThreshold
+        weak: vault.isWeakPassword(credential)
     };
 }
 
@@ -407,7 +402,7 @@ function showPasswordStrength(field: JQuery): void {
         } else if (strength <= 25) {
             bar.addClass('very-weak');
             status.html('Very Weak (' + strength + ')');
-        } else if (strength <= weakPasswordThreshold) {
+        } else if (strength <= vault.weakPasswordThreshold) {
             bar.addClass('weak');
             status.html('Weak (' + strength + ')');
         } else if (strength <= 55) {
@@ -434,11 +429,6 @@ export function sortCredentials(credentials: Credential[]): void {
         const descb: string = b.Description.toUpperCase();
         return desca < descb ? -1 : desca > descb ? 1 : 0;
     });
-}
-
-// Truncate a string at a specified length
-export function truncate(str: string, len: number): string {
-    return str.length > len ? str.substring(0, len - 3) + '...' : str;
 }
 
 // Update properties of the item with a specific ID in a list
@@ -517,7 +507,6 @@ export function init(basePath: string, devMode: boolean): void {
     internal.basePath = basePath;
 
     repository = new Repository(internal.basePath);
-    cryptoProvider = new CryptoProvider();
 
     uiSetup();
 
@@ -541,7 +530,7 @@ export function init(basePath: string, devMode: boolean): void {
         e.preventDefault();
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = search(null, decrypted, isWeakPassword);
+        const results: Credential[] = vault.search(null, decrypted);
         buildDataTable(results, (rows: CredentialSummary[]): void => {
             ui.container.html(createCredentialTable(rows));
             ui.searchInput.val('').focus();
@@ -551,7 +540,7 @@ export function init(basePath: string, devMode: boolean): void {
     ui.searchInput.on('keyup', rateLimit(async (e: Event): Promise<void> => {
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, decrypted, isWeakPassword);
+        const results: Credential[] = vault.search((e.currentTarget as HTMLInputElement).value, decrypted);
         buildDataTable(results, (rows: CredentialSummary[]): void => {
             ui.container.html(createCredentialTable(rows));
         }, internal.masterKey, internal.userId);
@@ -622,7 +611,7 @@ export function init(basePath: string, devMode: boolean): void {
         const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
         const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = search(ui.searchInput.val(), decrypted, isWeakPassword);
+        const results: Credential[] = vault.search(ui.searchInput.val(), decrypted);
 
         ui.modal.modal('hide');
 
@@ -769,5 +758,4 @@ export function init(basePath: string, devMode: boolean): void {
 
 export function testInit(testRepository: IRepository, testCryptoProvider: ICryptoProvider): void {
     repository = testRepository;
-    cryptoProvider = testCryptoProvider;
 }

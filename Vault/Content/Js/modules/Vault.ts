@@ -1,4 +1,5 @@
-﻿import { Credential } from '../types/all';
+﻿import { Credential, ICryptoProvider } from '../types/all';
+import { trim } from './Common';
 
 // A map of the properties which can be searched for using the fieldName:query syntax
 // We need this because the search is not case-sensitive, whereas JS properties are!
@@ -10,38 +11,70 @@ const queryablePropertyMap: any = {
     filter: 'FILTER'
 };
 
-export function search(query: string, list: Credential[], isWeakPassword: (item: Credential) => boolean): Credential[] {
-    let results: Credential[] = [];
-    let queryField: string;
-    let queryData: string[];
-    // Tidy up the query text
-    query = $.trim(query).toLowerCase();
-    if (query !== null && query !== '' && query.length > 1) {
-        queryField = queryablePropertyMap.description;
-        // Support queries in the form fieldName:query (e.g. username:me@email.com)
-        if (query.indexOf(':') !== -1) {
-            queryData = query.split(':');
-            // Safeguard against spaces either side of colon, query part not
-            // having been typed yet and searches on a non-existent property
-            if (queryData.length === 2 && queryData[0] !== '' && queryData[1] !== '') {
-                // If the fieldName part exists in the property map
-                if (queryablePropertyMap[queryData[0]]) {
-                    queryField = queryablePropertyMap[queryData[0]];
-                    query = queryData[1];
-                }
-            }
-        }
-        if (queryField === 'FILTER') {
-            if (query === 'all') {
-                results = list;
-            } else if (query === 'weak') {
-                results = list.filter(isWeakPassword);
-            }
-        } else {
-            results = list.filter((item: Credential): boolean => {
-                return item[queryField].toLowerCase().indexOf(query) > -1;
-            });
-        }
+interface ISearchQuery {
+    property: string;
+    text: string;
+}
+
+export class Vault {
+    // Bit value below which password is deemed weak
+    public readonly weakPasswordThreshold = 40;
+
+    private cryptoProvider: ICryptoProvider;
+
+    constructor(cryptoProvider: ICryptoProvider) {
+        this.cryptoProvider = cryptoProvider;
     }
-    return results;
+
+    public isWeakPassword(item: Credential) {
+        return item.Password && this.cryptoProvider.getPasswordBits(item.Password) <= this.weakPasswordThreshold;
+    }
+
+    public parseSearchQuery(queryText: string): ISearchQuery {
+        const parsedQuery: ISearchQuery = {
+            property: queryablePropertyMap.description,
+            text: null
+        };
+
+        const rawQuery = trim(queryText).toLowerCase();
+
+        if (!rawQuery || !rawQuery.length) {
+            return parsedQuery;
+        }
+
+        if (rawQuery.indexOf(':') === -1) {
+            parsedQuery.text = rawQuery;
+        } else {
+            // Support queries in the form fieldName:query (e.g. username:me@email.com)
+            const [property, query] = rawQuery.split(':').map(trim);
+
+            if (property && queryablePropertyMap[property] && query) {
+                parsedQuery.property = queryablePropertyMap[property];
+                parsedQuery.text = query;
+            }
+        }
+
+        return parsedQuery;
+    }
+
+    public search(query: string, list: Credential[]): Credential[] {
+        const q = this.parseSearchQuery(query);
+
+        if (!q.text) {
+            return [];
+        }
+
+        if (q.property === 'FILTER') {
+            switch (q.text) {
+                case 'all':
+                    return list;
+                case 'weak':
+                    return list.filter(i => this.isWeakPassword(i));
+                default:
+                    return [];
+            }
+        }
+
+        return list.filter(item => item[q.property].toLowerCase().indexOf(q.text) > -1);
+    }
 }
