@@ -278,20 +278,6 @@ suite('Main', () => {
         Vlt.testInit(testRepository, cryptoProvider);
     });
 
-    test('buildDataTable', done => {
-        const userId = 'user1';
-        const list = testCredentials.slice(0, 3);
-        const check = (row: CredentialSummary, id: string, desc: string) =>
-            row.credentialid === id && row.description === desc && row.masterkey === testMasterKeyBase64Encoded && row.userid === 'user1';
-        const result = Vlt.buildDataTable(list, rows => {
-            assert.lengthOf(rows, 3);
-            assert.ok(check(rows[0], 'cr1', 'Cat'));
-            assert.ok(check(rows[1], 'cr2', 'Dog'));
-            assert.ok(check(rows[2], 'cr3', 'Fish'));
-            done();
-        }, testMasterKeyBase64Encoded, userId);
-    });
-
     test('changePassword', async () => {
         const cryptoProvider = new CryptoProvider();
         const userId = 'user1';
@@ -378,16 +364,6 @@ suite('Main', () => {
         assert.equal(typeof obj.chromepassword, 'undefined');
         assert.equal(typeof obj.submit, 'undefined');
     });
-
-    // test('createCredentialTable', () => {
-    //     Vlt.uiSetup();
-    //     const data = testCredentials.map(c => Vlt.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
-    //     const table = $(Vlt.createCredentialTable(data));
-    //     const rows = table.filter('.row');
-    //     assert.lengthOf(rows, 6);
-    //     assert.equal($(rows[0]).attr('id'), 'cr1');
-    //     assert.equal($(rows[1]).find('.full').text(), 'Dog');
-    // });
 
     test('exportData', async () => {
         const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>

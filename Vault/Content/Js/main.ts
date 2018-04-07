@@ -48,14 +48,6 @@ const templates: any = {
     exportedDataWindow: null
 };
 
-// Build the data table
-export function buildDataTable(data: Credential[], callback: (c: CredentialSummary[]) => void, masterKey: string, userId: string) {
-    // Create a table row for each record and add it to the rows array
-    const rows = data.map(item => createCredentialDisplayData(item, masterKey, userId));
-    // Fire the callback and pass it the array of rows
-    callback(rows);
-}
-
 // Change the password and re-encrypt all credentials with the new password
 export async function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string): Promise<void> {
     const newPasswordHash: string = cryptoProvider.hash(newPassword);
@@ -91,13 +83,15 @@ function confirmDelete(id: string, masterKey: string): void {
         deleteText: 'Yes, Delete This Credential',
         ondelete: async (e: Event) => {
             e.preventDefault();
+
             await repository.deleteCredential(internal.userId, id);
 
             const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
             const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
-            const results: Credential[] = vault.search(ui.searchInput.val(), decrypted);
-            buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
+
+            const results = vault.search(ui.searchInput.val(), decrypted);
+            updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
 
             ui.modal.modal('hide');
         }
@@ -130,6 +124,11 @@ export function createCredentialFromFormFields(form: JQuery): Credential {
 // Create the credential table
 export function createCredentialTable(rows: CredentialSummary[]): string {
     return templates.credentialTable({ rows: rows });
+}
+
+export function updateCredentialListUI(container: JQuery, data: Credential[], userId: string, masterKey: string): void {
+    const rows = data.map(c => createCredentialDisplayData(c, masterKey, userId));
+    container.html(createCredentialTable(rows));
 }
 
 // Default action for modal accept button
@@ -498,20 +497,16 @@ export function init(basePath: string, devMode: boolean): void {
         e.preventDefault();
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = vault.search(null, decrypted);
-        buildDataTable(results, (rows: CredentialSummary[]): void => {
-            ui.container.html(createCredentialTable(rows));
-            ui.searchInput.val('').focus();
-        }, internal.masterKey, internal.userId);
+        const results = vault.search(null, decrypted);
+        updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
+        ui.searchInput.val('').focus();
     });
 
     ui.searchInput.on('keyup', rateLimit(async (e: Event): Promise<void> => {
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = vault.search((e.currentTarget as HTMLInputElement).value, decrypted);
-        buildDataTable(results, (rows: CredentialSummary[]): void => {
-            ui.container.html(createCredentialTable(rows));
-        }, internal.masterKey, internal.userId);
+        const results = vault.search((e.currentTarget as HTMLInputElement).value, decrypted);
+        updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
     }, 200));
 
     // Initialise globals and load data on correct login
@@ -579,13 +574,11 @@ export function init(basePath: string, devMode: boolean): void {
         const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
         const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = vault.search(ui.searchInput.val(), decrypted);
+        const results = vault.search(ui.searchInput.val(), decrypted);
 
         ui.modal.modal('hide');
 
-        buildDataTable(results, (rows: CredentialSummary[]): void => {
-            ui.container.html(createCredentialTable(rows));
-        }, internal.masterKey, internal.userId);
+        updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
 
         return;
     });
