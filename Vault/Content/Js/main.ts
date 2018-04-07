@@ -459,15 +459,13 @@ export function uiSetup(): void {
     Handlebars.registerPartial('copylink', templates.copyLink);
 
     Handlebars.registerHelper('breaklines', (text: string): hbs.SafeString => {
-        text = Handlebars.Utils.escapeExpression(text);
-        text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
-        return new Handlebars.SafeString(text);
+        const escapedText = Handlebars.Utils.escapeExpression(text);
+        return new Handlebars.SafeString(escapedText.replace(/(\r\n|\n|\r)/gm, '<br />'));
     });
 
     Handlebars.registerHelper('truncate', (text: string, size: number): hbs.SafeString => {
-        text = text.length > size ? text.substring(0, size - 3) + '...' : text;
-        text = Handlebars.Utils.escapeExpression(text);
-        return new Handlebars.SafeString(text);
+        const escapedText = Handlebars.Utils.escapeExpression(truncate(text, size));
+        return new Handlebars.SafeString(escapedText);
     });
 }
 
