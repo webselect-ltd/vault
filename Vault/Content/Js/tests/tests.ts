@@ -106,14 +106,26 @@ suite('CryptoProvider', () => {
         assert.equal(b64, 'VEVTVA==');
     });
 
-    test('decryptObject', () => {
+    test('decryptCredential', () => {
         const decrypted = new CryptoProvider().decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
         checkDecryption(decrypted);
     });
 
-    test('encryptObject', () => {
+    test('decryptCredentials', () => {
+        const credentials = [testCredentialEncrypted, testCredentialEncrypted];
+        const decrypted = new CryptoProvider().decryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        decrypted.forEach(c => checkDecryption(c));
+    });
+
+    test('encryptCredential', () => {
         const encrypted = new CryptoProvider().encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
         checkEncryption(encrypted, testMasterKeyPlainText);
+    });
+
+    test('encryptCredentials', () => {
+        const credentials = [testCredentialPlainText, testCredentialPlainText];
+        const encrypted = new CryptoProvider().encryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        encrypted.forEach(c => checkEncryption(c, testMasterKeyPlainText));
     });
 
     test('generateMasterKey', () => {
