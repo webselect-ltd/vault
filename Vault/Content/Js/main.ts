@@ -1,7 +1,7 @@
 ﻿import * as Handlebars from 'handlebars';
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
-import { CryptoProvider, Repository, truncate, Vault } from './modules/all';
+import { CryptoProvider, rateLimit, Repository, truncate, Vault } from './modules/all';
 import { Credential, CredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository } from './types/all';
 
 let repository: IRepository;
@@ -244,21 +244,6 @@ function optionsDialog(): void {
         title: 'Admin',
         content: dialogHtml
     });
-}
-
-// Rate-limit calls to the supplied function
-export function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) => void {
-    let timeout: number;
-    return function(): void {
-        const context = this;
-        const args: IArguments = arguments;
-        const later = (): void => {
-            timeout = null;
-            func.apply(context, args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
 }
 
 export function reloadApp(): void {

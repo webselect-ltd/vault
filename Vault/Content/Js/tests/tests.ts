@@ -1,7 +1,7 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
 import * as Vlt from '../main';
-import { CryptoProvider, truncate, Vault } from '../modules/all';
+import { CryptoProvider, rateLimit, truncate, Vault } from '../modules/all';
 import { Credential, CredentialSummary, IPasswordSpecification, IRepository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
@@ -73,6 +73,26 @@ const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBas
 
 let testCredentials: Credential[];
 let testRepository: IRepository;
+
+suite('Common', () => {
+
+    test('rateLimit', function(done) {
+        this.slow(1000);
+        // TODO: Does this actually test the function?
+        const func = rateLimit(() => {
+            assert.ok(true);
+            done();
+        }, 100);
+        func(new Event('click'));
+    });
+
+    test('truncate', () => {
+        const testString = 'This Is A Test';
+        assert.equal(truncate(testString, 10), 'This Is...');
+        assert.equal(truncate(testString, 20), 'This Is A Test');
+    });
+
+});
 
 suite('CryptoProvider', () => {
 
@@ -371,16 +391,6 @@ suite('Main', () => {
         assert.ok(check(exportedData[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
     });
 
-    test('rateLimit', function(done) {
-        this.slow(1000);
-        // TODO: Does this actually test the function?
-        const func = Vlt.rateLimit(() => {
-            assert.ok(true);
-            done();
-        }, 100);
-        func(new Event('click'));
-    });
-
     test('getPasswordGenerationOptions', () => {
         const html = '<div>'
             + '<input type="text" class="generate-password-option" id="len" name="len" value="32">'
@@ -438,12 +448,6 @@ suite('Main', () => {
         assert.equal(testCredentials[3].Description, 'Dogfish');
         assert.equal(testCredentials[4].Description, 'Fish');
         assert.equal(testCredentials[5].Description, 'Owl');
-    });
-
-    test('truncate', () => {
-        const testString = 'This Is A Test';
-        assert.equal(truncate(testString, 10), 'This Is...');
-        assert.equal(truncate(testString, 20), 'This Is A Test');
     });
 
     test('updateProperties', () => {
