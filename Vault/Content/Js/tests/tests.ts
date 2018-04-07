@@ -1,7 +1,7 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
 import * as Vault from '../main';
-import { CryptoProvider } from '../modules/all';
+import { CryptoProvider, search } from '../modules/all';
 import { Credential, CredentialSummary, IPasswordSpecification, IRepository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
@@ -261,15 +261,15 @@ suite('Vault', () => {
         assert.equal(typeof obj.submit, 'undefined');
     });
 
-    //test('createCredentialTable', () => {
-    //    Vault.uiSetup();
-    //    const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
-    //    const table = $(Vault.createCredentialTable(data));
-    //    const rows = table.filter('.row');
-    //    assert.lengthOf(rows, 6);
-    //    assert.equal($(rows[0]).attr('id'), 'cr1');
-    //    assert.equal($(rows[1]).find('.full').text(), 'Dog');
-    //});
+    // test('createCredentialTable', () => {
+    //     Vault.uiSetup();
+    //     const data = testCredentials.map(c => Vault.createCredentialDisplayData(c, testMasterKeyBase64Encoded, 'user1'));
+    //     const table = $(Vault.createCredentialTable(data));
+    //     const rows = table.filter('.row');
+    //     assert.lengthOf(rows, 6);
+    //     assert.equal($(rows[0]).attr('id'), 'cr1');
+    //     assert.equal($(rows[1]).find('.full').text(), 'Dog');
+    // });
 
     test('exportData', async () => {
         const check = (c: Credential, id: string, desc: string, uname: string, pwd: string) =>
@@ -359,29 +359,30 @@ suite('Vault', () => {
     });
 
     test('search', () => {
-        const noresults1 = Vault.search(null, testCredentials);
-        const noresults2 = Vault.search('', testCredentials);
-        const noresults3 = Vault.search('Z', testCredentials);
+        const isWeakPassword = (c: Credential) => false;
+        const noresults1 = search(null, testCredentials, isWeakPassword);
+        const noresults2 = search('', testCredentials, isWeakPassword);
+        const noresults3 = search('Z', testCredentials, isWeakPassword);
         assert.lengthOf(noresults1, 0);
         assert.lengthOf(noresults2, 0);
         assert.lengthOf(noresults3, 0);
-        const results1 = Vault.search('do', testCredentials);
+        const results1 = search('do', testCredentials, isWeakPassword);
         assert.lengthOf(results1, 2);
         assert.equal(results1[0].Description, 'Dog');
         assert.equal(results1[1].Description, 'Dogfish');
-        const results2 = Vault.search('username:dog', testCredentials);
+        const results2 = search('username:dog', testCredentials, isWeakPassword);
         assert.lengthOf(results2, 2);
         assert.equal(results2[0].Description, 'Dog');
         assert.equal(results2[1].Description, 'Dogfish');
-        const results3 = Vault.search('password:cat', testCredentials);
+        const results3 = search('password:cat', testCredentials, isWeakPassword);
         assert.lengthOf(results3, 2);
         assert.equal(results3[0].Description, 'Cat');
         assert.equal(results3[1].Description, 'Catfish');
-        const results4 = Vault.search('filter:all', testCredentials);
+        const results4 = search('filter:all', testCredentials, isWeakPassword);
         assert.lengthOf(results4, 6);
         assert.equal(results4[0].Description, 'Cat');
         assert.equal(results4[5].Description, 'Owl');
-        const results5 = Vault.search('filter:weak', testCredentials);
+        const results5 = search('filter:weak', testCredentials, isWeakPassword);
         assert.lengthOf(results5, 3);
         assert.equal(results5[0].Description, 'Cat');
         assert.equal(results5[2].Description, 'Fish');

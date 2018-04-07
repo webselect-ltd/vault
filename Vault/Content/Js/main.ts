@@ -1,10 +1,15 @@
 ﻿import * as Handlebars from 'handlebars';
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
-import { CryptoProvider, Repository } from './modules/all';
+import { CryptoProvider, Repository, search } from './modules/all';
 import { Credential, CredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository } from './types/all';
 
 const weakPasswordThreshold: number = 40;      // Bit value below which password is deemed weak
+
+const isWeakPassword = (item: Credential): boolean => {
+    const pwd: string = item.Password;
+    return pwd && cryptoProvider.getPasswordBits(pwd) <= weakPasswordThreshold;
+};
 
 let repository: IRepository;
 let cryptoProvider: ICryptoProvider;
@@ -14,16 +19,6 @@ const internal: any = {
     masterKey: '',      // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
     password: '',       // Current user's password
     userId: ''          // GUID identifying logged-in user
-};
-
-// A map of the properties which can be searched for using the fieldName:query syntax
-// We need this because the search is not case-sensitive, whereas JS properties are!
-const queryablePropertyMap: any = {
-    description: 'Description',
-    username: 'Username',
-    password: 'Password',
-    url: 'Url',
-    filter: 'FILTER'
 };
 
 const ui: any = {
@@ -106,7 +101,7 @@ function confirmDelete(id: string, masterKey: string): void {
             const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
             const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
-            const results: Credential[] = search(ui.searchInput.val(), decrypted);
+            const results: Credential[] = search(ui.searchInput.val(), decrypted, isWeakPassword);
             buildDataTable(results, rows => ui.container.html(createCredentialTable(rows)), masterKey, internal.userId);
 
             ui.modal.modal('hide');
@@ -289,46 +284,6 @@ export function reloadApp(): void {
 // Remove the credential with a specific ID from an array
 export function removeFromList(id: string, list: Credential[]): Credential[] {
     return list.filter(item => item.CredentialID !== id);
-}
-
-// Hide credential rows which don't contain a particular string
-export function search(query: string, list: Credential[]): Credential[] {
-    let results: Credential[] = [];
-    let queryField: string;
-    let queryData: string[];
-    // Tidy up the query text
-    query = $.trim(query).toLowerCase();
-    if (query !== null && query !== '' && query.length > 1) {
-        queryField = queryablePropertyMap.description;
-        // Support queries in the form fieldName:query (e.g. username:me@email.com)
-        if (query.indexOf(':') !== -1) {
-            queryData = query.split(':');
-            // Safeguard against spaces either side of colon, query part not
-            // having been typed yet and searches on a non-existent property
-            if (queryData.length === 2 && queryData[0] !== '' && queryData[1] !== '') {
-                // If the fieldName part exists in the property map
-                if (queryablePropertyMap[queryData[0]]) {
-                    queryField = queryablePropertyMap[queryData[0]];
-                    query = queryData[1];
-                }
-            }
-        }
-        if (queryField === 'FILTER') {
-            if (query === 'all') {
-                results = list;
-            } else if (query === 'weak') {
-                results = list.filter((item: Credential): boolean => {
-                    const pwd: string = item.Password;
-                    return pwd && cryptoProvider.getPasswordBits(pwd) <= weakPasswordThreshold;
-                });
-            }
-        } else {
-            results = list.filter((item: Credential): boolean => {
-                return item[queryField].toLowerCase().indexOf(query) > -1;
-            });
-        }
-    }
-    return results;
 }
 
 function setPasswordOptions(form: JQuery, opts: string): void {
@@ -586,7 +541,7 @@ export function init(basePath: string, devMode: boolean): void {
         e.preventDefault();
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = search(null, decrypted);
+        const results: Credential[] = search(null, decrypted, isWeakPassword);
         buildDataTable(results, (rows: CredentialSummary[]): void => {
             ui.container.html(createCredentialTable(rows));
             ui.searchInput.val('').focus();
@@ -596,7 +551,7 @@ export function init(basePath: string, devMode: boolean): void {
     ui.searchInput.on('keyup', rateLimit(async (e: Event): Promise<void> => {
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, decrypted);
+        const results: Credential[] = search((e.currentTarget as HTMLInputElement).value, decrypted, isWeakPassword);
         buildDataTable(results, (rows: CredentialSummary[]): void => {
             ui.container.html(createCredentialTable(rows));
         }, internal.masterKey, internal.userId);
@@ -667,7 +622,7 @@ export function init(basePath: string, devMode: boolean): void {
         const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
         const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
-        const results: Credential[] = search(ui.searchInput.val(), decrypted);
+        const results: Credential[] = search(ui.searchInput.val(), decrypted, isWeakPassword);
 
         ui.modal.modal('hide');
 
