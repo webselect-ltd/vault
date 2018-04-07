@@ -1,5 +1,7 @@
 ﻿import { Credential, IRepository, XHRError, XHRSuccess } from '../types/all';
 
+// TODO: Implement caching
+
 export class Repository implements IRepository {
     private jsonContentType = 'application/json; charset=utf-8';
 
@@ -51,6 +53,7 @@ export class Repository implements IRepository {
         return this.ajaxPostPromise<void>('Main/Delete', data);
     }
 
+    // TODO: Rename and add error path
     private ajaxPostPromise<T>(url: string, data: any, json: boolean = false): Promise<T> {
         return new Promise<T>(resolve => this.ajaxPost(this.basePath + url, data, result => resolve(result)));
     }
@@ -64,6 +67,7 @@ export class Repository implements IRepository {
     }
 
     private ajaxPost(url: string, data: any, successCallback: XHRSuccess, errorCallback?: XHRError, contentType?: string): void {
+        // TODO: Reinstate spinners in main.ts
         // ui.spinner.show();
 
         if (!errorCallback) {
