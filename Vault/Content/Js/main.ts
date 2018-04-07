@@ -157,16 +157,6 @@ export async function exportData(userId: string, masterKey: string): Promise<Cre
     return exportItems;
 }
 
-// Find the index of a credential within an array
-export function findIndex(id: string, list: Credential[]): number {
-    for (let i = 0; i < list.length; i++) {
-        if (list[i].CredentialID === id) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (element: JQuery) => boolean): IPasswordSpecification {
     const len: number = parseInt(inputs.filter('[name=len]').val(), 10);
     return {
@@ -274,11 +264,6 @@ export function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) =
 export function reloadApp(): void {
     // Just reload the whole page when we're done to force login
     location.href = internal.basePath.length > 1 ? internal.basePath.slice(0, -1) : internal.basePath;
-}
-
-// Remove the credential with a specific ID from an array
-export function removeFromList(id: string, list: Credential[]): Credential[] {
-    return list.filter(item => item.CredentialID !== id);
 }
 
 function setPasswordOptions(form: JQuery, opts: string): void {

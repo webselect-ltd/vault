@@ -371,13 +371,6 @@ suite('Main', () => {
         assert.ok(check(exportedData[5], 'cr6', 'Owl', 'owl', '_nT:NP?uovID8,TE'));
     });
 
-    test('findIndex', () => {
-        const idx = Vlt.findIndex('cr2', testCredentials);
-        assert.equal(idx, 1);
-        const idx2 = Vlt.findIndex('not-there', testCredentials);
-        assert.equal(idx2, -1);
-    });
-
     test('rateLimit', function(done) {
         this.slow(1000);
         // TODO: Does this actually test the function?
@@ -435,13 +428,6 @@ suite('Main', () => {
         const checkbox2 = $('<input type="checkbox" checked="checked">');
         assert.isFalse(Vlt.isChecked(checkbox1));
         assert.isTrue(Vlt.isChecked(checkbox2));
-    });
-
-    test('removeFromList', () => {
-        const list2 = Vlt.removeFromList('cr2', testCredentials);
-        assert.lengthOf(list2, 5);
-        assert.equal(list2[0].Description, 'Cat');
-        assert.equal(list2[1].Description, 'Fish');
     });
 
     test('sortCredentials', () => {
