@@ -38,6 +38,8 @@
         "clean": "del-cli ./Content/js/dist",
         "build-notests": "npm run clean && webpack --config=webpack.config.build --mode=development --display-modules",
         "build": "npm run build-notests && webpack --config=webpack.config.test --mode=development --display-modules",
+        "watch-app": "webpack --watch --config=webpack.config.app --mode=development",
+        "watch-tests": "webpack --watch --config=webpack.config.tests --mode=development",
         "test": "mocha --opts ./Content/Js/tests/mocha.opts",
         "coverage": "nyc mocha --opts ./Content/Js/tests/mocha.opts"
     },
@@ -64,5 +66,11 @@
         ],
         "sourceMap": true,
         "instrument": true
+    },
+    "-vs-binding": {
+        "ProjectOpened": [
+            "watch-app",
+            "watch-tests"
+        ]
     }
 }
