@@ -1,7 +1,10 @@
 ﻿export { Credential } from './Credential';
-export { CredentialSummary } from './CredentialSummary';
+export { CryptoProvider } from './CryptoProvider';
 export { ICryptoProvider } from './ICryptoProvider';
+export { ICredentialSearchQuery } from './ICredentialSearchQuery';
+export { ICredentialSummary } from './ICredentialSummary';
 export { IPasswordSpecification } from './IPasswordSpecification';
 export { IRepository } from './IRepository';
+export { Repository } from './Repository';
 export { XHRError } from './XHRError';
 export { XHRSuccess } from './XHRSuccess';

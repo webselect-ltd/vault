@@ -1,4 +1,2 @@
-﻿export { CryptoProvider } from './CryptoProvider';
-export { Repository } from './Repository';
-export { Vault } from './Vault';
+﻿export { mapToSummary, parseSearchQuery, searchCredentials, weakPasswordThreshold } from './Vault';
 export { trim, truncate, rateLimit } from './Common';
