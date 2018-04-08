@@ -12,6 +12,7 @@
         "chai": "4.1.2",
         "copy-webpack-plugin": "4.5.1",
         "del-cli": "1.1.0",
+        "gulp": "3.9.1",
         "istanbul": "0.4.5",
         "jsdom": "11.7.0",
         "jsdom-global": "3.0.2",

@@ -102,6 +102,7 @@
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
     <Content Include="Content\Js\tests\setup.js" />
+    <Content Include="gulpfile.js" />
     <Content Include="webpack.config.app.js" />
     <Content Include="webpack.config.tests.js" />
     <Content Include="webpack.config.common.js" />
@@ -364,6 +365,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>npm run build</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>
