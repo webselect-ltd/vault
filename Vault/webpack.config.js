@@ -8,6 +8,10 @@ module.exports = {
         filename: "[name].js",
         path: __dirname + "/Content/Js/dist"
     },
+    entry: {
+        main: "./Content/Js/main.ts",
+        tests: "./Content/Js/tests/tests.ts"
+    },
     // Enable sourcemaps for debugging webpack's output
     devtool: "source-map",
     plugins: [
@@ -42,6 +46,8 @@ module.exports = {
     externals: {
         jquery: "jQuery",
         handlebars: "Handlebars",
-        "js-cookie": "Cookies"
+        "js-cookie": "Cookies",
+        mocha: "Mocha",
+        chai: "chai"
     }
 };

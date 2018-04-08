@@ -24,8 +24,7 @@
         "ts-node": "5.0.1",
         "typescript": "2.8.1",
         "webpack": "4.4.1",
-        "webpack-cli": "2.0.14",
-        "webpack-merge": "4.1.2"
+        "webpack-cli": "2.0.14"
     },
     "dependencies": {
         "bootstrap": "3.3.7",
@@ -36,12 +35,10 @@
     },
     "scripts": {
         "clean": "del-cli ./Content/js/dist",
-        "build-notests": "npm run clean && webpack --config=webpack.config.build --mode=development --display-modules",
-        "build": "npm run build-notests && webpack --config=webpack.config.test --mode=development --display-modules",
-        "watch-app": "webpack --watch --config=webpack.config.app --mode=development",
-        "watch-tests": "webpack --watch --config=webpack.config.tests --mode=development",
+        "build": "npm run clean && webpack --mode=development --display-modules",
+        "watch": "webpack --watch --mode=development",
         "test": "mocha --opts ./Content/Js/tests/mocha.opts",
-        "coverage": "nyc mocha --opts ./Content/Js/tests/mocha.opts"
+        "cover": "nyc mocha --opts ./Content/Js/tests/mocha.opts"
     },
     "nyc": {
         "include": [
@@ -69,8 +66,7 @@
     },
     "-vs-binding": {
         "ProjectOpened": [
-            "watch-app",
-            "watch-tests"
+            "watch"
         ]
     }
 }
