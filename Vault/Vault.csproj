@@ -21,7 +21,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <TypeScriptToolsVersion>2.7</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -155,7 +155,7 @@
     <Content Include="Views\Main\SetDevCookie.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Js\tsconfig.json" />
+    <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="tslint.json" />
     <Content Include="Views\Main\Tests.cshtml" />
