@@ -157,7 +157,7 @@ export async function exportData(userId: string, masterKey: string): Promise<Cre
 }
 
 export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (element: JQuery) => boolean): IPasswordSpecification {
-    const len: number = parseInt(inputs.filter('[name=len]').val(), 10);
+    const len = inputs.filter('[name=len]').val() as number;
     return {
         length: isNaN(len) ? 16 : len,
         lowerCase: predicate(inputs.filter('[name=lcase]')),
@@ -355,10 +355,11 @@ function showModal(options: any): void {
 
 // Show password strength visually
 function showPasswordStrength(field: JQuery): void {
-    const strengthIndicator: JQuery = field.next('div.password-strength');
-    const status: JQuery = strengthIndicator.find('> span');
-    const bar: JQuery = strengthIndicator.find('> div');
-    const strength: number = cryptoProvider.getPasswordBits(field.val());
+    const strengthIndicator = field.next('div.password-strength');
+    const status = strengthIndicator.find('> span');
+    const bar = strengthIndicator.find('> div');
+    const password = field.val() as string;
+    const strength: number = cryptoProvider.getPasswordBits(password);
     bar.removeClass();
     if (strength === 0) {
         status.html('No Password');
@@ -502,7 +503,7 @@ export function init(basePath: string, devMode: boolean): void {
         ui.searchInput.val('').focus();
     });
 
-    ui.searchInput.on('keyup', rateLimit(async (e: Event): Promise<void> => {
+    ui.searchInput.on('keyup', rateLimit(async e => {
         const credentials = await repository.loadCredentialsForUser(internal.userId);
         const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
         const results = vault.search((e.currentTarget as HTMLInputElement).value, decrypted);
@@ -535,7 +536,7 @@ export function init(basePath: string, devMode: boolean): void {
     });
 
     // Save the new details on edit form submit
-    $('body').on('submit', '#credential-form', async (e: Event): Promise<void> => {
+    $('body').on('submit', '#credential-form', async e => {
         e.preventDefault();
 
         const form: JQuery = $(e.currentTarget);
@@ -584,12 +585,12 @@ export function init(basePath: string, devMode: boolean): void {
     });
 
     // Show password strength as it is typed
-    $('body').on('keyup', '#Password', rateLimit((e: Event): void => {
+    $('body').on('keyup', '#Password', rateLimit(e => {
         showPasswordStrength($(e.currentTarget));
-    }));
+    }, 200));
 
     // Generate a nice strong password
-    $('body').on('click', 'button.generate-password', (e: Event): void => {
+    $('body').on('click', 'button.generate-password', e => {
         e.preventDefault();
         const passwordSpecification = getPasswordGenerationOptionValues($('input.generate-password-option'), isChecked);
         const password: string = cryptoProvider.generatePassword(passwordSpecification);
@@ -605,13 +606,13 @@ export function init(basePath: string, devMode: boolean): void {
     });
 
     // Toggle password generation option UI visibility
-    $('body').on('click', 'a.generate-password-options-toggle', (e: Event): void => {
+    $('body').on('click', 'a.generate-password-options-toggle', e => {
         e.preventDefault();
         $('div.generate-password-options').toggle();
     });
 
     // Copy content to clipboard when copy icon is clicked
-    $('body').on('click', 'a.copy-link', (e: Event): void => {
+    $('body').on('click', 'a.copy-link', e => {
         e.preventDefault();
         const a: JQuery = $(e.currentTarget);
         $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
@@ -625,12 +626,12 @@ export function init(basePath: string, devMode: boolean): void {
         }
     });
 
-    $('body').on('click', 'button.btn-credential-open', (e: Event): void => {
+    $('body').on('click', 'button.btn-credential-open', e => {
         e.preventDefault();
         open($(e.currentTarget).data('url'));
     });
 
-    $('body').on('click', 'button.btn-credential-copy', (e: Event): void => {
+    $('body').on('click', 'button.btn-credential-copy', e => {
         e.preventDefault();
         const allButtons: JQuery = $('button.btn-credential-copy');
         const button: JQuery = $(e.currentTarget);
@@ -648,19 +649,18 @@ export function init(basePath: string, devMode: boolean): void {
     });
 
     // Automatically focus the search field if a key is pressed from the credential list
-    $('body').on('keydown', (e: Event): void => {
-        const event: KeyboardEvent = e as KeyboardEvent;
-        const eventTarget: HTMLElement = e.target as HTMLElement;
+    $('body').on('keydown', e => {
+        const eventTarget = e.target as HTMLElement;
         if (eventTarget.nodeName === 'BODY') {
             e.preventDefault();
             // Cancel the first mouseup event which will be fired after focus
-            ui.searchInput.one('mouseup', (me: Event): void => {
+            ui.searchInput.one('mouseup', (me: Event) => {
                 me.preventDefault();
             });
             ui.searchInput.focus();
-            const char: string = String.fromCharCode(event.keyCode);
+            const char: string = String.fromCharCode(e.keyCode);
             if (/[a-zA-Z0-9]/.test(char)) {
-                ui.searchInput.val(event.shiftKey ? char : char.toLowerCase());
+                ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
             } else {
                 ui.searchInput.select();
             }
@@ -668,8 +668,8 @@ export function init(basePath: string, devMode: boolean): void {
     });
 
     $('body').on('click', '#change-password-button', e => {
-        const newPassword: string = $('#NewPassword').val();
-        const newPasswordConfirm: string = $('#NewPasswordConfirm').val();
+        const newPassword = $('#NewPassword').val() as string;
+        const newPasswordConfirm = $('#NewPasswordConfirm').val() as string;
 
         const confirmationMsg = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
             + 'Are you SURE you want to change the master password?';
@@ -702,8 +702,9 @@ export function init(basePath: string, devMode: boolean): void {
 
     $('body').on('click', '#import-button', async e => {
         e.preventDefault();
-        const newData = parseImportData(internal.userId, internal.masterKey, $('#import-data').val());
-        await repository.updateMultiple(newData);
+        const rawData = $('#import-data').val() as string;
+        const parsedData = parseImportData(internal.userId, internal.masterKey, rawData);
+        await repository.updateMultiple(parsedData);
         reloadApp();
     });
 

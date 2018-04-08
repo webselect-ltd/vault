@@ -10,12 +10,12 @@ export function truncate(str: string, len: number): string {
     return str.length > len ? str.substring(0, len - 3) + '...' : str;
 }
 
-export function rateLimit(func: (e: Event) => void, wait?: number): (e: Event) => void {
+export function rateLimit(func: JQuery.EventHandler<HTMLElement>, wait?: number) {
     let timeout: number;
-    return function(): void {
+    return function() {
         const context = this;
         const args: IArguments = arguments;
-        const later = (): void => {
+        const later = () => {
             timeout = null;
             func.apply(context, args);
         };

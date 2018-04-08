@@ -79,11 +79,11 @@ suite('Common', () => {
     test('rateLimit', function(done) {
         this.slow(1000);
         // TODO: Does this actually test the function?
-        const func = rateLimit(() => {
+        const func = rateLimit(e => {
             assert.ok(true);
             done();
         }, 100);
-        func(new Event('click'));
+        func();
     });
 
     test('truncate', () => {
