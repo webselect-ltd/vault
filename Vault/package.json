@@ -36,7 +36,8 @@
     },
     "scripts": {
         "clean": "del-cli ./Content/js/dist",
-        "build": "npm run clean && webpack --config=webpack.config.build --mode=development --display-modules && webpack --config=webpack.config.test --mode=development --display-modules",
+        "build-notests": "npm run clean && webpack --config=webpack.config.build --mode=development --display-modules",
+        "build": "npm run build-notests && webpack --config=webpack.config.test --mode=development --display-modules",
         "test": "mocha --opts ./Content/Js/tests/mocha.opts",
         "coverage": "nyc mocha --opts ./Content/Js/tests/mocha.opts"
     },
