@@ -75,6 +75,8 @@ const internal: any = {
     userId: ''          // GUID identifying logged-in user
 };
 
+const encryptionExcludes = ['CredentialID', 'UserID'];
+
 const ui: IVaultUIElements = {
     loginFormDialog: $('#login-form-dialog'),
     loginForm: $('#login-form'),
@@ -137,11 +139,9 @@ export async function changePassword(userId: string, masterKey: string, oldPassw
     // Get all the user's credentials, decrypt each with the old password and re-encrypt it with the new one
     const credentials = await repository.loadCredentialsForUserFull(userId);
 
-    const excludes = ['CredentialID', 'UserID'];
-
     const reEncrypt = (item: Credential) => {
-        const decrypted = cryptoProvider.decryptCredential(item, masterKey, excludes);
-        return cryptoProvider.encryptCredential(decrypted, newMasterKey, excludes);
+        const decrypted = cryptoProvider.decryptCredential(item, masterKey, encryptionExcludes);
+        return cryptoProvider.encryptCredential(decrypted, newMasterKey, encryptionExcludes);
     };
 
     const newData = credentials.map(reEncrypt);
@@ -169,7 +169,7 @@ function confirmDelete(id: string, masterKey: string): void {
 
             const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
-            const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
+            const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, encryptionExcludes);
 
             const results = search(ui.searchInput.val() as string, decrypted);
             updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
@@ -201,7 +201,7 @@ function hideModal(e: JQuery.Event): void {
 // Export all credential data as JSON
 export async function exportData(userId: string, masterKey: string): Promise<Credential[]> {
     const credentials = await repository.loadCredentialsForUserFull(userId);
-    return credentials.map(item => cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID']));
+    return credentials.map(item => cryptoProvider.decryptCredential(item, masterKey, encryptionExcludes));
 }
 
 export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (element: JQuery) => boolean): IPasswordSpecification {
@@ -218,7 +218,7 @@ export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (el
 // Import unencrypted JSON credential data
 export function parseImportData(userId: string, masterKey: string, rawData: string): Credential[] {
     const jsonImportData: Credential[] = JSON.parse(rawData);
-    const excludes = ['CredentialID', 'UserID'];
+    const excludes = encryptionExcludes;
 
     const newData = jsonImportData.map(item => {
         // Null out the old credential ID so UpdateMultiple knows this is a new record
@@ -241,7 +241,7 @@ async function loadCredential(credentialId: string, masterKey: string): Promise<
     if (credentialId) {
         const encryptedCredential = await repository.loadCredential(credentialId);
         // CredentialID and UserID are not currently encrypted so don't try to decode them
-        const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, ['CredentialID', 'UserID']);
+        const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, encryptionExcludes);
         showModal({
             title: 'Edit Credential',
             content: templates.credentialForm(credential),
@@ -310,7 +310,7 @@ async function showDetail(credentialId: string, masterKey: string): Promise<void
     const encryptedCredential = await repository.loadCredential(credentialId);
 
     // CredentialID and UserID are not currently encrypted so don't try to decode them
-    const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, ['CredentialID', 'UserID']);
+    const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, encryptionExcludes);
 
     // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
     const urlText = templates.urlText({ Url: credential.Url });
@@ -450,7 +450,7 @@ ui.adminButton.on('click', e => {
 ui.clearSearchButton.on('click', async e => {
     e.preventDefault();
     const credentials = await repository.loadCredentialsForUser(internal.userId);
-    const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
+    const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, encryptionExcludes);
     const results = search(null, decrypted);
     updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
     ui.searchInput.val('').focus();
@@ -458,7 +458,7 @@ ui.clearSearchButton.on('click', async e => {
 
 ui.searchInput.on('keyup', rateLimit(async e => {
     const credentials = await repository.loadCredentialsForUser(internal.userId);
-    const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, ['CredentialID', 'UserID']);
+    const decrypted = cryptoProvider.decryptCredentials(credentials, internal.masterKey, encryptionExcludes);
     const results = search((e.currentTarget as HTMLInputElement).value, decrypted);
     updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
 }, 200));
@@ -521,13 +521,13 @@ $('body').on('submit', '#credential-form', async e => {
     };
 
     // CredentialID and UserID are not currently encrypted so don't try to decode them
-    const encryptedCredential = cryptoProvider.encryptCredential(credential, internal.masterKey, ['CredentialID', 'UserID']);
+    const encryptedCredential = cryptoProvider.encryptCredential(credential, internal.masterKey, encryptionExcludes);
 
     await repository.updateCredential(encryptedCredential);
 
     const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
-    const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, ['CredentialID', 'UserID']);
+    const decrypted = cryptoProvider.decryptCredentials(updatedCredentials, internal.masterKey, encryptionExcludes);
     const results = search(ui.searchInput.val() as string, decrypted);
 
     ui.modal.modal('hide');
