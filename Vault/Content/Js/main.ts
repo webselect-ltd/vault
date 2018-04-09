@@ -41,6 +41,29 @@ interface IVaultUITemplates {
     exportedDataWindow: HandlebarsTemplateDelegate;
 }
 
+interface IVaultModalOptions {
+    title: string;
+    content: string;
+    credentialId?: string;
+    showAccept?: boolean;
+    acceptText?: string;
+    onaccept?: (e: JQuery.Event) => void;
+    showClose?: boolean;
+    closeText?: string;
+    onclose?: (e: JQuery.Event) => void;
+    showEdit?: boolean;
+    editText?: string;
+    onedit?: (e: JQuery.Event) => void;
+    showDelete?: boolean;
+    deleteText?: string;
+    ondelete?: (e: JQuery.Event) => void;
+}
+
+interface IVaultFormValidationError {
+    field: JQuery<HTMLElement>;
+    msg: string;
+}
+
 declare var _VAULT_GLOBALS: IVaultGlobals;
 
 const repository = new Repository(_VAULT_GLOBALS.baseUrl);
@@ -114,14 +137,14 @@ export async function changePassword(userId: string, masterKey: string, oldPassw
     // Get all the user's credentials, decrypt each with the old password and re-encrypt it with the new one
     const credentials = await repository.loadCredentialsForUserFull(userId);
 
-    const excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+    const excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
     const reEncrypt = (item: Credential) => {
         const decrypted = cryptoProvider.decryptCredential(item, masterKey, excludes);
         return cryptoProvider.encryptCredential(decrypted, newMasterKey, excludes);
     };
 
-    const newData: Credential[] = credentials.map(reEncrypt);
+    const newData = credentials.map(reEncrypt);
 
     await repository.updateMultiple(newData);
 
@@ -139,7 +162,7 @@ function confirmDelete(id: string, masterKey: string): void {
         content: templates.deleteConfirmationDialog({}),
         showDelete: true,
         deleteText: 'Yes, Delete This Credential',
-        ondelete: async (e: Event) => {
+        ondelete: async e => {
             e.preventDefault();
 
             await repository.deleteCredential(internal.userId, id);
@@ -170,14 +193,7 @@ export function updateCredentialListUI(container: JQuery, data: Credential[], us
     container.html(templates.credentialTable({ rows: rows }));
 }
 
-// Default action for modal accept button
-function defaultAcceptAction(e: Event): void {
-    e.preventDefault();
-    ui.modal.modal('hide');
-}
-
-// Default action for modal close button
-function defaultCloseAction(e: Event): void {
+function hideModal(e: JQuery.Event): void {
     e.preventDefault();
     ui.modal.modal('hide');
 }
@@ -186,8 +202,8 @@ function defaultCloseAction(e: Event): void {
 export async function exportData(userId: string, masterKey: string): Promise<Credential[]> {
     const credentials = await repository.loadCredentialsForUserFull(userId);
 
-    const exportItems: Credential[] = credentials.map((item: Credential): Credential => {
-        const o: Credential = cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
+    const exportItems = credentials.map(item => {
+        const o = cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
         delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
         return o;
     });
@@ -209,9 +225,9 @@ export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (el
 // Import unencrypted JSON credential data
 export function parseImportData(userId: string, masterKey: string, rawData: string): Credential[] {
     const jsonImportData: Credential[] = JSON.parse(rawData);
-    const excludes: string[] = ['CredentialID', 'UserID'];
+    const excludes = ['CredentialID', 'UserID'];
 
-    const newData: Credential[] = jsonImportData.map((item: Credential): Credential => {
+    const newData = jsonImportData.map(item => {
         // Remove the confirmation property
         delete item.PasswordConfirmation;
         // Null out the old credential ID so UpdateMultiple knows this is a new record
@@ -231,7 +247,7 @@ export function isChecked(el: JQuery): boolean {
 // Load a record into the edit form
 // If null is passed as the credentialId, we set up the form for adding a new record
 async function loadCredential(credentialId: string, masterKey: string): Promise<void> {
-    if (credentialId !== null) {
+    if (credentialId) {
         const encryptedCredential = await repository.loadCredential(credentialId);
         // CredentialID and UserID are not currently encrypted so don't try to decode them
         const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, ['CredentialID', 'UserID']);
@@ -263,7 +279,7 @@ async function loadCredential(credentialId: string, masterKey: string): Promise<
 }
 
 export function openExportPopup(data: Credential[]): void {
-    const exportWindow: Window = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+    const exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
     if (exportWindow && exportWindow.top) {
         exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));
     } else {
@@ -273,7 +289,7 @@ export function openExportPopup(data: Credential[]): void {
 
 // Show the options dialog
 function optionsDialog(): void {
-    const dialogHtml: string = templates.optionsDialog({
+    const dialogHtml = templates.optionsDialog({
         userid: internal.userId,
         masterkey: cryptoProvider.utf8ToBase64(internal.masterKey)
     });
@@ -290,7 +306,7 @@ export function reloadApp(baseUrl: string) {
 }
 
 function setPasswordOptions(form: JQuery, opts: string): void {
-    const optArray: string[] = opts.split('|');
+    const optArray = opts.split('|');
     form.find('[name=len]').val(optArray[0]);
     checkIf(form.find('[name=ucase]'), () => optArray[1] === '1');
     checkIf(form.find('[name=lcase]'), () => optArray[2] === '1');
@@ -306,10 +322,10 @@ async function showDetail(credentialId: string, masterKey: string): Promise<void
     const credential = cryptoProvider.decryptCredential(encryptedCredential, masterKey, ['CredentialID', 'UserID']);
 
     // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
-    const urlText: string = templates.urlText({ Url: credential.Url });
-    const urlHtml: string = credential.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: credential.Url, UrlText: urlText });
+    const urlText = templates.urlText({ Url: credential.Url });
+    const urlHtml = credential.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: credential.Url, UrlText: urlText });
 
-    const detailHtml: string = templates.detail({
+    const detailHtml = templates.detail({
         Url: credential.Url,
         UrlHtml: urlHtml,
         Username: credential.Username,
@@ -332,25 +348,7 @@ async function showDetail(credentialId: string, masterKey: string): Promise<void
     });
 }
 
-// Show a Bootstrap modal with options as below
-// let modalOptions = {
-//     credentialId: '9c75660b-13ae-4c4f-b1d7-6770498a2466',
-//     title: 'TEST',
-//     content: '<p>TEST</p>',
-//     showAccept: true,
-//     showClose: true,
-//     showEdit: true,
-//     showDelete: true,
-//     acceptText: 'OK',
-//     accept: function() {}
-//     closeText: 'Close',
-//     close: function() {}
-//     editText: 'Edit',
-//     edit: function() {}
-//     deleteText: 'Delete',
-//     delete: function() {}
-// };
-function showModal(options: any): void {
+function showModal(options: IVaultModalOptions): void {
     const showAccept: boolean = options.showAccept || false;
     const showClose: boolean = options.showClose || true;
     const showEdit: boolean = options.showEdit || false;
@@ -385,10 +383,10 @@ function showModal(options: any): void {
     ui.modal.off('click', 'button.btn-close');
     ui.modal.off('click', 'button.btn-edit');
     ui.modal.off('click', 'button.btn-delete');
-    ui.modal.on('click', 'button.btn-accept', options.onaccept || defaultAcceptAction);
-    ui.modal.on('click', 'button.btn-close', options.onclose || defaultCloseAction);
-    ui.modal.on('click', 'button.btn-edit', options.onedit || ((): void => alert('NOT BOUND')));
-    ui.modal.on('click', 'button.btn-delete', options.ondelete || ((): void => alert('NOT BOUND')));
+    ui.modal.on('click', 'button.btn-accept', options.onaccept || hideModal);
+    ui.modal.on('click', 'button.btn-close', options.onclose || hideModal);
+    ui.modal.on('click', 'button.btn-edit', options.onedit || (() => alert('NOT BOUND')));
+    ui.modal.on('click', 'button.btn-delete', options.ondelete || (() => alert('NOT BOUND')));
     ui.modal.modal();
 }
 
@@ -431,12 +429,11 @@ function showPasswordStrength(field: JQuery): void {
     }
 }
 
-// Validate a credential record form
-export function validateRecord(f: JQuery): any[] {
-    const errors: any[] = [];
-    const description: JQuery = f.find('#Description');
-    const password: JQuery = f.find('#Password');
-    const passwordConfirmation: JQuery = f.find('#PasswordConfirmation');
+export function validateRecord(form: JQuery): IVaultFormValidationError[] {
+    const errors: IVaultFormValidationError[] = [];
+    const description = form.find('#Description');
+    const password = form.find('#Password');
+    const passwordConfirmation = form.find('#PasswordConfirmation');
 
     if (description.val() === '') {
         errors.push({ field: description, msg: 'You must fill in a Description' });
@@ -452,7 +449,7 @@ export function validateRecord(f: JQuery): any[] {
 
 ui.container.on('click', '.btn-credential-show-detail', e => {
     e.preventDefault();
-    const id: string = $(e.currentTarget).parent().parent().attr('id');
+    const id = $(e.currentTarget).parent().parent().attr('id');
     showDetail(id, internal.masterKey);
 });
 
@@ -511,7 +508,7 @@ ui.loginForm.on('submit', async e => {
 $('body').on('submit', '#credential-form', async e => {
     e.preventDefault();
 
-    const form: JQuery = $(e.currentTarget);
+    const form = $(e.currentTarget);
     const errorMsg: string[] = [];
 
     $('#validation-message').remove();
@@ -520,7 +517,7 @@ $('body').on('submit', '#credential-form', async e => {
     const errors = validateRecord(form);
 
     if (errors.length > 0) {
-        errors.forEach((error: any): void => {
+        errors.forEach(error => {
             errorMsg.push(error.msg);
             error.field.parent().parent().addClass('has-error');
         });
@@ -529,7 +526,7 @@ $('body').on('submit', '#credential-form', async e => {
         return;
     }
 
-    let credential = createCredentialFromFormFields(form);
+    const credential = createCredentialFromFormFields(form);
 
     // Hold the modified properties so we can update the list if the update succeeds
     const properties = {
@@ -540,9 +537,9 @@ $('body').on('submit', '#credential-form', async e => {
     };
 
     // CredentialID and UserID are not currently encrypted so don't try to decode them
-    credential = cryptoProvider.encryptCredential(credential, internal.masterKey, ['CredentialID', 'UserID']);
+    const encryptedCredential = cryptoProvider.encryptCredential(credential, internal.masterKey, ['CredentialID', 'UserID']);
 
-    await repository.updateCredential(credential);
+    await repository.updateCredential(encryptedCredential);
 
     const updatedCredentials = await repository.loadCredentialsForUser(internal.userId);
 
@@ -565,10 +562,10 @@ $('body').on('keyup', '#Password', rateLimit(e => {
 $('body').on('click', 'button.generate-password', e => {
     e.preventDefault();
     const passwordSpecification = getPasswordGenerationOptionValues($('input.generate-password-option'), isChecked);
-    const password: string = cryptoProvider.generatePassword(passwordSpecification);
+    const password = cryptoProvider.generatePassword(passwordSpecification);
     $('#Password').val(password);
     $('#PasswordConfirmation').val(password);
-    const opts: any[] = [$('#len').val(),
+    const opts = [$('#len').val() as number,
     isChecked($('#ucase')) ? 1 : 0,
     isChecked($('#lcase')) ? 1 : 0,
     isChecked($('#nums')) ? 1 : 0,
@@ -586,7 +583,7 @@ $('body').on('click', 'a.generate-password-options-toggle', e => {
 // Copy content to clipboard when copy icon is clicked
 $('body').on('click', 'a.copy-link', e => {
     e.preventDefault();
-    const a: JQuery = $(e.currentTarget);
+    const a = $(e.currentTarget);
     $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
     a.next('input.copy-content').select();
     try {
@@ -605,8 +602,8 @@ $('body').on('click', 'button.btn-credential-open', e => {
 
 $('body').on('click', 'button.btn-credential-copy', e => {
     e.preventDefault();
-    const allButtons: JQuery = $('button.btn-credential-copy');
-    const button: JQuery = $(e.currentTarget);
+    const allButtons = $('button.btn-credential-copy');
+    const button = $(e.currentTarget);
     allButtons.removeClass('btn-success').addClass('btn-primary');
     allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
     button.next('input.copy-content').select();
@@ -630,7 +627,7 @@ $('body').on('keydown', e => {
             me.preventDefault();
         });
         ui.searchInput.focus();
-        const char: string = String.fromCharCode(e.keyCode);
+        const char = String.fromCharCode(e.keyCode);
         if (/[a-zA-Z0-9]/.test(char)) {
             ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
         } else {
