@@ -10,7 +10,6 @@ const testCredentialPlainText = new Credential(
     'Test Credential',
     '_testuser123',
     '8{s?(\'7.171h)3H',
-    '8{s?(\'7.171h)3H',
     'http://www.test.com?id=23&param=TEST+VALUE',
     'Custom 1',
     'CUSTOM1',
@@ -25,7 +24,6 @@ const testCredentialEncrypted = new Credential(
     'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
     'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
     'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs=',
-    'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
     'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
     'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
     'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
@@ -42,7 +40,6 @@ function checkEncryption(credential: Credential, masterKeyPlainText: string) {
     assert.equal(Passpack.decode('AES', credential.Description, masterKeyPlainText), 'Test Credential');
     assert.equal(Passpack.decode('AES', credential.Username, masterKeyPlainText), '_testuser123');
     assert.equal(Passpack.decode('AES', credential.Password, masterKeyPlainText), '8{s?(\'7.171h)3H');
-    assert.equal(Passpack.decode('AES', credential.PasswordConfirmation, masterKeyPlainText), '8{s?(\'7.171h)3H');
     assert.equal(Passpack.decode('AES', credential.Url, masterKeyPlainText), 'http://www.test.com?id=23&param=TEST+VALUE');
     assert.equal(Passpack.decode('AES', credential.UserDefined1, masterKeyPlainText), 'CUSTOM1');
     assert.equal(Passpack.decode('AES', credential.UserDefined1Label, masterKeyPlainText), 'Custom 1');
@@ -57,7 +54,6 @@ function checkDecryption(credential: Credential) {
     assert.equal(credential.Description, 'Test Credential');
     assert.equal(credential.Username, '_testuser123');
     assert.equal(credential.Password, '8{s?(\'7.171h)3H');
-    assert.equal(credential.PasswordConfirmation, '8{s?(\'7.171h)3H');
     assert.equal(credential.Url, 'http://www.test.com?id=23&param=TEST+VALUE');
     assert.equal(credential.UserDefined1, 'CUSTOM1');
     assert.equal(credential.UserDefined1Label, 'Custom 1');
@@ -178,12 +174,12 @@ suite('Vault', () => {
     beforeEach(() => {
         /* tslint:disable:max-line-length */
         testCredentials = [
-            new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123', 'cat123', 'http://cat.com', 'Cat UD 1', 'catud1', 'Cat UD 1', 'catud1', 'Cat notes', '12|1|1|1|1'),
-            new Credential('cr2', 'user1', 'Dog', 'dog', 'dog123', 'dog123', 'http://dog.com', 'Dog UD 1', 'dogud1', 'Dog UD 1', 'dogud1', 'Dog notes', '12|1|1|1|1'),
-            new Credential('cr3', 'user1', 'Fish', 'fish', 'fish123', 'fish123', 'http://fish.com', 'Fish UD 1', 'fishud1', 'Fish UD 1', 'fishud1', 'Fish notes', '12|1|1|1|1'),
-            new Credential('cr4', 'user1', 'Catfish', 'catfish', 'catfish123', 'catfish123', 'http://catfish.com', 'Catfish UD 1', 'catfishud1', 'Catfish UD 1', 'catfishud1', 'Catfish notes', '12|1|1|1|1'),
-            new Credential('cr5', 'user1', 'Dogfish', 'dogfish', 'dogfish123', 'dogfish123', 'http://dogfish.com', 'Dogfish UD 1', 'dogfishud1', 'Dogfish UD 1', 'dogfishud1', 'Dogfish notes', '12|1|1|1|1'),
-            new Credential('cr6', 'user1', 'Owl', 'owl', '_nT:NP?uovID8,TE', '_nT:NP?uovID8,TE', 'http://owl.com', 'Owl UD 1', 'owlud1', 'Owl UD 1', 'owlud1', 'Owl notes', '12|1|1|1|1')
+            new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123', 'http://cat.com', 'Cat UD 1', 'catud1', 'Cat UD 1', 'catud1', 'Cat notes', '12|1|1|1|1'),
+            new Credential('cr2', 'user1', 'Dog', 'dog', 'dog123', 'http://dog.com', 'Dog UD 1', 'dogud1', 'Dog UD 1', 'dogud1', 'Dog notes', '12|1|1|1|1'),
+            new Credential('cr3', 'user1', 'Fish', 'fish', 'fish123', 'http://fish.com', 'Fish UD 1', 'fishud1', 'Fish UD 1', 'fishud1', 'Fish notes', '12|1|1|1|1'),
+            new Credential('cr4', 'user1', 'Catfish', 'catfish', 'catfish123', 'http://catfish.com', 'Catfish UD 1', 'catfishud1', 'Catfish UD 1', 'catfishud1', 'Catfish notes', '12|1|1|1|1'),
+            new Credential('cr5', 'user1', 'Dogfish', 'dogfish', 'dogfish123', 'http://dogfish.com', 'Dogfish UD 1', 'dogfishud1', 'Dogfish UD 1', 'dogfishud1', 'Dogfish notes', '12|1|1|1|1'),
+            new Credential('cr6', 'user1', 'Owl', 'owl', '_nT:NP?uovID8,TE', 'http://owl.com', 'Owl UD 1', 'owlud1', 'Owl UD 1', 'owlud1', 'Owl notes', '12|1|1|1|1')
         ];
         /* tslint:enable:max-line-length */
     });

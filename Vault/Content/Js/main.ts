@@ -137,7 +137,7 @@ export async function changePassword(userId: string, masterKey: string, oldPassw
     // Get all the user's credentials, decrypt each with the old password and re-encrypt it with the new one
     const credentials = await repository.loadCredentialsForUserFull(userId);
 
-    const excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+    const excludes = ['CredentialID', 'UserID'];
 
     const reEncrypt = (item: Credential) => {
         const decrypted = cryptoProvider.decryptCredential(item, masterKey, excludes);
@@ -201,14 +201,7 @@ function hideModal(e: JQuery.Event): void {
 // Export all credential data as JSON
 export async function exportData(userId: string, masterKey: string): Promise<Credential[]> {
     const credentials = await repository.loadCredentialsForUserFull(userId);
-
-    const exportItems = credentials.map(item => {
-        const o = cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID', 'PasswordConfirmation']);
-        delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
-        return o;
-    });
-
-    return exportItems;
+    return credentials.map(item => cryptoProvider.decryptCredential(item, masterKey, ['CredentialID', 'UserID']));
 }
 
 export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (element: JQuery) => boolean): IPasswordSpecification {
@@ -228,8 +221,6 @@ export function parseImportData(userId: string, masterKey: string, rawData: stri
     const excludes = ['CredentialID', 'UserID'];
 
     const newData = jsonImportData.map(item => {
-        // Remove the confirmation property
-        delete item.PasswordConfirmation;
         // Null out the old credential ID so UpdateMultiple knows this is a new record
         item.CredentialID = null;
         // Set the user ID to the ID of the new (logged in) user
@@ -432,16 +423,9 @@ function showPasswordStrength(field: JQuery): void {
 export function validateRecord(form: JQuery): IVaultFormValidationError[] {
     const errors: IVaultFormValidationError[] = [];
     const description = form.find('#Description');
-    const password = form.find('#Password');
-    const passwordConfirmation = form.find('#PasswordConfirmation');
 
     if (description.val() === '') {
         errors.push({ field: description, msg: 'You must fill in a Description' });
-    }
-
-    // We don't mind if these are blank, but they must be the same!
-    if (password.val() !== passwordConfirmation.val()) {
-        errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
     }
 
     return errors;
@@ -564,7 +548,6 @@ $('body').on('click', 'button.generate-password', e => {
     const passwordSpecification = getPasswordGenerationOptionValues($('input.generate-password-option'), isChecked);
     const password = cryptoProvider.generatePassword(passwordSpecification);
     $('#Password').val(password);
-    $('#PasswordConfirmation').val(password);
     const opts = [$('#len').val() as number,
     isChecked($('#ucase')) ? 1 : 0,
     isChecked($('#lcase')) ? 1 : 0,

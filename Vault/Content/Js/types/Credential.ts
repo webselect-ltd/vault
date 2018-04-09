@@ -4,7 +4,6 @@
     public Description: string;
     public Username: string;
     public Password: string;
-    public PasswordConfirmation: string;
     public Url: string;
     public UserDefined1Label: string;
     public UserDefined1: string;
@@ -22,7 +21,6 @@
         description: string,
         username: string,
         password: string,
-        passwordConfirmation: string,
         url: string,
         userDefined1Label: string,
         userDefined1: string,
@@ -36,7 +34,6 @@
         description: string,
         username?: string,
         password?: string,
-        passwordConfirmation?: string,
         url?: string,
         userDefined1Label?: string,
         userDefined1?: string,
@@ -49,7 +46,6 @@
         this.Description = description;
         this.Username = username;
         this.Password = password;
-        this.PasswordConfirmation = passwordConfirmation;
         this.Url = url;
         this.UserDefined1Label = userDefined1Label;
         this.UserDefined1 = userDefined1;

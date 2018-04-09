@@ -9,8 +9,6 @@ namespace Vault.Models
         public string Description { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        [DisplayName("Password Again")]
-        public string PasswordConfirmation { get; set; }
         public string Url { get; set; }
         [DisplayName("Custom 1 Label")]
         public string UserDefined1Label { get; set; }
@@ -29,7 +27,6 @@ namespace Vault.Models
             Description = "{{Description}}";
             Username = "{{Username}}";
             Password = "{{Password}}";
-            PasswordConfirmation = "{{PasswordConfirmation}}";
             Url = "{{Url}}";
             UserDefined1Label = "{{UserDefined1Label}}";
             UserDefined1 = "{{UserDefined1}}";

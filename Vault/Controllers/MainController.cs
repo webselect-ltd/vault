@@ -84,10 +84,6 @@ namespace Vault.Controllers
                 credential = conn.Query<CredentialViewModel>("SELECT * FROM Credentials WHERE CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
             }
 
-            // Fix for previous behaviour
-            if (credential != null)
-                credential.PasswordConfirmation = credential.Password;
-
             return Json(credential);
         }
 
