@@ -29,17 +29,14 @@
     <meta name="msapplication-config" content="~/Content/Img/browserconfig.xml">
     <meta name="theme-color" content="#7663de">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    @Styles.Render("~/Content/Css/main")
+    @Styles.Render("~/css")
     @RenderSection("head", false)
 </head>
 <body>
     <div class="container">
         @RenderSection("main")
     </div>
-    <script src="~/Content/Js/dist/vendor/jquery.min.js"></script>
-    <script src="~/Content/Js/dist/vendor/handlebars.min.js"></script>
-    <script src="~/Content/Js/dist/vendor/js.cookie.js"></script>
-    <script src="~/Content/Js/dist/vendor/modal.js"></script>
+    @Scripts.Render("~/js/external")
     @RenderSection("foot", false)
 </body>
 </html>

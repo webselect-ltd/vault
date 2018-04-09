@@ -388,16 +388,11 @@
     "forms.less",
     "buttons.less",
     "responsive-utilities.less",
-    "glyphicons.less",
-    "pagination.less",
     "labels.less",
     "alerts.less",
     "close.less",
     "modals.less"
   ],
-  "js": [
-    "alert.js",
-    "modal.js"
-  ],
-  "customizerUrl": "http://getbootstrap.com/customize/?id=ec382fb30fe3f9a67cd394ebbd5b98d1"
+  "js": [],
+  "customizerUrl": "https://getbootstrap.com/docs/3.3/customize/"
 }

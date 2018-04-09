@@ -7,29 +7,17 @@
     <meta charset="utf-8">
     <title>Test Suite</title>
     <link rel="shortcut icon" href="/content/img/favicon.ico" />
-    @Styles.Render("~/Content/Css/main")
     <link rel="stylesheet" type="text/css" href="~/node_modules/mocha/mocha.css" />
 </head>
 <body>
     <div id="mocha"></div>
-    <div class="container">
-        @{Html.RenderPartial("_LoginForm", new LoginViewModel());}
-
-        @{Html.RenderPartial("_StaticHtml");}
-
-        @{Html.RenderPartial("_ClientTemplates");}
-    </div>
-    <script src="~/Content/Js/dist/vendor/jquery.min.js"></script>
-    <script src="~/Content/Js/dist/vendor/handlebars.min.js"></script>
-    <script src="~/Content/Js/dist/vendor/js.cookie.js"></script>
-    <script src="~/Content/Js/dist/vendor/modal.js"></script>
+    @Scripts.Render("~/js/external")
     <script src="~/node_modules/mocha/mocha.js"></script>
     <script src="~/node_modules/chai/chai.js"></script>
     <script>mocha.setup('tdd');</script>
     <script src="~/Content/Js/dist/tests.js?@(DateTime.Now.Ticks)"></script>
     <script>
-        //mocha.checkLeaks();
-        //mocha.globals(['jQuery']);
+        mocha.checkLeaks();
         mocha.run();
     </script>
 </body>

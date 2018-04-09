@@ -96,9 +96,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Css\vendor\bootstrap.css" />
+    <Content Include="Content\Css\external\bootstrap.css" />
     <Content Include="Content\Css\main.css" />
-    <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
     <Content Include="Content\Js\tests\setup.js" />
@@ -137,18 +136,10 @@
     <Content Include="Views\Main\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\Fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="Content\Fonts\glyphicons-halflings-regular.woff" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Shared\_StaticHtml.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_ClientTemplates.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\Fonts\glyphicons-halflings-regular.woff2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Main\SetDevCookie.cshtml" />

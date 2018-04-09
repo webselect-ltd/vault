@@ -1,6 +1,5 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
-import * as Vlt from '../main';
 import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, weakPasswordThreshold } from '../modules/all';
 import { Credential, CryptoProvider, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';

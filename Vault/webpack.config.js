@@ -6,7 +6,8 @@ module.exports = {
     // Specify the output file name and location
     output: {
         filename: "[name].js",
-        path: __dirname + "/Content/Js/dist"
+        path: __dirname + "/Content/Js/dist",
+        library: "Vault"
     },
     entry: {
         main: "./Content/Js/main.ts",
@@ -23,10 +24,10 @@ module.exports = {
         }),
         // Copy the external dependencies into the output folder
         new CopyWebpackPlugin([
-            { from: 'node_modules/jquery/dist/jquery.min.js', to: 'vendor' },
-            { from: 'node_modules/handlebars/dist/handlebars.min.js', to: 'vendor' },
-            { from: 'node_modules/js-cookie/src/js.cookie.js', to: 'vendor' },
-            { from: 'node_modules/bootstrap/js/modal.js', to: 'vendor' }
+            { from: 'node_modules/jquery/dist/jquery.js', to: 'external' },
+            { from: 'node_modules/handlebars/dist/handlebars.js', to: 'external' },
+            { from: 'node_modules/js-cookie/src/js.cookie.js', to: 'external' },
+            { from: 'node_modules/bootstrap/js/modal.js', to: 'external' }
         ])
     ],
     resolve: {
