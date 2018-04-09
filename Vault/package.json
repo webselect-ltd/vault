@@ -10,6 +10,7 @@
         "@types/js-cookie": "2.1.0",
         "@types/mocha": "5.0.0",
         "chai": "4.1.2",
+        "clean-webpack-plugin": "0.1.19",
         "copy-webpack-plugin": "4.5.1",
         "del-cli": "1.1.0",
         "gulp": "3.9.1",
@@ -34,8 +35,7 @@
         "tslib": "1.9.0"
     },
     "scripts": {
-        "clean": "del-cli ./Content/js/dist",
-        "build": "npm run clean && webpack --mode=development --display-modules",
+        "build": "webpack --mode=development --display-modules",
         "watch": "webpack --watch --mode=development",
         "test": "mocha --opts ./Content/Js/tests/mocha.opts",
         "cover": "nyc mocha --opts ./Content/Js/tests/mocha.opts"

@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 const ProvidePlugin = require("webpack").ProvidePlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     // Specify the output file name and location
@@ -16,6 +17,8 @@ module.exports = {
     // Enable sourcemaps for debugging webpack's output
     devtool: "source-map",
     plugins: [
+        // Remove the output folder before build
+        new CleanWebpackPlugin(['Content/Js/dist']),
         // This automatically adds aliases to the application scope for the specified packages
         // So packages which look for the 'jQuery' global alias still work within our app closure
         new ProvidePlugin({
