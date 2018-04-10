@@ -2,7 +2,7 @@
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
 import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, validateCredential, weakPasswordThreshold } from './modules/all';
-import { Credential, CryptoProvider, ICredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository, Repository } from './types/all';
+import { CryptoProvider, ICredential, ICredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository, Repository } from './types/all';
 
 interface IVaultGlobals {
     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
@@ -117,11 +117,11 @@ Handlebars.registerHelper('truncate', (text: string, size: number): hbs.SafeStri
     return new Handlebars.SafeString(escapedText);
 });
 
-function isWeakPassword(item: Credential) {
+function isWeakPassword(item: ICredential) {
     return item.Password && cryptoProvider.getPasswordBits(item.Password) <= weakPasswordThreshold;
 }
 
-function search(query: string, credentials: Credential[]) {
+function search(query: string, credentials: ICredential[]) {
     const parsedQuery = parseSearchQuery(query);
     return searchCredentials(parsedQuery, isWeakPassword, credentials);
 }
@@ -134,7 +134,7 @@ export async function changePassword(userId: string, masterKey: string, oldPassw
     // Get all the user's credentials, decrypt each with the old password and re-encrypt it with the new one
     const credentials = await repository.loadCredentialsForUserFull(userId);
 
-    const reEncrypt = (item: Credential) => {
+    const reEncrypt = (item: ICredential) => {
         const decrypted = cryptoProvider.decryptCredential(item, masterKey, encryptionExcludes);
         return cryptoProvider.encryptCredential(decrypted, newMasterKey, encryptionExcludes);
     };
@@ -174,7 +174,7 @@ function confirmDelete(id: string, masterKey: string): void {
     });
 }
 
-export function createCredentialFromFormFields(form: JQuery): Credential {
+export function createCredentialFromFormFields(form: JQuery): ICredential {
     const obj: any = {};
     // Serialize the form inputs into an object
     form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each((i, el): void => {
@@ -183,7 +183,7 @@ export function createCredentialFromFormFields(form: JQuery): Credential {
     return obj;
 }
 
-export function updateCredentialListUI(container: JQuery, data: Credential[], userId: string, masterKey: string): void {
+export function updateCredentialListUI(container: JQuery, data: ICredential[], userId: string, masterKey: string): void {
     const rows = data.map(c => mapToSummary(masterKey, userId, isWeakPassword, c));
     container.html(templates.credentialTable({ rows: rows }));
 }
@@ -194,7 +194,7 @@ function hideModal(e: JQuery.Event): void {
 }
 
 // Export all credential data as JSON
-export async function exportData(userId: string, masterKey: string): Promise<Credential[]> {
+export async function exportData(userId: string, masterKey: string): Promise<ICredential[]> {
     const credentials = await repository.loadCredentialsForUserFull(userId);
     return credentials.map(item => cryptoProvider.decryptCredential(item, masterKey, encryptionExcludes));
 }
@@ -211,8 +211,8 @@ export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (el
 }
 
 // Import unencrypted JSON credential data
-export function parseImportData(userId: string, masterKey: string, rawData: string): Credential[] {
-    const jsonImportData: Credential[] = JSON.parse(rawData);
+export function parseImportData(userId: string, masterKey: string, rawData: string): ICredential[] {
+    const jsonImportData = JSON.parse(rawData) as ICredential[];
     const excludes = encryptionExcludes;
 
     const newData = jsonImportData.map(item => {
@@ -264,7 +264,7 @@ async function loadCredential(credentialId: string, masterKey: string): Promise<
     }
 }
 
-export function openExportPopup(data: Credential[]): void {
+export function openExportPopup(data: ICredential[]): void {
     const exportWindow = open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
     if (exportWindow && exportWindow.top) {
         exportWindow.document.write(templates.exportedDataWindow({ json: JSON.stringify(data, undefined, 4) }));

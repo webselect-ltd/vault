@@ -1,5 +1,5 @@
 ﻿import '../legacy/passpack-v1.1.js';
-import { Credential, ICryptoProvider, IPasswordSpecification } from '../types/all';
+import { ICredential, ICryptoProvider, IPasswordSpecification } from '../types/all';
 
 export class CryptoProvider implements ICryptoProvider {
     public base64ToUtf8(str: string): string {
@@ -55,19 +55,19 @@ export class CryptoProvider implements ICryptoProvider {
         return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
     }
 
-    public decryptCredential(credential: Credential, masterKey: string, excludes: string[]): Credential {
+    public decryptCredential(credential: ICredential, masterKey: string, excludes: string[]): ICredential {
         return this.crypt(Passpack.decode, credential, masterKey, excludes);
     }
 
-    public decryptCredentials(credentials: Credential[], masterKey: string, excludes: string[]): Credential[] {
+    public decryptCredentials(credentials: ICredential[], masterKey: string, excludes: string[]): ICredential[] {
         return credentials.map(item => this.decryptCredential(item, masterKey, excludes));
     }
 
-    public encryptCredential(credential: Credential, masterKey: string, excludes: string[]): Credential {
+    public encryptCredential(credential: ICredential, masterKey: string, excludes: string[]): ICredential {
         return this.crypt(Passpack.encode, credential, masterKey, excludes);
     }
 
-    public encryptCredentials(credentials: Credential[], masterKey: string, excludes: string[]): Credential[] {
+    public encryptCredentials(credentials: ICredential[], masterKey: string, excludes: string[]): ICredential[] {
         return credentials.map(item => this.encryptCredential(item, masterKey, excludes));
     }
 
@@ -79,7 +79,7 @@ export class CryptoProvider implements ICryptoProvider {
      * @param {string[]} excludes - An array of object property names whose values should not be encrypted
      * @returns {Credential}
      */
-    private crypt(action: PasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
+    private crypt(action: PasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): ICredential {
         const newCredential: any = {};
         Object.keys(obj).forEach((k: string): void => {
             if (excludes.indexOf(k) === -1) {

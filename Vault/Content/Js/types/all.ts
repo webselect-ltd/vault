@@ -1,9 +1,9 @@
-﻿export { Credential } from './Credential';
-export { CryptoProvider } from './CryptoProvider';
-export { ICryptoProvider } from './ICryptoProvider';
+﻿export { CryptoProvider } from './CryptoProvider';
+export { ICredential } from './ICredential';
 export { ICredentialSearchQuery } from './ICredentialSearchQuery';
 export { ICredentialSummary } from './ICredentialSummary';
 export { ICredentialValidationError } from './ICredentialValidationError';
+export { ICryptoProvider } from './ICryptoProvider';
 export { IPasswordSpecification } from './IPasswordSpecification';
 export { IRepository } from './IRepository';
 export { Repository } from './Repository';

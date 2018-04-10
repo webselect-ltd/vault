@@ -1,15 +1,15 @@
-﻿import { Credential } from './all';
+﻿import { ICredential } from './all';
 
 export interface IRepository {
     login(hashedUsername: string, hashedPassword: string): Promise<any>;
 
-    loadCredential(credentialId: string): Promise<Credential>;
-    loadCredentialsForUser(userId: string): Promise<Credential[]>;
-    loadCredentialsForUserFull(userId: string): Promise<Credential[]>;
+    loadCredential(credentialId: string): Promise<ICredential>;
+    loadCredentialsForUser(userId: string): Promise<ICredential[]>;
+    loadCredentialsForUserFull(userId: string): Promise<ICredential[]>;
 
-    updateCredential(credential: Credential): Promise<Credential>;
+    updateCredential(credential: ICredential): Promise<ICredential>;
     updatePassword(userId: string, oldHash: string, newHash: string): Promise<void>;
-    updateMultiple(credentials: Credential[]): Promise<void>;
+    updateMultiple(credentials: ICredential[]): Promise<void>;
 
     deleteCredential(userId: string, credentialId: string): Promise<void>;
 }

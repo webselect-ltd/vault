@@ -1,4 +1,4 @@
-﻿import { Credential, IRepository, XHRError, XHRSuccess } from '../types/all';
+﻿import { ICredential, IRepository, XHRError, XHRSuccess } from '../types/all';
 
 // TODO: Implement caching
 
@@ -16,20 +16,20 @@ export class Repository implements IRepository {
         return this.ajaxPostPromise<any>('Main/Login', data);
     }
 
-    public async loadCredential(credentialId: string): Promise<Credential> {
-        return this.ajaxPostPromise<Credential>('Main/Load', { id: credentialId });
+    public async loadCredential(credentialId: string): Promise<ICredential> {
+        return this.ajaxPostPromise<ICredential>('Main/Load', { id: credentialId });
     }
 
-    public async loadCredentialsForUser(userId: string): Promise<Credential[]> {
-        return this.ajaxPostPromise<Credential[]>('Main/GetAll', { userId: userId });
+    public async loadCredentialsForUser(userId: string): Promise<ICredential[]> {
+        return this.ajaxPostPromise<ICredential[]>('Main/GetAll', { userId: userId });
     }
 
-    public async loadCredentialsForUserFull(userId: string): Promise<Credential[]> {
-        return this.ajaxPostPromise<Credential[]>('Main/GetAllComplete', { userId: userId });
+    public async loadCredentialsForUserFull(userId: string): Promise<ICredential[]> {
+        return this.ajaxPostPromise<ICredential[]>('Main/GetAllComplete', { userId: userId });
     }
 
-    public async updateCredential(credential: Credential): Promise<Credential> {
-        return this.ajaxPostPromise<Credential>('Main/Update', credential);
+    public async updateCredential(credential: ICredential): Promise<ICredential> {
+        return this.ajaxPostPromise<ICredential>('Main/Update', credential);
     }
 
     public async updatePassword(userId: string, oldHash: string, newHash: string): Promise<void> {
@@ -41,7 +41,7 @@ export class Repository implements IRepository {
         return this.ajaxPostPromise<void>('Main/UpdatePassword', data);
     }
 
-    public async updateMultiple(credentials: Credential[]): Promise<void> {
+    public async updateMultiple(credentials: ICredential[]): Promise<void> {
         return this.ajaxPostPromiseJson<void>('Main/UpdateMultiple', JSON.stringify(credentials));
     }
 

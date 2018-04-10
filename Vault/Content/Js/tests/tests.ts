@@ -1,40 +1,44 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
 import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, validateCredential, weakPasswordThreshold } from '../modules/all';
-import { Credential, CryptoProvider, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
+import { CryptoProvider, ICredential, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
-const testCredentialPlainText = new Credential(
-    '361fe91a-3dca-4871-b69e-c41c31507c8c',
-    'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
-    'Test Credential',
-    '_testuser123',
-    '8{s?(\'7.171h)3H',
-    'http://www.test.com?id=23&param=TEST+VALUE',
-    'Custom 1',
-    'CUSTOM1',
-    'Custom 2',
-    'CUSTOM2',
-    'Test Notes:\n\nThese are test notes.',
-    '16|1|1|1|1'
-);
+// Created with Vault.utf8ToBase64(Vault.createMasterKey('test123'))
+const testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
+const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
 
-const testCredentialEncrypted = new Credential(
-    '361fe91a-3dca-4871-b69e-c41c31507c8c',
-    'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
-    'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
-    'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs=',
-    'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
-    'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
-    'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
-    'FMOPw4TDj0gBITAhITAhLW88TTrDrEXDvw==',
-    'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmA=',
-    'FcOPw4TDj0gBITAhITAhLcOeJDjCncKcw47DqA==',
-    'FcOPw4TDj0gBITAhITAhLcOJFBjCvcOzw43CtVxmwoJzw4pAw63CpcKRLSkDwpg5LiE0NSHCmwNTajjCmVbCtMKAwq0tw43CvQ==',
-    '16|1|1|1|1'
-);
+const testCredentialPlainText: ICredential = {
+    CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
+    UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
+    Description: 'Test Credential',
+    Username: '_testuser123',
+    Password: '8{s?(\'7.171h)3H',
+    Url: 'http://www.test.com?id=23&param=TEST+VALUE',
+    UserDefined1Label: 'Custom 1',
+    UserDefined1: 'CUSTOM1',
+    UserDefined2Label: 'Custom 2',
+    UserDefined2: 'CUSTOM2',
+    Notes: 'Test Notes:\n\nThese are test notes.',
+    PwdOptions: '16|1|1|1|1'
+};
 
-function checkEncryption(credential: Credential, masterKeyPlainText: string) {
+const testCredentialEncrypted: ICredential = {
+    CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
+    UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
+    Description: 'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
+    Username: 'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs=',
+    Password: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
+    Url: 'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
+    UserDefined1Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
+    UserDefined1: 'FMOPw4TDj0gBITAhITAhLW88TTrDrEXDvw==',
+    UserDefined2Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmA=',
+    UserDefined2: 'FcOPw4TDj0gBITAhITAhLcOeJDjCncKcw47DqA==',
+    Notes: 'FcOPw4TDj0gBITAhITAhLcOJFBjCvcOzw43CtVxmwoJzw4pAw63CpcKRLSkDwpg5LiE0NSHCmwNTajjCmVbCtMKAwq0tw43CvQ==',
+    PwdOptions: '16|1|1|1|1'
+};
+
+function checkEncryption(credential: ICredential, masterKeyPlainText: string) {
     assert.equal(credential.CredentialID, '361fe91a-3dca-4871-b69e-c41c31507c8c');
     assert.equal(credential.UserID, 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
     assert.equal(Passpack.decode('AES', credential.Description, masterKeyPlainText), 'Test Credential');
@@ -48,7 +52,7 @@ function checkEncryption(credential: Credential, masterKeyPlainText: string) {
     assert.equal(Passpack.decode('AES', credential.Notes, masterKeyPlainText), 'Test Notes:\n\nThese are test notes.');
 }
 
-function checkDecryption(credential: Credential) {
+function checkDecryption(credential: ICredential) {
     assert.equal(credential.CredentialID, '361fe91a-3dca-4871-b69e-c41c31507c8c');
     assert.equal(credential.UserID, 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
     assert.equal(credential.Description, 'Test Credential');
@@ -62,14 +66,11 @@ function checkDecryption(credential: Credential) {
     assert.equal(credential.Notes, 'Test Notes:\n\nThese are test notes.');
 }
 
-// Created with Vault.utf8ToBase64(Vault.createMasterKey('test123'))
-const testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
-const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
+function getTestCredentials(): ICredential[] {
+    return new FakeRepository(new CryptoProvider(), testMasterKeyBase64Encoded).credentials;
+}
 
-let testCredentials: Credential[];
-// let testRepository: IRepository;
-
-const nw = (c: Credential) => false;
+const nw = (c: ICredential) => false;
 
 suite('Common', () => {
 
@@ -171,19 +172,6 @@ suite('CryptoProvider', () => {
 
 suite('Vault', () => {
 
-    beforeEach(() => {
-        /* tslint:disable:max-line-length */
-        testCredentials = [
-            new Credential('cr1', 'user1', 'Cat', 'cat', 'cat123', 'http://cat.com', 'Cat UD 1', 'catud1', 'Cat UD 1', 'catud1', 'Cat notes', '12|1|1|1|1'),
-            new Credential('cr2', 'user1', 'Dog', 'dog', 'dog123', 'http://dog.com', 'Dog UD 1', 'dogud1', 'Dog UD 1', 'dogud1', 'Dog notes', '12|1|1|1|1'),
-            new Credential('cr3', 'user1', 'Fish', 'fish', 'fish123', 'http://fish.com', 'Fish UD 1', 'fishud1', 'Fish UD 1', 'fishud1', 'Fish notes', '12|1|1|1|1'),
-            new Credential('cr4', 'user1', 'Catfish', 'catfish', 'catfish123', 'http://catfish.com', 'Catfish UD 1', 'catfishud1', 'Catfish UD 1', 'catfishud1', 'Catfish notes', '12|1|1|1|1'),
-            new Credential('cr5', 'user1', 'Dogfish', 'dogfish', 'dogfish123', 'http://dogfish.com', 'Dogfish UD 1', 'dogfishud1', 'Dogfish UD 1', 'dogfishud1', 'Dogfish notes', '12|1|1|1|1'),
-            new Credential('cr6', 'user1', 'Owl', 'owl', '_nT:NP?uovID8,TE', 'http://owl.com', 'Owl UD 1', 'owlud1', 'Owl UD 1', 'owlud1', 'Owl notes', '12|1|1|1|1')
-        ];
-        /* tslint:enable:max-line-length */
-    });
-
     test('parseQuery', () => {
         const parsed = parseSearchQuery(' EmAil ');
 
@@ -213,6 +201,8 @@ suite('Vault', () => {
     });
 
     test('searchCredentials bad queries', () => {
+        const testCredentials = getTestCredentials();
+
         const noresults1 = searchCredentials(null, nw, testCredentials);
         const noresults2 = searchCredentials({ property: null, text: 'ABC' }, nw, testCredentials);
         const noresults3 = searchCredentials({ property: 'Description', text: null }, nw, testCredentials);
@@ -227,6 +217,7 @@ suite('Vault', () => {
     });
 
     test('searchCredentials standard query', () => {
+        const testCredentials = getTestCredentials();
         const results = searchCredentials({ property: 'Description', text: 'do' }, nw, testCredentials);
         assert.lengthOf(results, 2);
         assert.equal(results[0].Description, 'Dog');
@@ -234,6 +225,7 @@ suite('Vault', () => {
     });
 
     test('searchCredentials username query', () => {
+        const testCredentials = getTestCredentials();
         const results = searchCredentials({ property: 'Username', text: 'dog' }, nw, testCredentials);
         assert.lengthOf(results, 2);
         assert.equal(results[0].Description, 'Dog');
@@ -241,6 +233,7 @@ suite('Vault', () => {
     });
 
     test('searchCredentials password query', () => {
+        const testCredentials = getTestCredentials();
         const results = searchCredentials({ property: 'Password', text: 'cat' }, nw, testCredentials);
         assert.lengthOf(results, 2);
         assert.equal(results[0].Description, 'Cat');
@@ -248,6 +241,7 @@ suite('Vault', () => {
     });
 
     test('searchCredentials all query', () => {
+        const testCredentials = getTestCredentials();
         const results = searchCredentials({ property: 'FILTER', text: 'all' }, nw, testCredentials);
         assert.lengthOf(results, 6);
         assert.equal(results[0].Description, 'Cat');
@@ -255,7 +249,8 @@ suite('Vault', () => {
     });
 
     test('searchCredentials weak password query', () => {
-        const isWeakPassword = (c: Credential) => c.Password.length < 7;
+        const testCredentials = getTestCredentials();
+        const isWeakPassword = (c: ICredential) => c.Password.length < 7;
         const results = searchCredentials({ property: 'FILTER', text: 'weak' }, isWeakPassword, testCredentials);
         assert.lengthOf(results, 2);
         assert.equal(results[0].Description, 'Cat');
@@ -275,8 +270,8 @@ suite('Vault', () => {
     });
 
     test('validateCredential', () => {
-        const validCredential = new Credential('ID', 'USER', 'VALID CREDENTIAL');
-        const invalidCredential = { CredentialID: 'ID', UserID: 'USER', Description: '' } as Credential;
+        const validCredential = { CredentialID: 'ID', UserID: 'USER', Description: 'VALID CREDENTIAL' };
+        const invalidCredential = { CredentialID: 'ID', UserID: 'USER', Description: '' };
 
         assert.lengthOf(validateCredential(validCredential), 0);
         assert.lengthOf(validateCredential(invalidCredential), 1);

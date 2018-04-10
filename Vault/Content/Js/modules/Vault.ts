@@ -1,4 +1,4 @@
-﻿import { Credential, ICredentialSearchQuery, ICredentialSummary, ICredentialValidationError, ICryptoProvider } from '../types/all';
+﻿import { ICredential, ICredentialSearchQuery, ICredentialSummary, ICredentialValidationError, ICryptoProvider } from '../types/all';
 import { trim } from './Common';
 
 // A map of the properties which can be searched for using the fieldName:query syntax
@@ -41,7 +41,7 @@ export function parseSearchQuery(queryText: string): ICredentialSearchQuery {
     return parsedQuery;
 }
 
-export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword: (c: Credential) => boolean, list: Credential[]): Credential[] {
+export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword: (c: ICredential) => boolean, list: ICredential[]): ICredential[] {
     if (!query || !query.property || !query.text) {
         return [];
     }
@@ -60,7 +60,7 @@ export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword:
     return list.filter(item => item[query.property].toLowerCase().indexOf(query.text) > -1);
 }
 
-export function mapToSummary(masterKey: string, userId: string, isWeakPassword: (c: Credential) => boolean, credential: Credential): ICredentialSummary {
+export function mapToSummary(masterKey: string, userId: string, isWeakPassword: (c: ICredential) => boolean, credential: ICredential): ICredentialSummary {
     return {
         credentialid: credential.CredentialID,
         masterkey: masterKey,
@@ -73,7 +73,7 @@ export function mapToSummary(masterKey: string, userId: string, isWeakPassword: 
     };
 }
 
-export function validateCredential(credential: Credential): ICredentialValidationError[] {
+export function validateCredential(credential: ICredential): ICredentialValidationError[] {
     const errors: ICredentialValidationError[] = [];
 
     if (!credential.Description) {

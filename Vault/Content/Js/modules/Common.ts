@@ -1,4 +1,4 @@
-﻿import { Credential } from '../types/all';
+﻿import { ICredential } from '../types/all';
 
 const rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
 

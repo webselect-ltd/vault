@@ -1,4 +1,4 @@
-﻿import { Credential, IPasswordSpecification } from './all';
+﻿import { ICredential, IPasswordSpecification } from './all';
 
 export interface ICryptoProvider {
     base64ToUtf8(str: string): string;
@@ -7,8 +7,8 @@ export interface ICryptoProvider {
     generateMasterKey(password: string): string;
     hash(str: string): string;
     getPasswordBits(password: string): number;
-    encryptCredential(credential: Credential, masterKey: string, excludes: string[]): Credential;
-    encryptCredentials(credentials: Credential[], masterKey: string, excludes: string[]): Credential[];
-    decryptCredential(credential: Credential, masterKey: string, excludes: string[]): Credential;
-    decryptCredentials(credentials: Credential[], masterKey: string, excludes: string[]): Credential[];
+    encryptCredential(credential: ICredential, masterKey: string, excludes: string[]): ICredential;
+    encryptCredentials(credentials: ICredential[], masterKey: string, excludes: string[]): ICredential[];
+    decryptCredential(credential: ICredential, masterKey: string, excludes: string[]): ICredential;
+    decryptCredentials(credentials: ICredential[], masterKey: string, excludes: string[]): ICredential[];
 }

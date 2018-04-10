@@ -110,7 +110,7 @@
     <TypeScriptCompile Include="Content\Js\types\XHRError.ts" />
     <TypeScriptCompile Include="Content\Js\types\CryptoProvider.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredentialSummary.ts" />
-    <TypeScriptCompile Include="Content\Js\types\Credential.ts" />
+    <TypeScriptCompile Include="Content\Js\types\ICredential.ts" />
     <TypeScriptCompile Include="Content\Js\types\Repository.ts" />
     <TypeScriptCompile Include="Content\Js\tests\tests.ts" />
     <TypeScriptCompile Include="Content\Js\modules\Common.ts" />
