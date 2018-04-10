@@ -37,7 +37,7 @@
     "scripts": {
         "build": "webpack --mode=development --display-modules",
         "watch": "webpack --watch --mode=development",
-        "test": "mocha --opts ./Content/Js/tests/mocha.opts",
+        "tests": "mocha --opts ./Content/Js/tests/mocha.opts",
         "cover": "nyc mocha --opts ./Content/Js/tests/mocha.opts"
     },
     "nyc": {
