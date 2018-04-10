@@ -146,8 +146,8 @@ export async function changePassword(userId: string, masterKey: string, oldPassw
     await repository.updatePassword(userId, cryptoProvider.hash(oldPassword), newPasswordHash);
 }
 
-export function checkIf(el: JQuery, condition: () => boolean): void {
-    (el[0] as HTMLInputElement).checked = condition();
+export function checkIf(el: JQuery, condition: boolean): void {
+    (el[0] as HTMLInputElement).checked = condition;
 }
 
 // Show delete confirmation dialog
@@ -292,12 +292,12 @@ export function reloadApp(baseUrl: string) {
 }
 
 function setPasswordOptions(form: JQuery, opts: string): void {
-    const optArray = opts.split('|');
-    form.find('[name=len]').val(optArray[0]);
-    checkIf(form.find('[name=ucase]'), () => optArray[1] === '1');
-    checkIf(form.find('[name=lcase]'), () => optArray[2] === '1');
-    checkIf(form.find('[name=nums]'), () => optArray[3] === '1');
-    checkIf(form.find('[name=symb]'), () => optArray[4] === '1');
+    const [len, ucase, lcase, nums, symb] = opts.split('|');
+    form.find('[name=len]').val(len);
+    checkIf(form.find('[name=ucase]'), ucase === '1');
+    checkIf(form.find('[name=lcase]'), lcase === '1');
+    checkIf(form.find('[name=nums]'), nums === '1');
+    checkIf(form.find('[name=symb]'), symb === '1');
 }
 
 // Show the read-only details modal
