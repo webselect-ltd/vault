@@ -496,14 +496,6 @@ $('body').on('submit', '#credential-form', async e => {
         return;
     }
 
-    // Hold the modified properties so we can update the list if the update succeeds
-    const properties = {
-        Description: form.find('#Description').val(),
-        Username: form.find('#Username').val(),
-        Password: form.find('#Password').val(),
-        Url: form.find('#Url').val()
-    };
-
     // CredentialID and UserID are not currently encrypted so don't try to decode them
     const encryptedCredential = cryptoProvider.encryptCredential(credential, internal.masterKey, encryptionExcludes);
 
