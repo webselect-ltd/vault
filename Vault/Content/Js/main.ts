@@ -1,7 +1,7 @@
 ﻿import * as Handlebars from 'handlebars';
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
-import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, weakPasswordThreshold } from './modules/all';
+import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, validateCredential, weakPasswordThreshold } from './modules/all';
 import { Credential, CryptoProvider, ICredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository, Repository } from './types/all';
 
 interface IVaultGlobals {
@@ -57,11 +57,6 @@ interface IVaultModalOptions {
     showDelete?: boolean;
     deleteText?: string;
     ondelete?: (e: JQuery.Event) => void;
-}
-
-interface IVaultFormValidationError {
-    field: JQuery<HTMLElement>;
-    msg: string;
 }
 
 declare var _VAULT_GLOBALS: IVaultGlobals;
@@ -420,17 +415,6 @@ function showPasswordStrength(field: JQuery): void {
     }
 }
 
-export function validateRecord(form: JQuery): IVaultFormValidationError[] {
-    const errors: IVaultFormValidationError[] = [];
-    const description = form.find('#Description');
-
-    if (description.val() === '') {
-        errors.push({ field: description, msg: 'You must fill in a Description' });
-    }
-
-    return errors;
-}
-
 ui.container.on('click', '.btn-credential-show-detail', e => {
     e.preventDefault();
     const id = $(e.currentTarget).parent().parent().attr('id');
@@ -498,19 +482,19 @@ $('body').on('submit', '#credential-form', async e => {
     $('#validation-message').remove();
     form.find('div.has-error').removeClass('has-error');
 
-    const errors = validateRecord(form);
+    const credential = createCredentialFromFormFields(form);
+
+    const errors = validateCredential(credential);
 
     if (errors.length > 0) {
-        errors.forEach(error => {
-            errorMsg.push(error.msg);
-            error.field.parent().parent().addClass('has-error');
+        errors.forEach(err => {
+            errorMsg.push(err.errorMessage);
+            $(`${err.property}`).parent().parent().addClass('has-error');
         });
 
         ui.modal.find('div.modal-body').prepend(templates.validationMessage({ errors: errorMsg.join('<br />') }));
         return;
     }
-
-    const credential = createCredentialFromFormFields(form);
 
     // Hold the modified properties so we can update the list if the update succeeds
     const properties = {

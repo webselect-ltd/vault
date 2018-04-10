@@ -3,6 +3,7 @@ export { CryptoProvider } from './CryptoProvider';
 export { ICryptoProvider } from './ICryptoProvider';
 export { ICredentialSearchQuery } from './ICredentialSearchQuery';
 export { ICredentialSummary } from './ICredentialSummary';
+export { ICredentialValidationError } from './ICredentialValidationError';
 export { IPasswordSpecification } from './IPasswordSpecification';
 export { IRepository } from './IRepository';
 export { Repository } from './Repository';

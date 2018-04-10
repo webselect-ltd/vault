@@ -1,4 +1,4 @@
-﻿import { Credential, ICredentialSearchQuery, ICredentialSummary, ICryptoProvider } from '../types/all';
+﻿import { Credential, ICredentialSearchQuery, ICredentialSummary, ICredentialValidationError, ICryptoProvider } from '../types/all';
 import { trim } from './Common';
 
 // A map of the properties which can be searched for using the fieldName:query syntax
@@ -71,4 +71,14 @@ export function mapToSummary(masterKey: string, userId: string, isWeakPassword: 
         url: credential.Url,
         weak: isWeakPassword(credential)
     };
+}
+
+export function validateCredential(credential: Credential): ICredentialValidationError[] {
+    const errors: ICredentialValidationError[] = [];
+
+    if (!credential.Description) {
+        errors.push({ property: 'Description', errorMessage: 'You must fill in a Description' });
+    }
+
+    return errors;
 }

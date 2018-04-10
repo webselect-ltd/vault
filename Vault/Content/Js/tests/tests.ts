@@ -1,6 +1,6 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
-import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, weakPasswordThreshold } from '../modules/all';
+import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, validateCredential, weakPasswordThreshold } from '../modules/all';
 import { Credential, CryptoProvider, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
@@ -272,6 +272,14 @@ suite('Vault', () => {
         assert.equal(summary.userid, 'user1');
         assert.equal(summary.username, '_testuser123');
         assert.isTrue(summary.weak);
+    });
+
+    test('validateCredential', () => {
+        const validCredential = new Credential('ID', 'USER', 'VALID CREDENTIAL');
+        const invalidCredential = { CredentialID: 'ID', UserID: 'USER', Description: '' } as Credential;
+
+        assert.lengthOf(validateCredential(validCredential), 0);
+        assert.lengthOf(validateCredential(invalidCredential), 1);
     });
 
 });
