@@ -89,36 +89,36 @@ export class FakeRepository implements IRepository {
         this.encryptedCredentials = cryptoProvider.encryptCredentials(this.credentials, masterKey, ['CredentialID', 'UserID']);
     }
 
-    public async login(hashedUsername: string, hashedPassword: string): Promise<any> {
+    public async login(hashedUsername: string, hashedPassword: string) {
         // TODO: Implement
     }
 
-    public async loadCredential(credentialId: string): Promise<ICredential> {
+    public async loadCredential(credentialId: string) {
         return this.encryptedCredentials.filter(c => c.CredentialID === credentialId)[0];
     }
 
-    public async loadCredentialsForUser(userId: string): Promise<ICredential[]> {
+    public async loadCredentialsForUser(userId: string) {
         return this.encryptedCredentials.filter(c => c.UserID === userId);
     }
 
-    public async loadCredentialsForUserFull(userId: string): Promise<ICredential[]> {
+    public async loadCredentialsForUserFull(userId: string) {
         return new Promise<ICredential[]>(resolve => resolve(this.encryptedCredentials.filter(c => c.UserID === userId)));
     }
 
-    public async updateCredential(credential: ICredential): Promise<ICredential> {
+    public async updateCredential(credential: ICredential) {
         return new Promise<ICredential>(resolve => resolve());
     }
 
-    public async updatePassword(userId: string, oldHash: string, newHash: string): Promise<void> {
+    public async updatePassword(userId: string, oldHash: string, newHash: string) {
         return new Promise<void>(resolve => resolve());
     }
 
-    public async updateMultiple(credentials: ICredential[]): Promise<void> {
+    public async updateMultiple(credentials: ICredential[]) {
         this.encryptedCredentials = credentials;
         return new Promise<void>(resolve => resolve());
     }
 
-    public async deleteCredential(userId: string, credentialId: string): Promise<void> {
+    public async deleteCredential(userId: string, credentialId: string) {
         this.credentials = this.credentials.filter(c => c.CredentialID !== credentialId);
         this.encryptedCredentials = this.encryptedCredentials.filter(c => c.CredentialID !== credentialId);
         return new Promise<void>(resolve => resolve());

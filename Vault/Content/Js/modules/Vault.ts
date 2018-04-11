@@ -21,7 +21,7 @@ const queryablePropertyMap: any = {
 // Bit value below which password is deemed weak
 export const weakPasswordThreshold = 40;
 
-export function parseSearchQuery(queryText: string): ICredentialSearchQuery {
+export function parseSearchQuery(queryText: string) {
     const parsedQuery: ICredentialSearchQuery = {
         property: queryablePropertyMap.description,
         text: null
@@ -48,7 +48,7 @@ export function parseSearchQuery(queryText: string): ICredentialSearchQuery {
     return parsedQuery;
 }
 
-export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword: (c: ICredential) => boolean, list: ICredential[]): ICredential[] {
+export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword: (c: ICredential) => boolean, list: ICredential[]) {
     if (!query || !query.property || !query.text) {
         return [];
     }
@@ -67,8 +67,8 @@ export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword:
     return list.filter(item => item[query.property].toLowerCase().indexOf(query.text) > -1);
 }
 
-export function mapToSummary(masterKey: string, userId: string, isWeakPassword: (c: ICredential) => boolean, credential: ICredential): ICredentialSummary {
-    return {
+export function mapToSummary(masterKey: string, userId: string, isWeakPassword: (c: ICredential) => boolean, credential: ICredential) {
+    const credentialSummary: ICredentialSummary = {
         credentialid: credential.CredentialID,
         masterkey: masterKey,
         userid: userId,
@@ -78,9 +78,10 @@ export function mapToSummary(masterKey: string, userId: string, isWeakPassword: 
         url: credential.Url,
         weak: isWeakPassword(credential)
     };
+    return credentialSummary;
 }
 
-export function validateCredential(credential: ICredential): ICredentialValidationError[] {
+export function validateCredential(credential: ICredential) {
     const errors: ICredentialValidationError[] = [];
 
     if (!credential.Description) {
