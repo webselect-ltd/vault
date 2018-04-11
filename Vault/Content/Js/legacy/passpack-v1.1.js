@@ -1264,7 +1264,8 @@ Passpack.utils.extend({
 		var pass = '';
 		if (str) {
 			var l = str.length,
-				p = 0;
+				p = 0,
+				v = 0;
 			for (p=0;p<n;) {
 				v = Math.floor(Math.random() * l);
 				if (v == l) continue;
