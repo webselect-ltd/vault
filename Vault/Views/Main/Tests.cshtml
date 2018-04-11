@@ -12,6 +12,8 @@
 <body>
     <div id="mocha"></div>
     @Scripts.Render("~/js/external")
+    <script src="~/node_modules/source-map-support/browser-source-map-support.js"></script>
+    <script>sourceMapSupport.install();</script>
     <script src="~/node_modules/mocha/mocha.js"></script>
     <script src="~/node_modules/chai/chai.js"></script>
     <script>mocha.setup('tdd');</script>
