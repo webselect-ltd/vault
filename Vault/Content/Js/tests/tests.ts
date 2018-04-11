@@ -136,8 +136,8 @@ suite('CryptoProvider', () => {
 
         const spec: IPasswordSpecification = {
             length: 0,
-            lowerCase: false,
-            upperCase: false,
+            lowercase: false,
+            uppercase: false,
             numbers: false,
             symbols: false
         };
@@ -148,16 +148,16 @@ suite('CryptoProvider', () => {
         assert.equal(empty, null);
         assert.equal(empty2, null);
 
-        spec.lowerCase = true;
+        spec.lowercase = true;
         const lc = cp.generatePassword(spec);
         assert.equal(lc.toLowerCase(), lc);
 
-        spec.lowerCase = false;
-        spec.upperCase = true;
+        spec.lowercase = false;
+        spec.uppercase = true;
         const uc = cp.generatePassword(spec);
         assert.equal(uc.toUpperCase(), uc);
 
-        spec.upperCase = false;
+        spec.uppercase = false;
         spec.numbers = true;
         const nums = cp.generatePassword(spec);
         assert.ok(nums.match(/\d+/gi));

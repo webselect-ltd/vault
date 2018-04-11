@@ -203,8 +203,8 @@ export function getPasswordGenerationOptionValues(inputs: JQuery, predicate: (el
     const len = inputs.filter('[name=len]').val() as number;
     return {
         length: isNaN(len) ? 16 : len,
-        lowerCase: predicate(inputs.filter('[name=lcase]')),
-        upperCase: predicate(inputs.filter('[name=ucase]')),
+        lowercase: predicate(inputs.filter('[name=lcase]')),
+        uppercase: predicate(inputs.filter('[name=ucase]')),
         numbers: predicate(inputs.filter('[name=nums]')),
         symbols: predicate(inputs.filter('[name=symb]'))
     };

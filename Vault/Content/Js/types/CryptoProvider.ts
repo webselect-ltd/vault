@@ -23,8 +23,8 @@ export class CryptoProvider implements ICryptoProvider {
             return null;
         }
 
-        if (specification.lowerCase === false
-            && specification.upperCase === false
+        if (specification.lowercase === false
+            && specification.uppercase === false
             && specification.numbers === false
             && specification.symbols === false) {
             return null;
@@ -32,11 +32,11 @@ export class CryptoProvider implements ICryptoProvider {
 
         const options: IPasspackCharOptions = {};
 
-        if (specification.lowerCase) {
+        if (specification.lowercase) {
             options.lcase = 1;
         }
 
-        if (specification.upperCase) {
+        if (specification.uppercase) {
             options.ucase = 1;
         }
 

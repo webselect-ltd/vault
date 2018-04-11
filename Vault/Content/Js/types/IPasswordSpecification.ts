@@ -1,7 +1,7 @@
 ﻿export interface IPasswordSpecification {
     length: number;
-    lowerCase: boolean;
-    upperCase: boolean;
+    lowercase: boolean;
+    uppercase: boolean;
     numbers: boolean;
     symbols: boolean;
 }
