@@ -1,6 +1,16 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
-import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, validateCredential, weakPasswordThreshold } from '../modules/all';
+import {
+    getPasswordSpecificationFromPassword,
+    mapToSummary,
+    parsePasswordSpecificationString,
+    parseSearchQuery,
+    rateLimit,
+    searchCredentials,
+    truncate,
+    validateCredential,
+    weakPasswordThreshold
+} from '../modules/all';
 import { CryptoProvider, ICredential, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
@@ -275,6 +285,81 @@ suite('Vault', () => {
 
         assert.lengthOf(validateCredential(validCredential), 0);
         assert.lengthOf(validateCredential(invalidCredential), 1);
+    });
+
+    test('parsePasswordSpecificationString bad inputs', () => {
+        assert.isNull(parsePasswordSpecificationString(null));
+        assert.isNull(parsePasswordSpecificationString(''));
+        assert.isNull(parsePasswordSpecificationString('1|2|3'));
+    });
+
+    test('parsePasswordSpecificationString valid inputs', () => {
+        const spec1: IPasswordSpecification = {
+            length: 16,
+            lowercase: true,
+            uppercase: true,
+            numbers: true,
+            symbols: true
+        };
+        const spec2: IPasswordSpecification = {
+            length: 32,
+            lowercase: false,
+            uppercase: true,
+            numbers: false,
+            symbols: true
+        };
+        const spec3: IPasswordSpecification = {
+            length: 64,
+            lowercase: true,
+            uppercase: false,
+            numbers: true,
+            symbols: false
+        };
+
+        assert.deepEqual(parsePasswordSpecificationString('16|1|1|1|1'), spec1);
+        assert.deepEqual(parsePasswordSpecificationString('32|0|1|0|1'), spec2);
+        assert.deepEqual(parsePasswordSpecificationString('64|1|0|1|0'), spec3);
+    });
+
+    test('getPasswordSpecificationFromPassword bad inputs', () => {
+        assert.isNull(getPasswordSpecificationFromPassword(null));
+        assert.isNull(getPasswordSpecificationFromPassword(''));
+    });
+
+    test('getPasswordSpecificationFromPassword valid inputs', () => {
+        const spec1: IPasswordSpecification = {
+            length: 8,
+            lowercase: true,
+            uppercase: false,
+            numbers: true,
+            symbols: false
+        };
+        const spec2: IPasswordSpecification = {
+            length: 10,
+            lowercase: true,
+            uppercase: true,
+            numbers: true,
+            symbols: true
+        };
+        const spec3: IPasswordSpecification = {
+            length: 12,
+            lowercase: false,
+            uppercase: false,
+            numbers: true,
+            symbols: false
+        };
+        const spec4: IPasswordSpecification = {
+            length: 14,
+            lowercase: false,
+            uppercase: true,
+            numbers: false,
+            symbols: true
+        };
+
+        assert.deepEqual(getPasswordSpecificationFromPassword('abcd1234'), spec1);
+        assert.deepEqual(getPasswordSpecificationFromPassword('!aBcd1234^'), spec2);
+        assert.deepEqual(getPasswordSpecificationFromPassword('123456789012'), spec3);
+        assert.deepEqual(getPasswordSpecificationFromPassword('ABCD*EFG?H&JK-'), spec4);
     });
 
 });

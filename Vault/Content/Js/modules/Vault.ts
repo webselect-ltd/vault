@@ -1,4 +1,11 @@
-﻿import { ICredential, ICredentialSearchQuery, ICredentialSummary, ICredentialValidationError, ICryptoProvider } from '../types/all';
+﻿import {
+    ICredential,
+    ICredentialSearchQuery,
+    ICredentialSummary,
+    ICredentialValidationError,
+    ICryptoProvider,
+    IPasswordSpecification
+} from '../types/all';
 import { trim } from './Common';
 
 // A map of the properties which can be searched for using the fieldName:query syntax
@@ -81,4 +88,44 @@ export function validateCredential(credential: ICredential): ICredentialValidati
     }
 
     return errors;
+}
+
+export function parsePasswordSpecificationString(optionString: string) {
+    if (!optionString || optionString.indexOf('|') === -1) {
+        return null;
+    }
+
+    const optionsArray = optionString.split('|');
+
+    if (optionsArray.length !== 5) {
+        return null;
+    }
+
+    const [length, lowercase, uppercase, numbers, symbols] = optionsArray;
+
+    const specification: IPasswordSpecification = {
+        length: parseInt(length, 10),
+        uppercase: uppercase === '1',
+        lowercase: lowercase === '1',
+        numbers: numbers === '1',
+        symbols: symbols === '1'
+    };
+
+    return specification;
+}
+
+export function getPasswordSpecificationFromPassword(password: string) {
+    if (!password || !password.length) {
+        return null;
+    }
+
+    const specification: IPasswordSpecification = {
+        length: password.length,
+        lowercase: /[a-z]+/.test(password),
+        uppercase: /[A-Z]+/.test(password),
+        numbers: /\d+/.test(password),
+        symbols: /[^\dA-Z]+/i.test(password)
+    };
+
+    return specification;
 }

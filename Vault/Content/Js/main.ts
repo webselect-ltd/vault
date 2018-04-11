@@ -1,8 +1,26 @@
 ﻿import * as Handlebars from 'handlebars';
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
-import { mapToSummary, parseSearchQuery, rateLimit, searchCredentials, truncate, validateCredential, weakPasswordThreshold } from './modules/all';
-import { CryptoProvider, ICredential, ICredentialSummary, ICryptoProvider, IPasswordSpecification, IRepository, Repository } from './types/all';
+import {
+    getPasswordSpecificationFromPassword,
+    mapToSummary,
+    parsePasswordSpecificationString,
+    parseSearchQuery,
+    rateLimit,
+    searchCredentials,
+    truncate,
+    validateCredential,
+    weakPasswordThreshold
+} from './modules/all';
+import {
+    CryptoProvider,
+    ICredential,
+    ICredentialSummary,
+    ICryptoProvider,
+    IPasswordSpecification,
+    IRepository,
+    Repository
+} from './types/all';
 
 interface IVaultGlobals {
     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
@@ -248,7 +266,8 @@ async function loadCredential(credentialId: string, masterKey: string): Promise<
         });
         ui.modal.find('#Description').focus();
         showPasswordStrength(ui.modal.find('#Password'));
-        setPasswordOptions(ui.modal, credential.PwdOptions);
+        const passwordSpecification = parsePasswordSpecificationString(credential.PwdOptions);
+        setPasswordSpecification(ui.modal, passwordSpecification);
     } else { // New record setup
         showModal({
             title: 'Add Credential',
@@ -291,13 +310,12 @@ export function reloadApp(baseUrl: string) {
     location.href = baseUrl.length > 1 ? baseUrl.slice(0, -1) : baseUrl;
 }
 
-function setPasswordOptions(form: JQuery, opts: string): void {
-    const [len, ucase, lcase, nums, symb] = opts.split('|');
-    form.find('[name=len]').val(len);
-    checkIf(form.find('[name=ucase]'), ucase === '1');
-    checkIf(form.find('[name=lcase]'), lcase === '1');
-    checkIf(form.find('[name=nums]'), nums === '1');
-    checkIf(form.find('[name=symb]'), symb === '1');
+function setPasswordSpecification(form: JQuery, specification: IPasswordSpecification): void {
+    form.find('[name=len]').val(specification.length);
+    checkIf(form.find('[name=ucase]'), specification.uppercase);
+    checkIf(form.find('[name=lcase]'), specification.lowercase);
+    checkIf(form.find('[name=nums]'), specification.numbers);
+    checkIf(form.find('[name=symb]'), specification.symbols);
 }
 
 // Show the read-only details modal
