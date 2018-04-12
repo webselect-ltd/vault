@@ -71,15 +71,7 @@ export class CryptoProvider implements ICryptoProvider {
         return credentials.map(item => this.encryptCredential(item, masterKey, excludes));
     }
 
-    /**
-     * Encrypt/decrypt the properties of an object literal using Passpack.
-     * @param {IPasspackCryptoFunction} action - The Passpack function to use for encryption/decryption
-     * @param {any} obj - The object literal to be encrypted/decrypted
-     * @param {string} masterKey - A Passpack master key
-     * @param {string[]} excludes - An array of object property names whose values should not be encrypted
-     * @returns {Credential}
-     */
-    private crypt(action: PasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]) {
+    private crypt(action: PasspackCryptoFunction, obj: ICredential, masterKey: string, excludes: string[]) {
         const newCredential: any = {};
         Object.keys(obj).forEach((k: string) => {
             if (excludes.indexOf(k) === -1) {
@@ -88,6 +80,6 @@ export class CryptoProvider implements ICryptoProvider {
                 newCredential[k] = obj[k];
             }
         });
-        return newCredential;
+        return (newCredential as ICredential);
     }
 }
