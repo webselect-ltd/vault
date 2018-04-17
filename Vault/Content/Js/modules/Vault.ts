@@ -56,7 +56,7 @@ export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword:
             case 'all':
                 return list;
             case 'weak':
-                return list.filter(c => isWeakPassword(c.Password));
+                return list.filter(c => c.Password && isWeakPassword(c.Password));
             default:
                 return [];
         }

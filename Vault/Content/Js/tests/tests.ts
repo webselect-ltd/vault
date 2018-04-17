@@ -289,7 +289,13 @@ suite('Vault', () => {
 
     test('searchCredentials weak password query', () => {
         const testCredentials = getTestCredentials();
-        const isWeakPwd = (password: string) => password.length < 7;
+        testCredentials.push({
+            CredentialID: 'TEST',
+            UserID: 'user1',
+            Description: 'NOPASSWORD',
+            Password: null
+        });
+        const isWeakPwd = (password: string) => !password || password.length < 7;
         const results = searchCredentials({ property: 'FILTER', text: 'weak' }, isWeakPwd, testCredentials);
         assert.lengthOf(results, 2);
         assert.equal(results[0].Description, 'Cat');
