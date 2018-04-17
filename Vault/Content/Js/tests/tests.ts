@@ -1,17 +1,29 @@
 ﻿import { assert } from 'chai';
 import { beforeEach, suite, test } from 'mocha';
 import {
+    base64ToUtf8,
+    decryptCredential,
+    decryptCredentials,
+    encryptCredential,
+    encryptCredentials,
+    generateMasterKey,
+    generatePassword,
+    getPasswordBits,
     getPasswordSpecificationFromPassword,
+    hash,
+    isWeakPassword,
     mapToSummary,
     parsePasswordSpecificationString,
     parseSearchQuery,
     rateLimit,
     searchCredentials,
+    sortCredentials,
     truncate,
+    utf8ToBase64,
     validateCredential,
     weakPasswordThreshold
 } from '../modules/all';
-import { CryptoProvider, ICredential, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
+import { ICredential, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
 // Created with Vault.utf8ToBase64(Vault.createMasterKey('test123'))
@@ -77,10 +89,10 @@ function checkDecryption(credential: ICredential) {
 }
 
 function getTestCredentials(): ICredential[] {
-    return new FakeRepository(new CryptoProvider(), testMasterKeyBase64Encoded).credentials;
+    return new FakeRepository(encryptCredentials, testMasterKeyBase64Encoded).credentials;
 }
 
-const nw = (c: ICredential) => false;
+const nw = (password: string) => false;
 
 suite('Common', () => {
 
@@ -102,48 +114,46 @@ suite('Common', () => {
 
 });
 
-suite('CryptoProvider', () => {
+suite('Cryptography', () => {
 
     test('base64ToUtf8', () => {
-        const utf8 = new CryptoProvider().base64ToUtf8('VEVTVA==');
+        const utf8 = base64ToUtf8('VEVTVA==');
         assert.equal(utf8, 'TEST');
     });
 
     test('utf8ToBase64', () => {
-        const b64 = new CryptoProvider().utf8ToBase64('TEST');
+        const b64 = utf8ToBase64('TEST');
         assert.equal(b64, 'VEVTVA==');
     });
 
     test('decryptCredential', () => {
-        const decrypted = new CryptoProvider().decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        const decrypted = decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
         checkDecryption(decrypted);
     });
 
     test('decryptCredentials', () => {
         const credentials = [testCredentialEncrypted, testCredentialEncrypted];
-        const decrypted = new CryptoProvider().decryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        const decrypted = decryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
         decrypted.forEach(c => checkDecryption(c));
     });
 
     test('encryptCredential', () => {
-        const encrypted = new CryptoProvider().encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        const encrypted = encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
         checkEncryption(encrypted, testMasterKeyPlainText);
     });
 
     test('encryptCredentials', () => {
         const credentials = [testCredentialPlainText, testCredentialPlainText];
-        const encrypted = new CryptoProvider().encryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        const encrypted = encryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
         encrypted.forEach(c => checkEncryption(c, testMasterKeyPlainText));
     });
 
     test('generateMasterKey', () => {
         const k = Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true);
-        assert.equal(k, new CryptoProvider().generateMasterKey('test123'));
+        assert.equal(k, generateMasterKey('test123'));
     });
 
     test('generatePassword', () => {
-        const cp = new CryptoProvider();
-
         const spec: IPasswordSpecification = {
             length: 0,
             lowercase: false,
@@ -152,29 +162,29 @@ suite('CryptoProvider', () => {
             symbols: false
         };
 
-        const empty = cp.generatePassword(spec);
+        const empty = generatePassword(spec);
         spec.length = 32;
-        const empty2 = cp.generatePassword(spec);
+        const empty2 = generatePassword(spec);
         assert.equal(empty, null);
         assert.equal(empty2, null);
 
         spec.lowercase = true;
-        const lc = cp.generatePassword(spec);
+        const lc = generatePassword(spec);
         assert.equal(lc.toLowerCase(), lc);
 
         spec.lowercase = false;
         spec.uppercase = true;
-        const uc = cp.generatePassword(spec);
+        const uc = generatePassword(spec);
         assert.equal(uc.toUpperCase(), uc);
 
         spec.uppercase = false;
         spec.numbers = true;
-        const nums = cp.generatePassword(spec);
+        const nums = generatePassword(spec);
         assert.ok(nums.match(/\d+/gi));
 
         spec.numbers = false;
         spec.symbols = true;
-        const sym = cp.generatePassword(spec);
+        const sym = generatePassword(spec);
         assert.ok(sym.match(/[^a-z0-9]+/gi));
     });
 
@@ -260,8 +270,8 @@ suite('Vault', () => {
 
     test('searchCredentials weak password query', () => {
         const testCredentials = getTestCredentials();
-        const isWeakPassword = (c: ICredential) => c.Password.length < 7;
-        const results = searchCredentials({ property: 'FILTER', text: 'weak' }, isWeakPassword, testCredentials);
+        const isWeakPwd = (password: string) => password.length < 7;
+        const results = searchCredentials({ property: 'FILTER', text: 'weak' }, isWeakPwd, testCredentials);
         assert.lengthOf(results, 2);
         assert.equal(results[0].Description, 'Cat');
         assert.equal(results[1].Description, 'Dog');

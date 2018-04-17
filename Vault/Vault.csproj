@@ -73,6 +73,8 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Models\LoginResult.cs" />
+    <Compile Include="Support\SqlExecutor.cs" />
     <TypeScriptCompile Include="Content\Js\main.ts" />
     <TypeScriptCompile Include="Content\Js\modules\all.ts" />
     <TypeScriptCompile Include="Content\Js\modules\Vault.ts" />
@@ -82,17 +84,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\ConnectionFactoryBase.cs" />
-    <Compile Include="Models\CredentialListViewModel.cs" />
-    <Compile Include="Models\CredentialViewModel.cs" />
+    <Compile Include="Models\CredentialSummary.cs" />
+    <Compile Include="Models\Credential.cs" />
     <Compile Include="Models\SetDevCookieViewModel.cs" />
-    <Compile Include="Models\GenerateViewModel.cs" />
-    <Compile Include="Models\HttpContextLifetimeManager.cs" />
-    <Compile Include="Models\IConnectionFactory.cs" />
+    <Compile Include="Models\GenerateVaultCredentialViewModel.cs" />
+    <Compile Include="Support\HttpContextLifetimeManager.cs" />
+    <Compile Include="Support\IConnectionFactory.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
-    <Compile Include="Models\SqlConnectionFactory.cs" />
-    <Compile Include="Models\SQLiteConnectionFactory.cs" />
-    <Compile Include="Models\UnityDependencyResolver.cs" />
+    <Compile Include="Support\SqlConnectionFactory.cs" />
+    <Compile Include="Support\SQLiteConnectionFactory.cs" />
+    <Compile Include="Support\UnityDependencyResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -103,12 +104,12 @@
     <Content Include="Content\Js\tests\setup.js" />
     <TypeScriptCompile Include="Content\Js\types\ICredentialSearchQuery.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredentialValidationError.ts" />
+    <TypeScriptCompile Include="Content\Js\types\ILoginResult.ts" />
     <Content Include="webpack.config.js" />
-    <TypeScriptCompile Include="Content\Js\types\ICryptoProvider.ts" />
     <TypeScriptCompile Include="Content\Js\types\IRepository.ts" />
     <TypeScriptCompile Include="Content\Js\types\XHRSuccess.ts" />
     <TypeScriptCompile Include="Content\Js\types\XHRError.ts" />
-    <TypeScriptCompile Include="Content\Js\types\CryptoProvider.ts" />
+    <TypeScriptCompile Include="Content\Js\modules\Cryptography.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredentialSummary.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredential.ts" />
     <TypeScriptCompile Include="Content\Js\types\Repository.ts" />
@@ -133,7 +134,7 @@
     <Content Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Main\Generate.cshtml" />
+    <Content Include="Views\Main\GenerateVaultCredential.cshtml" />
     <Content Include="Views\Main\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>

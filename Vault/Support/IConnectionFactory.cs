@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Vault.Models
+namespace Vault.Support
 {
     public interface IConnectionFactory
     {

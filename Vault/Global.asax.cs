@@ -8,6 +8,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.Practices.Unity;
 using Vault.Models;
+using Vault.Support;
 
 namespace Vault
 {
@@ -27,9 +28,9 @@ namespace Vault
 
             // Inject the correct connection factory depending on the DB type
             if(ConfigurationManager.AppSettings["DbType"] == "SQLite")
-                container.RegisterType<ConnectionFactoryBase>(new HttpContextLifetimeManager<SQLiteConnectionFactory>(), new InjectionFactory(c => new SQLiteConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
+                container.RegisterType<IConnectionFactory>(new HttpContextLifetimeManager<SQLiteConnectionFactory>(), new InjectionFactory(c => new SQLiteConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
             else
-                container.RegisterType<ConnectionFactoryBase>(new HttpContextLifetimeManager<SqlConnectionFactory>(), new InjectionFactory(c => new SqlConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
+                container.RegisterType<IConnectionFactory>(new HttpContextLifetimeManager<SqlConnectionFactory>(), new InjectionFactory(c => new SqlConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
 
             var resolver = new UnityDependencyResolver(container);
 

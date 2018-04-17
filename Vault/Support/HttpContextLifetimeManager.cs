@@ -2,7 +2,7 @@
 using System.Web;
 using Microsoft.Practices.Unity;
 
-namespace Vault.Models
+namespace Vault.Support
 {
     public class HttpContextLifetimeManager<T> : LifetimeManager, IDisposable
     {

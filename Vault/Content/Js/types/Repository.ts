@@ -1,4 +1,4 @@
-﻿import { ICredential, IRepository, XHRError, XHRSuccess } from '../types/all';
+﻿import { ICredential, ILoginResult, IRepository, XHRError, XHRSuccess } from '../types/all';
 
 // TODO: Implement caching
 
@@ -13,23 +13,23 @@ export class Repository implements IRepository {
             UN1209: hashedUsername,
             PW9804: hashedPassword
         };
-        return this.ajaxPostPromise<any>('Main/Login', data);
+        return this.ajaxPostPromise<ILoginResult>('Main/Login', data);
     }
 
     public async loadCredential(credentialId: string) {
-        return this.ajaxPostPromise<ICredential>('Main/Load', { id: credentialId });
+        return this.ajaxPostPromise<ICredential>('Main/LoadCredential', { id: credentialId });
     }
 
-    public async loadCredentialsForUser(userId: string) {
-        return this.ajaxPostPromise<ICredential[]>('Main/GetAll', { userId: userId });
+    public async loadCredentialSummaryList(userId: string) {
+        return this.ajaxPostPromise<ICredential[]>('Main/GetCredentialSummaryList', { userId: userId });
     }
 
-    public async loadCredentialsForUserFull(userId: string) {
-        return this.ajaxPostPromise<ICredential[]>('Main/GetAllComplete', { userId: userId });
+    public async loadCredentials(userId: string) {
+        return this.ajaxPostPromise<ICredential[]>('Main/GetCredentials', { userId: userId });
     }
 
     public async updateCredential(credential: ICredential) {
-        return this.ajaxPostPromise<ICredential>('Main/Update', credential);
+        return this.ajaxPostPromise<ICredential>('Main/UpdateCredential', credential);
     }
 
     public async updatePassword(userId: string, oldHash: string, newHash: string) {
@@ -42,7 +42,7 @@ export class Repository implements IRepository {
     }
 
     public async updateMultiple(credentials: ICredential[]) {
-        return this.ajaxPostPromiseJson<void>('Main/UpdateMultiple', JSON.stringify(credentials));
+        return this.ajaxPostPromiseJson<void>('Main/UpdateMultipleCredentials', JSON.stringify(credentials));
     }
 
     public async deleteCredential(userId: string, credentialId: string) {
@@ -50,7 +50,7 @@ export class Repository implements IRepository {
             userId: userId,
             credentialId: credentialId
         };
-        return this.ajaxPostPromise<void>('Main/Delete', data);
+        return this.ajaxPostPromise<void>('Main/DeleteCredential', data);
     }
 
     // TODO: Rename and add error path

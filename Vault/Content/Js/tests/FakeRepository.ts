@@ -1,11 +1,10 @@
-﻿import { ICredential, ICryptoProvider, IRepository } from '../types/all';
+﻿import { ICredential, ILoginResult, IRepository } from '../types/all';
 
 export class FakeRepository implements IRepository {
-    public cryptoProvider: ICryptoProvider;
     public credentials: ICredential[];
     public encryptedCredentials: ICredential[];
 
-    constructor(cryptoProvider: ICryptoProvider, masterKey: string) {
+    constructor(encryptCredentials: (credentials: ICredential[], masterKey: string, excludes: string[]) => ICredential[], masterKey: string) {
         this.credentials = [{
             CredentialID: 'cr1',
             UserID: 'user1',
@@ -86,22 +85,22 @@ export class FakeRepository implements IRepository {
             PwdOptions: '12|1|1|1|1'
         }];
 
-        this.encryptedCredentials = cryptoProvider.encryptCredentials(this.credentials, masterKey, ['CredentialID', 'UserID']);
+        this.encryptedCredentials = encryptCredentials(this.credentials, masterKey, ['CredentialID', 'UserID']);
     }
 
     public async login(hashedUsername: string, hashedPassword: string) {
-        // TODO: Implement
+        return new Promise<ILoginResult>((resolve, reject) => resolve({ UserID: 'user1', Success: true }));
     }
 
     public async loadCredential(credentialId: string) {
         return this.encryptedCredentials.filter(c => c.CredentialID === credentialId)[0];
     }
 
-    public async loadCredentialsForUser(userId: string) {
+    public async loadCredentialSummaryList(userId: string) {
         return this.encryptedCredentials.filter(c => c.UserID === userId);
     }
 
-    public async loadCredentialsForUserFull(userId: string) {
+    public async loadCredentials(userId: string) {
         return new Promise<ICredential[]>(resolve => resolve(this.encryptedCredentials.filter(c => c.UserID === userId)));
     }
 

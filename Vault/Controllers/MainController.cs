@@ -1,43 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
-using Vault.Models;
 using Dapper;
+using Vault.Models;
+using Vault.Support;
 
 namespace Vault.Controllers
 {
     public class MainController : Controller
     {
-        private ConnectionFactoryBase _cf;
+        private SqlExecutor _db;
 
-        public MainController(ConnectionFactoryBase cf)
-        {
-            _cf = cf;
-        }
+        public MainController(IConnectionFactory cf) => _db = new SqlExecutor(cf);
 
-        public ActionResult Index()
-        {
-            return View();
-        }
+        public ActionResult Index() => View();
 
-        public ActionResult Generate()
-        {
-            return View(new GenerateViewModel {
-                GUID = Guid.NewGuid().ToString()
-            });
-        }
+        public ActionResult GenerateVaultCredential() => View(new GenerateVaultCredentialViewModel());
 
-        public ActionResult SetDevCookie()
-        {
-            return View();
-        }
+        public ActionResult SetDevCookie() => View();
 
         [HttpPost]
-        public ActionResult GetAll(string userId)
+        public async Task<ActionResult> GetCredentialSummaryList(string userId)
         {
-            IEnumerable<CredentialListViewModel> credentials;
-
             var sql = @"SELECT 
                             CredentialID, 
                             UserID, 
@@ -50,73 +35,34 @@ namespace Vault.Controllers
                         WHERE 
                             UserID = @UserID";
 
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                credentials = conn.Query<CredentialListViewModel>(sql, new { UserID = userId });
-            }
-
-            return Json(credentials);
+            return await _db.ResultAsJson(conn => conn.QueryAsync<CredentialSummary>(sql, new { UserID = userId }));
         }
 
         [HttpPost]
-        public ActionResult GetAllComplete(string userId)
-        {
-            IEnumerable<CredentialViewModel> credentials;
-
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                credentials = conn.Query<CredentialViewModel>("SELECT * FROM Credentials WHERE UserID = @UserID", new { UserID = userId });
-            }
-
-            return Json(credentials);
-        }
+        public async Task<ActionResult> GetCredentials(string userId) =>
+            await _db.ResultAsJson(conn => conn.QueryAsync<Credential>("SELECT * FROM Credentials WHERE UserID = @UserID", new { UserID = userId }));
 
         [HttpPost]
-        public ActionResult Load(string id)
-        {
-            CredentialViewModel credential;
-
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                credential = conn.Query<CredentialViewModel>("SELECT * FROM Credentials WHERE CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
-            }
-
-            return Json(credential);
-        }
+        public async Task<ActionResult> LoadCredential(string id) =>
+            await _db.ResultAsJson(conn => conn.QuerySingleOrDefaultAsync<Credential>("SELECT * FROM Credentials WHERE CredentialID = @CredentialID", new { CredentialID = id }));
 
         [HttpPost]
-        public ActionResult Delete(string credentialId, string userId)
-        {
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                conn.Execute("DELETE FROM Credentials WHERE UserID = @UserID AND CredentialID = @CredentialID", new { UserID = userId, CredentialID = credentialId });
-            }
-
-            return Json(new { Success = true });
-        }
+        public async Task<ActionResult> DeleteCredential(string credentialId, string userId) =>
+            await _db.ResultAsJson(conn => conn.ExecuteAsync("DELETE FROM Credentials WHERE UserID = @UserID AND CredentialID = @CredentialID", new { UserID = userId, CredentialID = credentialId }));
 
         [HttpPost]
-        public ActionResult UpdateMultiple(IList<CredentialViewModel> model)
+        public async Task<ActionResult> UpdateCredential(Credential model) => await DoUpdateCredential(model);
+
+        [HttpPost]
+        public async Task<ActionResult> UpdateMultipleCredentials(IList<Credential> model)
         {
             foreach (var item in model)
-                UpdateCredential(item);
+                await DoUpdateCredential(item);
 
             return Json(new { Updated = model.Count });
         }
 
-        [HttpPost]
-        public ActionResult Update(CredentialViewModel model)
-        {
-            var updated = UpdateCredential(model);
-
-            return Json(new { updated.CredentialID });
-        }
-
-        private CredentialViewModel UpdateCredential(CredentialViewModel model)
+        private async Task<ActionResult> DoUpdateCredential(Credential model)
         {
             var sql = @"INSERT INTO 
                             Credentials (
@@ -171,44 +117,18 @@ namespace Vault.Controllers
             if (model.CredentialID == null)
                 model.CredentialID = Guid.NewGuid().ToString();
 
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                conn.Execute(sql, model);
-            }
 
-            return model;
+            return await _db.ResultAsJson(conn => conn.ExecuteAsync(sql, model));
         }
 
         [HttpPost]
-        public ActionResult UpdatePassword(string userId, string oldHash, string newHash)
-        {
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                conn.Execute("UPDATE Users SET Password = @NewHash WHERE UserID = @UserID AND Password = @OldHash", new { UserID = userId, OldHash = oldHash, NewHash = newHash });
-            }
-
-            return Json(new { success = true });
-        }
+        public async Task<ActionResult> UpdatePassword(string userId, string oldHash, string newHash) =>
+            await _db.ResultAsJson(conn => conn.ExecuteAsync("UPDATE Users SET Password = @NewHash WHERE UserID = @UserID AND Password = @OldHash", new { UserID = userId, OldHash = oldHash, NewHash = newHash }));
 
         [HttpPost]
-        public ActionResult Login(LoginViewModel model)
-        {
-            var userId = "";
+        public async Task<ActionResult> Login(LoginViewModel model) =>
+            await _db.ResultAsJson(conn => conn.QuerySingleOrDefaultAsync<LoginResult>("SELECT UserID FROM Users WHERE Username = @Username AND Password = @Password", new { Username = model.UN1209, Password = model.PW9804 }));
 
-            using (var conn = _cf.GetConnection())
-            {
-                conn.Open();
-                userId = conn.Query<string>("SELECT * FROM Users WHERE Username = @Username AND Password = @Password", new { Username = model.UN1209, Password = model.PW9804 }).FirstOrDefault();
-            }
-
-            return Json(new { result = ((!string.IsNullOrEmpty(userId)) ? 1 : 0), id = userId });
-        }
-
-        public ActionResult Tests()
-        {
-            return View();
-        }
+        public ActionResult Tests() => View();
     }
 }

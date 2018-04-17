@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using Microsoft.Practices.Unity;
 
-namespace Vault.Models
+namespace Vault.Support
 {
     public class UnityDependencyResolver : IDependencyResolver
     {

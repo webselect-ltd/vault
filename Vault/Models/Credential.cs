@@ -2,7 +2,7 @@
 
 namespace Vault.Models
 {
-    public class CredentialViewModel
+    public class Credential
     {
         public string CredentialID { get; set; }
         public string UserID { get; set; }
@@ -21,7 +21,8 @@ namespace Vault.Models
         public string Notes { get; set; }
         public string PwdOptions { get; set; }
 
-        public CredentialViewModel() {
+        public Credential()
+        {
             CredentialID = "{{CredentialID}}";
             UserID = "{{UserID}}";
             Description = "{{Description}}";

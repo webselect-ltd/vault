@@ -1,6 +1,6 @@
 ﻿namespace Vault.Models
 {
-    public class CredentialListViewModel
+    public class CredentialSummary
     {
         public string CredentialID { get; set; }
         public string UserID { get; set; }
