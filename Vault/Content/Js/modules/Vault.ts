@@ -65,11 +65,9 @@ export function searchCredentials(query: ICredentialSearchQuery, isWeakPassword:
     return list.filter(item => item[query.property].toLowerCase().indexOf(query.text) > -1);
 }
 
-export function mapToSummary(masterKey: string, userId: string, isWeakPassword: (password: string) => boolean, credential: ICredential) {
+export function mapToSummary(credential: ICredential, isWeakPassword: (password: string) => boolean) {
     const credentialSummary: ICredentialSummary = {
         credentialid: credential.CredentialID,
-        masterkey: masterKey,
-        userid: userId,
         description: credential.Description,
         username: credential.Username,
         password: credential.Password,

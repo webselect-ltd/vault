@@ -2,12 +2,6 @@
 import * as $ from 'jquery';
 import * as Cookies from 'js-cookie';
 import {
-    base64ToUtf8,
-    decryptCredential,
-    decryptCredentials,
-    encryptCredential,
-    encryptCredentials,
-    generateMasterKey,
     generatePassword,
     getPasswordBits,
     getPasswordSpecificationFromPassword,
@@ -20,7 +14,6 @@ import {
     searchCredentials,
     sortCredentials,
     truncate,
-    utf8ToBase64,
     validateCredential,
     weakPasswordThreshold
 } from './modules/all';
@@ -91,14 +84,6 @@ interface IVaultModalOptions {
 declare var _VAULT_GLOBALS: IVaultGlobals;
 
 const repository = new Repository(_VAULT_GLOBALS.baseUrl);
-
-const internal: any = {
-    masterKey: '',      // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
-    password: '',       // Current user's password
-    userId: ''          // GUID identifying logged-in user
-};
-
-const globalEncryptionExcludes = ['CredentialID', 'UserID'];
 
 const defaultPasswordSpecification: IPasswordSpecification = {
     length: 16,
@@ -193,16 +178,14 @@ export function getCredentialFromUI(container: JQuery) {
     return (obj as ICredential);
 }
 
-export function parseImportData(userId: string, masterKey: string, rawData: string, encryptionExcludes: string[]) {
+export function parseImportData(rawData: string) {
     const jsonImportData = JSON.parse(rawData) as ICredential[];
 
     const newData = jsonImportData.map(item => {
         // Null out any existing credential ID so that the UpdateMultipleCredentials
         // endpoint knows that this is a new record, not an update
         item.CredentialID = null;
-        // Set the user ID to the ID of the new (logged in) user
-        item.UserID = userId;
-        return encryptCredential(item, masterKey, encryptionExcludes);
+        return item;
     });
 
     return newData;
@@ -216,36 +199,16 @@ function search(query: string, credentials: ICredential[]) {
     return sortCredentials(results);
 }
 
-function updateCredentialListUI(container: JQuery, data: ICredential[], userId: string, masterKey: string) {
-    const rows = data.map(c => mapToSummary(masterKey, userId, isWeakPassword, c));
+function updateCredentialListUI(container: JQuery, data: ICredential[]) {
+    const rows = data.map(c => mapToSummary(c, isWeakPassword));
     container.html(templates.credentialTable({ rows: rows }));
 }
 
-async function exportData(userId: string, masterKey: string) {
-    const credentials = await repository.loadCredentials(userId);
-    return credentials.map(item => decryptCredential(item, masterKey, globalEncryptionExcludes));
+async function exportData() {
+    return await repository.loadCredentials();
 }
 
-async function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string) {
-    const newPasswordHash: string = hash(newPassword);
-    const newMasterKey: string = utf8ToBase64(generateMasterKey(newPassword));
-
-    // Get all the user's credentials, decrypt each with the old password and re-encrypt it with the new one
-    const credentials = await repository.loadCredentials(userId);
-
-    const reEncrypt = (item: ICredential) => {
-        const decrypted = decryptCredential(item, masterKey, globalEncryptionExcludes);
-        return encryptCredential(decrypted, newMasterKey, globalEncryptionExcludes);
-    };
-
-    const newData = credentials.map(reEncrypt);
-
-    await repository.updateMultiple(newData);
-
-    await repository.updatePassword(userId, hash(oldPassword), newPasswordHash);
-}
-
-function confirmDelete(id: string, masterKey: string) {
+function confirmDelete(id: string) {
     showModal({
         title: 'Delete Credential',
         content: templates.deleteConfirmationDialog({}),
@@ -254,14 +217,12 @@ function confirmDelete(id: string, masterKey: string) {
         ondelete: async e => {
             e.preventDefault();
 
-            await repository.deleteCredential(internal.userId, id);
+            await repository.deleteCredential(id);
 
-            const updatedCredentials = await repository.loadCredentialSummaryList(internal.userId);
+            const updatedCredentials = await repository.loadCredentialSummaryList();
 
-            const decrypted = decryptCredentials(updatedCredentials, internal.masterKey, globalEncryptionExcludes);
-
-            const results = search(ui.searchInput.val() as string, decrypted);
-            updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
+            const results = search(ui.searchInput.val() as string, updatedCredentials);
+            updateCredentialListUI(ui.container, results);
 
             ui.modal.modal('hide');
         }
@@ -273,10 +234,8 @@ function hideModal(e: JQuery.Event) {
     ui.modal.modal('hide');
 }
 
-async function editCredential(credentialId: string, masterKey: string) {
-    const encryptedCredential = await repository.loadCredential(credentialId);
-    // CredentialID and UserID are not currently encrypted so don't try to decode them
-    const credential = decryptCredential(encryptedCredential, masterKey, globalEncryptionExcludes);
+async function editCredential(credentialId: string) {
+    const credential = await repository.loadCredential(credentialId);
     showModal({
         title: 'Edit Credential',
         content: templates.credentialForm(credential),
@@ -313,14 +272,9 @@ function openExportPopup(data: ICredential[]) {
 }
 
 function optionsDialog() {
-    const dialogHtml = templates.optionsDialog({
-        userid: internal.userId,
-        masterkey: utf8ToBase64(internal.masterKey)
-    });
-
     showModal({
         title: 'Admin',
-        content: dialogHtml
+        content: templates.optionsDialog({})
     });
 }
 
@@ -329,11 +283,8 @@ function reloadApp(baseUrl: string) {
     location.href = baseUrl.length > 1 ? baseUrl.slice(0, -1) : baseUrl;
 }
 
-async function showDetail(credentialId: string, masterKey: string) {
-    const encryptedCredential = await repository.loadCredential(credentialId);
-
-    // CredentialID and UserID are not currently encrypted so don't try to decode them
-    const credential = decryptCredential(encryptedCredential, masterKey, globalEncryptionExcludes);
+async function showDetail(credentialId: string) {
+    const credential = await repository.loadCredential(credentialId);
 
     // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
     const urlText = templates.urlText({ Url: credential.Url });
@@ -357,8 +308,8 @@ async function showDetail(credentialId: string, masterKey: string) {
         content: detailHtml,
         showEdit: true,
         showDelete: true,
-        onedit: () => editCredential(credentialId, masterKey),
-        ondelete: () => confirmDelete(credentialId, masterKey)
+        onedit: () => editCredential(credentialId),
+        ondelete: () => confirmDelete(credentialId)
     });
 }
 
@@ -447,14 +398,14 @@ function showPasswordStrength(field: JQuery) {
 ui.container.on('click', '.btn-credential-show-detail', e => {
     e.preventDefault();
     const id = $(e.currentTarget).parent().parent().attr('id');
-    showDetail(id, internal.masterKey);
+    showDetail(id);
 });
 
 ui.newButton.on('click', e => {
     e.preventDefault();
     showModal({
         title: 'Add Credential',
-        content: templates.credentialForm({ UserID: internal.userId }),
+        content: templates.credentialForm({}),
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
@@ -473,18 +424,16 @@ ui.adminButton.on('click', e => {
 
 ui.clearSearchButton.on('click', async e => {
     e.preventDefault();
-    const credentials = await repository.loadCredentialSummaryList(internal.userId);
-    const decrypted = decryptCredentials(credentials, internal.masterKey, globalEncryptionExcludes);
-    const results = search(null, decrypted);
-    updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
+    const credentials = await repository.loadCredentialSummaryList();
+    const results = search(null, credentials);
+    updateCredentialListUI(ui.container, results);
     ui.searchInput.val('').focus();
 });
 
 ui.searchInput.on('keyup', rateLimit(async e => {
-    const credentials = await repository.loadCredentialSummaryList(internal.userId);
-    const decrypted = decryptCredentials(credentials, internal.masterKey, globalEncryptionExcludes);
-    const results = search((e.currentTarget as HTMLInputElement).value, decrypted);
-    updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
+    const credentials = await repository.loadCredentialSummaryList();
+    const results = search((e.currentTarget as HTMLInputElement).value, credentials);
+    updateCredentialListUI(ui.container, results);
 }, 200));
 
 ui.loginForm.on('submit', async e => {
@@ -493,16 +442,9 @@ ui.loginForm.on('submit', async e => {
     const username = ui.loginForm.find('#UN1209').val() as string;
     const password = ui.loginForm.find('#PW9804').val() as string;
 
-    const loginResult = await repository.login(hash(username), hash(password));
+    const loginResult = await repository.login(username, password);
 
     if (loginResult.Success) {
-        // Set some private variables so that we can reuse them for encryption during this session
-        internal.userId = loginResult.UserID;
-        internal.password = password;
-        internal.masterKey = utf8ToBase64(generateMasterKey(internal.password));
-
-        await repository.loadCredentialSummaryList(internal.userId);
-        // Successfully logged in. Hide the login form
         ui.loginForm.hide();
         ui.loginFormDialog.modal('hide');
         ui.controls.show();
@@ -533,19 +475,15 @@ ui.body.on('submit', '#credential-form', async e => {
         return;
     }
 
-    // CredentialID and UserID are not currently encrypted so don't try to decode them
-    const encryptedCredential = encryptCredential(credential, internal.masterKey, globalEncryptionExcludes);
+    await repository.updateCredential(credential);
 
-    await repository.updateCredential(encryptedCredential);
+    const updatedCredentials = await repository.loadCredentialSummaryList();
 
-    const updatedCredentials = await repository.loadCredentialSummaryList(internal.userId);
-
-    const decrypted = decryptCredentials(updatedCredentials, internal.masterKey, globalEncryptionExcludes);
-    const results = search(ui.searchInput.val() as string, decrypted);
+    const results = search(ui.searchInput.val() as string, updatedCredentials);
 
     ui.modal.modal('hide');
 
-    updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
+    updateCredentialListUI(ui.container, results);
 
     return;
 });
@@ -651,21 +589,21 @@ ui.body.on('click', '#change-password-button', async e => {
         return;
     }
 
-    await changePassword(internal.userId, internal.masterKey, internal.password, newPassword);
+    await repository.updatePassword(newPassword);
 
     reloadApp(_VAULT_GLOBALS.baseUrl);
 });
 
 ui.body.on('click', '#export-button', async e => {
     e.preventDefault();
-    const exportedData = await exportData(internal.userId, internal.masterKey);
+    const exportedData = await exportData();
     openExportPopup(exportedData);
 });
 
 ui.body.on('click', '#import-button', async e => {
     e.preventDefault();
     const rawData = $('#import-data').val() as string;
-    const parsedData = parseImportData(internal.userId, internal.masterKey, rawData, globalEncryptionExcludes);
+    const parsedData = parseImportData(rawData);
     await repository.updateMultiple(parsedData);
     reloadApp(_VAULT_GLOBALS.baseUrl);
 });

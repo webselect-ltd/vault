@@ -84,7 +84,7 @@ function crypt(action: PasspackCryptoFunction, obj: ICredential, masterKey: stri
     const newCredential: any = {};
     Object.keys(obj).forEach((k: string) => {
         if (excludes.indexOf(k) === -1) {
-            newCredential[k] = action('AES', obj[k], base64ToUtf8(masterKey));
+            newCredential[k] = action('AES', obj[k], masterKey);
         } else {
             newCredential[k] = obj[k];
         }

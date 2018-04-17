@@ -27,9 +27,7 @@ import {
 import { ICredential, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
-// Created with utf8ToBase64(createMasterKey('test123'))
-const testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
-const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
+const testMasterKey = '%sÁI@YÅG¿µA';
 
 const testCredentialPlainText: ICredential = {
     CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
@@ -90,7 +88,7 @@ function checkDecryption(credential: ICredential) {
 }
 
 function getTestCredentials(): ICredential[] {
-    return new FakeRepository(encryptCredentials, testMasterKeyBase64Encoded).credentials;
+    return new FakeRepository().credentials;
 }
 
 const nw = (password: string) => false;
@@ -135,25 +133,25 @@ suite('Cryptography', () => {
     });
 
     test('decryptCredential', () => {
-        const decrypted = decryptCredential(testCredentialEncrypted, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        const decrypted = decryptCredential(testCredentialEncrypted, testMasterKey, ['CredentialID', 'UserID']);
         checkDecryption(decrypted);
     });
 
     test('decryptCredentials', () => {
         const credentials = [testCredentialEncrypted, testCredentialEncrypted];
-        const decrypted = decryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
+        const decrypted = decryptCredentials(credentials, testMasterKey, ['CredentialID', 'UserID']);
         decrypted.forEach(c => checkDecryption(c));
     });
 
     test('encryptCredential', () => {
-        const encrypted = encryptCredential(testCredentialPlainText, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-        checkEncryption(encrypted, testMasterKeyPlainText);
+        const encrypted = encryptCredential(testCredentialPlainText, testMasterKey, ['CredentialID', 'UserID']);
+        checkEncryption(encrypted, testMasterKey);
     });
 
     test('encryptCredentials', () => {
         const credentials = [testCredentialPlainText, testCredentialPlainText];
-        const encrypted = encryptCredentials(credentials, testMasterKeyBase64Encoded, ['CredentialID', 'UserID']);
-        encrypted.forEach(c => checkEncryption(c, testMasterKeyPlainText));
+        const encrypted = encryptCredentials(credentials, testMasterKey, ['CredentialID', 'UserID']);
+        encrypted.forEach(c => checkEncryption(c, testMasterKey));
     });
 
     test('generateMasterKey', () => {
@@ -299,13 +297,11 @@ suite('Vault', () => {
     });
 
     test('mapToSummary', () => {
-        const summary = mapToSummary(testMasterKeyPlainText, 'user1', c => true, testCredentialPlainText);
+        const summary = mapToSummary(testCredentialPlainText, c => true);
         assert.equal(summary.credentialid, '361fe91a-3dca-4871-b69e-c41c31507c8c');
         assert.equal(summary.description, 'Test Credential');
-        assert.equal(summary.masterkey, testMasterKeyPlainText);
         assert.equal(summary.password, '8{s?(\'7.171h)3H');
         assert.equal(summary.url, 'http://www.test.com?id=23&param=TEST+VALUE');
-        assert.equal(summary.userid, 'user1');
         assert.equal(summary.username, '_testuser123');
         assert.isTrue(summary.weak);
     });

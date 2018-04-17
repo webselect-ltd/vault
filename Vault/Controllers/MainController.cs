@@ -56,6 +56,8 @@ namespace Vault.Controllers
         [HttpPost]
         public async Task<ActionResult> UpdateMultipleCredentials(IList<Credential> model)
         {
+            // TODO: Wrap this in a transaction
+
             foreach (var item in model)
                 await DoUpdateCredential(item);
 
