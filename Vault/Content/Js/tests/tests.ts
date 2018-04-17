@@ -27,7 +27,7 @@ import {
 import { ICredential, ICredentialSummary, IPasswordSpecification, IRepository, Repository } from '../types/all';
 import { FakeRepository } from './FakeRepository';
 
-// Created with Vault.utf8ToBase64(Vault.createMasterKey('test123'))
+// Created with utf8ToBase64(createMasterKey('test123'))
 const testMasterKeyBase64Encoded = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
 const testMasterKeyPlainText = unescape(decodeURIComponent(atob(testMasterKeyBase64Encoded)));
 
@@ -207,11 +207,17 @@ suite('Cryptography', () => {
 
 suite('Vault', () => {
 
-    test('parseQuery', () => {
+    test('parseSearchQuery', () => {
         const parsed = parseSearchQuery(' EmAil ');
 
         assert.equal(parsed.property, 'Description');
         assert.equal(parsed.text, 'email');
+    });
+
+    test('parseSearchQuery bad queries', () => {
+        assert.equal(parseSearchQuery(null).text, null);
+        assert.equal(parseSearchQuery('').text, null);
+        assert.equal(parseSearchQuery('INVALID:description').text, null);
     });
 
     test('parseSearchQuery specific field', () => {

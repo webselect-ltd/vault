@@ -23,17 +23,19 @@ export function parseSearchQuery(queryText: string) {
         text: null
     };
 
-    const rawQuery = trim(queryText).toLowerCase();
+    const rawQuery = trim(queryText);
 
     if (!rawQuery || !rawQuery.length) {
         return parsedQuery;
     }
 
-    if (rawQuery.indexOf(':') === -1) {
-        parsedQuery.text = rawQuery;
+    const processedQuery = rawQuery.toLowerCase();
+
+    if (processedQuery.indexOf(':') === -1) {
+        parsedQuery.text = processedQuery;
     } else {
         // Support queries in the form fieldName:query (e.g. username:me@email.com)
-        const [property, query] = rawQuery.split(':').map(trim);
+        const [property, query] = processedQuery.split(':').map(trim);
 
         if (property && queryablePropertyMap[property] && query) {
             parsedQuery.property = queryablePropertyMap[property];
