@@ -379,6 +379,18 @@ suite('Vault', () => {
         assert.deepEqual(getPasswordSpecificationFromPassword('ABCD*EFG?H&JK-'), spec4);
     });
 
+    test('sortCredentials', () => {
+        const credentials = getTestCredentials();
+        const sortedCredentials = sortCredentials(credentials);
+        assert.lengthOf(sortedCredentials, 6);
+        assert.equal(sortedCredentials[0].Description, 'Cat');
+        assert.equal(sortedCredentials[1].Description, 'Catfish');
+        assert.equal(sortedCredentials[2].Description, 'Dog');
+        assert.equal(sortedCredentials[3].Description, 'Dogfish');
+        assert.equal(sortedCredentials[4].Description, 'Fish');
+        assert.equal(sortedCredentials[5].Description, 'Owl');
+    });
+
 });
 
 // suite('Main', () => {
