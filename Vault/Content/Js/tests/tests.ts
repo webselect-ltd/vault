@@ -18,6 +18,7 @@ import {
     rateLimit,
     searchCredentials,
     sortCredentials,
+    trim,
     truncate,
     utf8ToBase64,
     validateCredential,
@@ -95,6 +96,13 @@ function getTestCredentials(): ICredential[] {
 const nw = (password: string) => false;
 
 suite('Common', () => {
+
+    test('trim', () => {
+        assert.equal(trim(null), null);
+        assert.equal(trim('ABC   '), 'ABC');
+        assert.equal(trim('    ABC'), 'ABC');
+        assert.equal(trim('    ABC   '), 'ABC');
+    });
 
     test('rateLimit', function(done) {
         this.slow(1000);
