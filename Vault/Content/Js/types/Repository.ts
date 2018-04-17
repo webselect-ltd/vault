@@ -1,14 +1,17 @@
 ﻿import { ICredential, ILoginResult, IRepository } from '../types/all';
 
-// TODO: Implement caching
-
 export type XHRSuccessCallback = (data: any, status?: string, request?: JQueryXHR) => void;
 export type XHRErrorCallback = (request: JQueryXHR, status: string, error: string) => void;
 
 export class Repository implements IRepository {
-    private jsonContentType = 'application/json; charset=utf-8';
+    private readonly jsonContentType = 'application/json; charset=utf-8';
 
-    constructor(private basePath: string) {
+    private basePath: string;
+    private cache: ICredential[];
+
+    constructor(basePath: string) {
+        this.basePath = basePath;
+        this.cache = [];
     }
 
     public async login(hashedUsername: string, hashedPassword: string) {
@@ -24,7 +27,10 @@ export class Repository implements IRepository {
     }
 
     public async loadCredentialSummaryList(userId: string) {
-        return this.post<ICredential[]>('Main/GetCredentialSummaryList', { userId: userId });
+        if (!this.cache.length) {
+            this.cache = await this.post<ICredential[]>('Main/GetCredentialSummaryList', { userId: userId });
+        }
+        return this.cache;
     }
 
     public async loadCredentials(userId: string) {
@@ -32,10 +38,12 @@ export class Repository implements IRepository {
     }
 
     public async updateCredential(credential: ICredential) {
+        this.cache.length = 0;
         return this.post<ICredential>('Main/UpdateCredential', credential);
     }
 
     public async updatePassword(userId: string, oldHash: string, newHash: string) {
+        this.cache.length = 0;
         const data = {
             userid: userId,
             oldHash: oldHash,
@@ -45,10 +53,12 @@ export class Repository implements IRepository {
     }
 
     public async updateMultiple(credentials: ICredential[]) {
+        this.cache.length = 0;
         return this.post<void>('Main/UpdateMultipleCredentials', JSON.stringify(credentials), this.jsonContentType);
     }
 
     public async deleteCredential(userId: string, credentialId: string) {
+        this.cache.length = 0;
         const data = {
             userId: userId,
             credentialId: credentialId
