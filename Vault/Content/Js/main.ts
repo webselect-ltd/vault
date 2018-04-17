@@ -218,7 +218,6 @@ export async function exportData(userId: string, masterKey: string) {
     return credentials.map(item => cryptoProvider.decryptCredential(item, masterKey, encryptionExcludes));
 }
 
-// Change the password and re-encrypt all credentials with the new password
 export async function changePassword(userId: string, masterKey: string, oldPassword: string, newPassword: string) {
     const newPasswordHash: string = cryptoProvider.hash(newPassword);
     const newMasterKey: string = cryptoProvider.utf8ToBase64(cryptoProvider.generateMasterKey(newPassword));
@@ -238,7 +237,6 @@ export async function changePassword(userId: string, masterKey: string, oldPassw
     await repository.updatePassword(userId, cryptoProvider.hash(oldPassword), newPasswordHash);
 }
 
-// Show delete confirmation dialog
 function confirmDelete(id: string, masterKey: string) {
     showModal({
         title: 'Delete Credential',
@@ -267,8 +265,6 @@ function hideModal(e: JQuery.Event) {
     ui.modal.modal('hide');
 }
 
-// Load a record into the edit form
-// If null is passed as the credentialId, we set up the form for adding a new record
 async function editCredential(credentialId: string, masterKey: string) {
     const encryptedCredential = await repository.loadCredential(credentialId);
     // CredentialID and UserID are not currently encrypted so don't try to decode them
@@ -308,7 +304,6 @@ export function openExportPopup(data: ICredential[]) {
     }
 }
 
-// Show the options dialog
 function optionsDialog() {
     const dialogHtml = templates.optionsDialog({
         userid: internal.userId,
@@ -326,7 +321,6 @@ export function reloadApp(baseUrl: string) {
     location.href = baseUrl.length > 1 ? baseUrl.slice(0, -1) : baseUrl;
 }
 
-// Show the read-only details modal
 async function showDetail(credentialId: string, masterKey: string) {
     const encryptedCredential = await repository.loadCredential(credentialId);
 
@@ -402,7 +396,6 @@ function showModal(options: IVaultModalOptions) {
     ui.modal.modal();
 }
 
-// Show password strength visually
 function showPasswordStrength(field: JQuery) {
     const strengthIndicator = field.next('div.password-strength');
     const status = strengthIndicator.find('> span');
@@ -484,7 +477,6 @@ ui.searchInput.on('keyup', rateLimit(async e => {
     updateCredentialListUI(ui.container, results, internal.userId, internal.masterKey);
 }, 200));
 
-// Initialise globals and load data on correct login
 ui.loginForm.on('submit', async e => {
     e.preventDefault();
 
@@ -493,7 +485,6 @@ ui.loginForm.on('submit', async e => {
 
     const loginResult = await repository.login(cryptoProvider.hash(username), cryptoProvider.hash(password));
 
-    // If the details were valid
     if (loginResult.result === 1 && loginResult.id !== '') {
         // Set some private variables so that we can reuse them for encryption during this session
         internal.userId = loginResult.id;
@@ -509,7 +500,6 @@ ui.loginForm.on('submit', async e => {
     }
 });
 
-// Save the new details on edit form submit
 ui.body.on('submit', '#credential-form', async e => {
     e.preventDefault();
 
@@ -555,7 +545,6 @@ ui.body.on('keyup', '#Password', rateLimit(e => {
     showPasswordStrength($(e.currentTarget));
 }, 200));
 
-// Generate a nice strong password
 ui.body.on('click', 'button.generate-password', e => {
     e.preventDefault();
     const passwordSpecification = getPasswordSpecificationFromUI(ui.modal, isChecked);
@@ -576,7 +565,6 @@ ui.body.on('click', 'a.generate-password-options-toggle', e => {
     $('div.generate-password-options').toggle();
 });
 
-// Copy content to clipboard when copy icon is clicked
 ui.body.on('click', 'a.copy-link', e => {
     e.preventDefault();
     const a = $(e.currentTarget);
