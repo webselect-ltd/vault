@@ -6,5 +6,3 @@ export { ILoginResult } from './ILoginResult';
 export { IPasswordSpecification } from './IPasswordSpecification';
 export { IRepository } from './IRepository';
 export { Repository } from './Repository';
-export { XHRError } from './XHRError';
-export { XHRSuccess } from './XHRSuccess';

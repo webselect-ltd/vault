@@ -107,8 +107,6 @@
     <TypeScriptCompile Include="Content\Js\types\ILoginResult.ts" />
     <Content Include="webpack.config.js" />
     <TypeScriptCompile Include="Content\Js\types\IRepository.ts" />
-    <TypeScriptCompile Include="Content\Js\types\XHRSuccess.ts" />
-    <TypeScriptCompile Include="Content\Js\types\XHRError.ts" />
     <TypeScriptCompile Include="Content\Js\modules\Cryptography.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredentialSummary.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredential.ts" />

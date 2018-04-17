@@ -1,6 +1,9 @@
-﻿import { ICredential, ILoginResult, IRepository, XHRError, XHRSuccess } from '../types/all';
+﻿import { ICredential, ILoginResult, IRepository } from '../types/all';
 
 // TODO: Implement caching
+
+export type XHRSuccessCallback = (data: any, status?: string, request?: JQueryXHR) => void;
+export type XHRErrorCallback = (request: JQueryXHR, status: string, error: string) => void;
 
 export class Repository implements IRepository {
     private jsonContentType = 'application/json; charset=utf-8';
@@ -13,23 +16,23 @@ export class Repository implements IRepository {
             UN1209: hashedUsername,
             PW9804: hashedPassword
         };
-        return this.ajaxPostPromise<ILoginResult>('Main/Login', data);
+        return this.post<ILoginResult>('Main/Login', data);
     }
 
     public async loadCredential(credentialId: string) {
-        return this.ajaxPostPromise<ICredential>('Main/LoadCredential', { id: credentialId });
+        return this.post<ICredential>('Main/LoadCredential', { id: credentialId });
     }
 
     public async loadCredentialSummaryList(userId: string) {
-        return this.ajaxPostPromise<ICredential[]>('Main/GetCredentialSummaryList', { userId: userId });
+        return this.post<ICredential[]>('Main/GetCredentialSummaryList', { userId: userId });
     }
 
     public async loadCredentials(userId: string) {
-        return this.ajaxPostPromise<ICredential[]>('Main/GetCredentials', { userId: userId });
+        return this.post<ICredential[]>('Main/GetCredentials', { userId: userId });
     }
 
     public async updateCredential(credential: ICredential) {
-        return this.ajaxPostPromise<ICredential>('Main/UpdateCredential', credential);
+        return this.post<ICredential>('Main/UpdateCredential', credential);
     }
 
     public async updatePassword(userId: string, oldHash: string, newHash: string) {
@@ -38,11 +41,11 @@ export class Repository implements IRepository {
             oldHash: oldHash,
             newHash: newHash
         };
-        return this.ajaxPostPromise<void>('Main/UpdatePassword', data);
+        return this.post<void>('Main/UpdatePassword', data);
     }
 
     public async updateMultiple(credentials: ICredential[]) {
-        return this.ajaxPostPromiseJson<void>('Main/UpdateMultipleCredentials', JSON.stringify(credentials));
+        return this.post<void>('Main/UpdateMultipleCredentials', JSON.stringify(credentials), this.jsonContentType);
     }
 
     public async deleteCredential(userId: string, credentialId: string) {
@@ -50,43 +53,23 @@ export class Repository implements IRepository {
             userId: userId,
             credentialId: credentialId
         };
-        return this.ajaxPostPromise<void>('Main/DeleteCredential', data);
+        return this.post<void>('Main/DeleteCredential', data);
     }
 
-    // TODO: Rename and add error path
-    private ajaxPostPromise<T>(url: string, data: any, json: boolean = false) {
-        return new Promise<T>(resolve => this.ajaxPost(this.basePath + url, data, result => resolve(result)));
+    private post<T>(url: string, data: any, contentType: string = null) {
+        return new Promise<T>((resolve, reject) => {
+            return this.__xhr(this.basePath + url, data, result => resolve(result), error => reject(error), contentType);
+        });
     }
 
-    private ajaxPostPromiseJson<T>(url: string, data: any, json: boolean = false) {
-        return new Promise<T>(resolve => this.ajaxPost(this.basePath + url, data, result => resolve(result), null, this.jsonContentType));
-    }
-
-    private defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string) {
-        return alert('Http Error: ' + status + ' - ' + error);
-    }
-
-    private ajaxPost(url: string, data: any, successCallback: XHRSuccess, errorCallback?: XHRError, contentType?: string) {
-        // TODO: Reinstate spinners in main.ts
-        // ui.spinner.show();
-
-        if (!errorCallback) {
-            errorCallback = this.defaultAjaxErrorCallback;
-        }
-
+    private __xhr(url: string, data: any, success: XHRSuccessCallback, error: XHRErrorCallback, contentType?: string) {
         const options: any = {
             url: url,
             data: data,
             dataType: 'json',
             type: 'POST',
-            success: (responseData: any, status: string, request: JQueryXHR) => {
-                // ui.spinner.hide();
-                successCallback(responseData, status, request);
-            },
-            error: (request: JQueryXHR, status: string, error: string) => {
-                // ui.spinner.hide();
-                errorCallback(request, status, error);
-            }
+            success: success,
+            error: error
         };
 
         if (contentType) {
