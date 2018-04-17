@@ -72,7 +72,7 @@ export function mapToSummary(masterKey: string, userId: string, isWeakPassword: 
         username: credential.Username,
         password: credential.Password,
         url: credential.Url,
-        weak: isWeakPassword(credential.Password)
+        weak: credential.Password && isWeakPassword(credential.Password)
     };
     return credentialSummary;
 }

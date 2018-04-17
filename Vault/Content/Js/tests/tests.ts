@@ -188,6 +188,13 @@ suite('Cryptography', () => {
         assert.ok(sym.match(/[^a-z0-9]+/gi));
     });
 
+    test('isWeakPassword', () => {
+        assert.isTrue(isWeakPassword(null));
+        assert.isTrue(isWeakPassword(''));
+        assert.isTrue(isWeakPassword('pass123'));
+        assert.isFalse(isWeakPassword('dhk2J*jsjk'));
+    });
+
 });
 
 suite('Vault', () => {

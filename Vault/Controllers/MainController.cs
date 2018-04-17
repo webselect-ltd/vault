@@ -117,7 +117,6 @@ namespace Vault.Controllers
             if (model.CredentialID == null)
                 model.CredentialID = Guid.NewGuid().ToString();
 
-
             return await _db.ResultAsJson(conn => conn.ExecuteAsync(sql, model));
         }
 

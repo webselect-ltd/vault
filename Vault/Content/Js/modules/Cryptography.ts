@@ -74,7 +74,10 @@ export function encryptCredentials(credentials: ICredential[], masterKey: string
 }
 
 export function isWeakPassword(password: string) {
-    return password && getPasswordBits(password) <= weakPasswordThreshold;
+    if (!password) {
+        return true;
+    }
+    return getPasswordBits(password) <= weakPasswordThreshold;
 }
 
 function crypt(action: PasspackCryptoFunction, obj: ICredential, masterKey: string, excludes: string[]) {
