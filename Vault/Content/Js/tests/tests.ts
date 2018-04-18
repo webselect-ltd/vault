@@ -194,6 +194,10 @@ suite('Cryptography', () => {
         assert.ok(sym.match(/[^a-z0-9]+/gi));
     });
 
+    test('hash', () => {
+        assert.equal(hash('test123'), 'ec18d133a93a4098adf0c17027025375');
+    });
+
     test('isWeakPassword', () => {
         assert.isTrue(isWeakPassword(null));
         assert.isTrue(isWeakPassword(''));
@@ -396,15 +400,22 @@ suite('Vault', () => {
     });
 
     test('sortCredentials', () => {
-        const credentials = getTestCredentials();
-        const sortedCredentials = sortCredentials(credentials);
-        assert.lengthOf(sortedCredentials, 6);
+        const testCredentials = getTestCredentials();
+        testCredentials.push({
+            CredentialID: 'TEST',
+            UserID: 'user1',
+            Description: 'Fish',
+            Password: null
+        });
+        const sortedCredentials = sortCredentials(testCredentials);
+        assert.lengthOf(sortedCredentials, 7);
         assert.equal(sortedCredentials[0].Description, 'Cat');
         assert.equal(sortedCredentials[1].Description, 'Catfish');
         assert.equal(sortedCredentials[2].Description, 'Dog');
         assert.equal(sortedCredentials[3].Description, 'Dogfish');
         assert.equal(sortedCredentials[4].Description, 'Fish');
-        assert.equal(sortedCredentials[5].Description, 'Owl');
+        assert.equal(sortedCredentials[5].Description, 'Fish');
+        assert.equal(sortedCredentials[6].Description, 'Owl');
     });
 
 });
