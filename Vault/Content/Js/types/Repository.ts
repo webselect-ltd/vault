@@ -47,28 +47,35 @@ export class Repository implements IRepository {
     }
 
     public async loadCredential(credentialId: string) {
-        const encryptedCredential = await this.post<ICredential>('Main/LoadCredential', { id: credentialId });
+        const encryptedCredential = await this.post<ICredential>('Credentials/Read', { id: credentialId });
         return decryptCredential(encryptedCredential, this.masterKey, this.encryptionExcludes);
     }
 
     public async loadCredentialSummaryList() {
         if (!this.cache.length) {
-            const encryptedCredentials = await this.post<ICredential[]>('Main/GetCredentialSummaryList', { userId: this.userID });
+            const encryptedCredentials = await this.post<ICredential[]>('Credentials/ReadSummaries', { userId: this.userID });
             this.cache = decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
         }
         return this.cache;
     }
 
     public async loadCredentials() {
-        const encryptedCredentials = await this.post<ICredential[]>('Main/GetCredentials', { userId: this.userID });
+        const encryptedCredentials = await this.post<ICredential[]>('Credentials/ReadAll', { userId: this.userID });
         return decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
+    }
+
+    public async createCredential(credential: ICredential) {
+        this.cache.length = 0;
+        credential.UserID = this.userID;
+        const encryptedCredential = encryptCredential(credential, this.masterKey, this.encryptionExcludes);
+        return this.post<ICredential>('Credentials/Create', encryptedCredential);
     }
 
     public async updateCredential(credential: ICredential) {
         this.cache.length = 0;
         credential.UserID = this.userID;
         const encryptedCredential = encryptCredential(credential, this.masterKey, this.encryptionExcludes);
-        return this.post<ICredential>('Main/UpdateCredential', encryptedCredential);
+        return this.post<ICredential>('Credentials/Update', encryptedCredential);
     }
 
     public async updatePassword(newPassword: string) {
@@ -82,21 +89,22 @@ export class Repository implements IRepository {
         this.password = newPassword;
         this.masterKey = generateMasterKey(newPassword);
 
-        await this.updateMultiple(credentials);
+        const reEncryptedCredentials = encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
 
-        const data = {
-            userid: this.userID,
-            oldHash: oldPasswordHash,
-            newHash: newPasswordHash
+        const model = {
+            UpdatedCredentials: reEncryptedCredentials,
+            UserID: this.userID,
+            OldPasswordHash: oldPasswordHash,
+            NewPasswordHash: newPasswordHash
         };
 
-        await this.post<void>('Main/UpdatePassword', data);
+        await this.post<void>('Main/UpdatePassword', model);
     }
 
     public async updateMultiple(credentials: ICredential[]) {
         this.cache.length = 0;
         const encryptedCredentials = encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
-        return this.post<void>('Main/UpdateMultipleCredentials', JSON.stringify(encryptedCredentials), this.jsonContentType);
+        return this.post<void>('Credentials/UpdateMultiple', JSON.stringify(encryptedCredentials), this.jsonContentType);
     }
 
     public async deleteCredential(credentialId: string) {
@@ -105,7 +113,7 @@ export class Repository implements IRepository {
             userId: this.userID,
             credentialId: credentialId
         };
-        return this.post<void>('Main/DeleteCredential', data);
+        return this.post<void>('Credentials/Delete', data);
     }
 
     private post<T>(url: string, data: any, contentType: string = null) {

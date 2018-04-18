@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace Vault.Models
 {
@@ -23,7 +24,7 @@ namespace Vault.Models
 
         public Credential()
         {
-            CredentialID = "{{CredentialID}}";
+            CredentialID = Guid.NewGuid().ToString();
             UserID = "{{UserID}}";
             Description = "{{Description}}";
             Username = "{{Username}}";

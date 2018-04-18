@@ -236,9 +236,10 @@ function hideModal(e: JQuery.Event) {
 
 async function editCredential(credentialId: string) {
     const credential = await repository.loadCredential(credentialId);
+    const templateModel = Object.assign({ new: false }, credential);
     showModal({
         title: 'Edit Credential',
-        content: templates.credentialForm(credential),
+        content: templates.credentialForm(templateModel),
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
@@ -405,7 +406,7 @@ ui.newButton.on('click', e => {
     e.preventDefault();
     showModal({
         title: 'Add Credential',
-        content: templates.credentialForm({}),
+        content: templates.credentialForm({ new: true }),
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
@@ -461,6 +462,8 @@ ui.body.on('submit', '#credential-form', async e => {
     $('#validation-message').remove();
     form.find('div.has-error').removeClass('has-error');
 
+    const isNew = form.find('[name=new]').val() === 'true';
+
     const credential = getCredentialFromUI(form);
 
     const errors = validateCredential(credential);
@@ -475,7 +478,11 @@ ui.body.on('submit', '#credential-form', async e => {
         return;
     }
 
-    await repository.updateCredential(credential);
+    if (isNew) {
+        await repository.createCredential(credential);
+    } else {
+        await repository.updateCredential(credential);
+    }
 
     const updatedCredentials = await repository.loadCredentialSummaryList();
 

@@ -7,6 +7,7 @@ export interface IRepository {
     loadCredentialSummaryList(): Promise<ICredential[]>;
     loadCredentials(): Promise<ICredential[]>;
 
+    createCredential(credential: ICredential): Promise<ICredential>;
     updateCredential(credential: ICredential): Promise<ICredential>;
     updatePassword(newPassword: string): Promise<void>;
     updateMultiple(credentials: ICredential[]): Promise<void>;

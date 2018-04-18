@@ -73,7 +73,9 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\CredentialsController.cs" />
     <Compile Include="Models\LoginResult.cs" />
+    <Compile Include="Models\UpdatePasswordViewModel.cs" />
     <Compile Include="Support\SqlExecutor.cs" />
     <TypeScriptCompile Include="Content\Js\main.ts" />
     <TypeScriptCompile Include="Content\Js\modules\all.ts" />
@@ -93,6 +95,7 @@
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Support\SqlConnectionFactory.cs" />
     <Compile Include="Support\SQLiteConnectionFactory.cs" />
+    <Compile Include="Support\SqlStatements.cs" />
     <Compile Include="Support\UnityDependencyResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -20,7 +20,38 @@ namespace Vault.Support
             }
         }
 
+        public async Task<T> Result<T>(Func<IDbConnection, IDbTransaction, Task<T>> action)
+        {
+            using (var conn = _connectionFactory.GetConnection())
+            {
+                conn.Open();
+                using (var tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var result = await action(conn, tran);
+                        tran.Commit();
+                        return result;
+                    }
+                    catch
+                    {
+                        tran.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task<JsonResult> ResultAsJson<T>(Func<IDbConnection, Task<T>> action)
+        {
+            var result = await Result(action);
+
+            return new JsonResult {
+                Data = result
+            };
+        }
+
+        public async Task<JsonResult> ResultAsJson<T>(Func<IDbConnection, IDbTransaction, Task<T>> action)
         {
             var result = await Result(action);
 
