@@ -439,9 +439,7 @@ ui.adminButton.on('click', e => {
 
 ui.clearSearchButton.on('click', async e => {
     e.preventDefault();
-    const credentials = await repository.loadCredentialSummaryList();
-    const results = search(null, credentials);
-    updateCredentialListUI(ui.container, results);
+    updateCredentialListUI(ui.container, []);
     ui.searchInput.val('').focus();
 });
 
