@@ -215,9 +215,13 @@ function confirmDelete(id: string) {
         ondelete: async e => {
             e.preventDefault();
 
+            ui.spinner.show();
+
             await repository.deleteCredential(id);
 
             const updatedCredentials = await repository.loadCredentialSummaryList();
+
+            ui.spinner.hide();
 
             const results = search(ui.searchInput.val() as string, updatedCredentials);
             updateCredentialListUI(ui.container, results);
@@ -233,8 +237,14 @@ function hideModal(e: JQuery.Event) {
 }
 
 async function editCredential(credentialId: string) {
+    ui.spinner.show();
+
     const credential = await repository.loadCredential(credentialId);
+
+    ui.spinner.hide();
+
     const templateModel = Object.assign({ new: false }, credential);
+
     showModal({
         title: 'Edit Credential',
         content: templates.credentialForm(templateModel),
@@ -244,7 +254,9 @@ async function editCredential(credentialId: string) {
             $('#credential-form').submit();
         }
     });
+
     ui.modal.find('#Description').focus();
+
     showPasswordStrength(ui.modal.find('#Password'));
 
     const savedPasswordSpecification = parsePasswordSpecificationString(credential.PwdOptions);
@@ -283,7 +295,11 @@ function reloadApp(baseUrl: string) {
 }
 
 async function showDetail(credentialId: string) {
+    ui.spinner.show();
+
     const credential = await repository.loadCredential(credentialId);
+
+    ui.spinner.hide();
 
     // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
     const urlText = templates.urlText({ Url: credential.Url });
@@ -430,13 +446,17 @@ ui.clearSearchButton.on('click', async e => {
 });
 
 ui.searchInput.on('keyup', rateLimit(async e => {
+    ui.spinner.show();
     const credentials = await repository.loadCredentialSummaryList();
+    ui.spinner.hide();
     const results = search((e.currentTarget as HTMLInputElement).value, credentials);
     updateCredentialListUI(ui.container, results);
 }, 200));
 
 ui.loginForm.on('submit', async e => {
     e.preventDefault();
+
+    ui.spinner.show();
 
     const username = ui.loginForm.find('#UN1209').val() as string;
     const password = ui.loginForm.find('#PW9804').val() as string;
@@ -453,6 +473,8 @@ ui.loginForm.on('submit', async e => {
     } else {
         ui.loginErrorMessage.text('Login failed');
     }
+
+    ui.spinner.hide();
 });
 
 ui.body.on('submit', '#credential-form', async e => {
@@ -480,6 +502,8 @@ ui.body.on('submit', '#credential-form', async e => {
         return;
     }
 
+    ui.spinner.show();
+
     if (isNew) {
         await repository.createCredential(credential);
     } else {
@@ -489,6 +513,8 @@ ui.body.on('submit', '#credential-form', async e => {
     const updatedCredentials = await repository.loadCredentialSummaryList();
 
     const results = search(ui.searchInput.val() as string, updatedCredentials);
+
+    ui.spinner.hide();
 
     ui.modal.modal('hide');
 
@@ -596,22 +622,30 @@ ui.body.on('click', '#change-password-button', async e => {
         return;
     }
 
+    ui.spinner.show();
+
     await repository.updatePassword(newPassword);
+
+    ui.spinner.hide();
 
     reloadApp(_VAULT_GLOBALS.baseUrl);
 });
 
 ui.body.on('click', '#export-button', async e => {
     e.preventDefault();
+    ui.spinner.show();
     const exportedData = await repository.loadCredentials();
+    ui.spinner.hide();
     openExportPopup(exportedData);
 });
 
 ui.body.on('click', '#import-button', async e => {
     e.preventDefault();
+    ui.spinner.show();
     const rawData = $('#import-data').val() as string;
     const parsedData = parseImportData(rawData);
     await repository.updateMultiple(parsedData);
+    ui.spinner.hide();
     reloadApp(_VAULT_GLOBALS.baseUrl);
 });
 
