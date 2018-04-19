@@ -493,8 +493,6 @@ ui.body.on('submit', '#credential-form', async e => {
     ui.modal.modal('hide');
 
     updateCredentialListUI(ui.container, results);
-
-    return;
 });
 
 // Show password strength as it is typed
