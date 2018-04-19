@@ -206,10 +206,6 @@ function updateCredentialListUI(container: JQuery, data: ICredential[]) {
     container.html(templates.credentialTable({ rows: rows }));
 }
 
-async function exportData() {
-    return await repository.loadCredentials();
-}
-
 function confirmDelete(id: string) {
     showModal({
         title: 'Delete Credential',
@@ -609,7 +605,7 @@ ui.body.on('click', '#change-password-button', async e => {
 
 ui.body.on('click', '#export-button', async e => {
     e.preventDefault();
-    const exportedData = await exportData();
+    const exportedData = await repository.loadCredentials();
     openExportPopup(exportedData);
 });
 
