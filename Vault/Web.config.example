@@ -26,6 +26,20 @@
             <mimeMap fileExtension=".woff" mimeType="application/x-font-woff" />
             <mimeMap fileExtension=".woff2" mimeType="application/x-font-woff" />
         </staticContent>
+        <rewrite>
+            <rules>
+                <rule name="CanonicalHTTPSHostName">
+                    <match url="(.*)" />
+                    <conditions logicalGrouping="MatchAny">
+                        <!-- If host is not canonical OR request is for a non-HTTPS url -->
+                        <add input="{HTTP_HOST}" pattern="^XXX\.YYY\.ZZZ$" negate="true" />
+                        <add input="{HTTPS}" pattern="^OFF$" />
+                    </conditions>
+                    <!-- Redirect to the same url under the new, secure URL -->
+                    <action type="Redirect" url="https://XXX.YYY.ZZZ/{R:1}" redirectType="Permanent" />
+                </rule>
+            </rules>
+        </rewrite>
     </system.webServer>
     <runtime>
         <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
