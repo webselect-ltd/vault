@@ -15,9 +15,13 @@
     padding-bottom: 15px;
 }
 
-#validation-message {
+.validation-message {
     color: #a94442;
     font-weight: bold;
+}
+
+.modal-footer .validation-message {
+    padding-right: 30px;
 }
 
 .table.detail th:first-child {

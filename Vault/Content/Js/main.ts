@@ -35,6 +35,7 @@ interface IVaultUIElements {
     body: JQuery;
     loginFormDialog: JQuery;
     loginForm: JQuery;
+    loginErrorMessage: JQuery;
     container: JQuery;
     controls: JQuery;
     modal: JQuery;
@@ -97,6 +98,7 @@ const ui: IVaultUIElements = {
     body: $('body'),
     loginFormDialog: $('#login-form-dialog'),
     loginForm: $('#login-form'),
+    loginErrorMessage: $('#login-form-dialog').find('.validation-message'),
     container: $('#container'),
     controls: $('#controls'),
     modal: $('#modal'),
@@ -443,6 +445,8 @@ ui.loginForm.on('submit', async e => {
     const username = ui.loginForm.find('#UN1209').val() as string;
     const password = ui.loginForm.find('#PW9804').val() as string;
 
+    ui.loginErrorMessage.text('');
+
     const loginResult = await repository.login(username, password);
 
     if (loginResult.Success) {
@@ -450,6 +454,8 @@ ui.loginForm.on('submit', async e => {
         ui.loginFormDialog.modal('hide');
         ui.controls.show();
         ui.searchInput.focus();
+    } else {
+        ui.loginErrorMessage.text('Login failed');
     }
 });
 
@@ -459,7 +465,7 @@ ui.body.on('submit', '#credential-form', async e => {
     const form = $(e.currentTarget);
     const errorMsg: string[] = [];
 
-    $('#validation-message').remove();
+    $('.validation-message').remove();
     form.find('div.has-error').removeClass('has-error');
 
     const isNew = form.find('[name=new]').val() === 'true';
