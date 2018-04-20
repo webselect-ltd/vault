@@ -1,6 +1,4 @@
-﻿@model dynamic
-
-@{
+﻿@{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
@@ -20,7 +18,9 @@
     <script>
         var _VAULT_GLOBALS = {
             baseUrl: '@(Url.Action("Index", "Main", null))',
-            devMode: @(System.Configuration.ConfigurationManager.AppSettings["DevMode"])
+            devMode: @(System.Configuration.ConfigurationManager.AppSettings["DevMode"]),
+            securityKeyParameterName: '@(ProtectWithSecurityKeyAttribute.PARAMETER_NAME)',
+            securityKey: '@(Request[ProtectWithSecurityKeyAttribute.PARAMETER_NAME])'
         };
     </script>
 

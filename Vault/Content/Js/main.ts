@@ -29,6 +29,8 @@ interface IVaultGlobals {
     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
     baseUrl: string;
     devMode: boolean;
+    securityKeyParameterName: string;
+    securityKey: string;
 }
 
 interface IVaultUIElements {
@@ -84,7 +86,11 @@ interface IVaultModalOptions {
 
 declare var _VAULT_GLOBALS: IVaultGlobals;
 
-const repository = new Repository(_VAULT_GLOBALS.baseUrl);
+const repository = new Repository(
+    _VAULT_GLOBALS.baseUrl,
+    _VAULT_GLOBALS.securityKeyParameterName,
+    _VAULT_GLOBALS.securityKey
+);
 
 const defaultPasswordSpecification: IPasswordSpecification = {
     length: 16,

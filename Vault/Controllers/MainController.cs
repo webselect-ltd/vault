@@ -6,6 +6,7 @@ using Vault.Support;
 
 namespace Vault.Controllers
 {
+    [ProtectWithSecurityKey]
     public class MainController : Controller
     {
         private SqlExecutor _db;

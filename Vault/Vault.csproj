@@ -76,6 +76,7 @@
     <Compile Include="Controllers\CredentialsController.cs" />
     <Compile Include="Models\LoginResult.cs" />
     <Compile Include="Models\UpdatePasswordViewModel.cs" />
+    <Compile Include="Support\ProtectWithSecurityKeyAttribute.cs" />
     <Compile Include="Support\SqlExecutor.cs" />
     <TypeScriptCompile Include="Content\Js\main.ts" />
     <TypeScriptCompile Include="Content\Js\modules\all.ts" />

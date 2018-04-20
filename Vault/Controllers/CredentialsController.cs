@@ -8,6 +8,7 @@ using Vault.Support;
 
 namespace Vault.Controllers
 {
+    [ProtectWithSecurityKey]
     public class CredentialsController : Controller
     {
         private SqlExecutor _db;

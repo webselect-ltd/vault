@@ -20,13 +20,17 @@ export class Repository implements IRepository {
     private password: string;
     private masterKey: string;
     private cache: ICredential[];
+    private securityKey: any;
 
-    constructor(basePath: string) {
+    constructor(basePath: string, securityKeyParameterName: string, securityKey: string) {
         this.basePath = basePath;
         this.userID = null;
         this.password = null;
         this.masterKey = null;
         this.cache = [];
+
+        this.securityKey = {};
+        this.securityKey[securityKeyParameterName] = securityKey;
     }
 
     public async login(username: string, password: string) {
@@ -123,9 +127,11 @@ export class Repository implements IRepository {
     }
 
     private __xhr(url: string, data: any, success: XHRSuccessCallback, error: XHRErrorCallback, contentType?: string) {
+        const dataWithSecurityKey = Object.assign({}, data, this.securityKey);
+
         const options: any = {
             url: url,
-            data: data,
+            data: dataWithSecurityKey,
             dataType: 'json',
             type: 'POST',
             success: success,
