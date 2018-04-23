@@ -17,7 +17,7 @@ namespace Vault.Controllers
 
         [HttpPost]
         public async Task<ActionResult> Create(Credential model) =>
-            await _db.ResultAsJson(conn => conn.ExecuteAsync(SqlStatements.Insert, model));
+            await _db.ResultAsJson(conn => conn.ExecuteAsync(SqlStatements.Insert, model.WithNewID()));
 
         [HttpPost]
         public async Task<ActionResult> Read(string id) =>

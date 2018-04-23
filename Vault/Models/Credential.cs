@@ -25,7 +25,7 @@ namespace Vault.Models
 
         public Credential()
         {
-            CredentialID = Guid.NewGuid().ToString();
+            CredentialID = "{{CredentialID}}";
             UserID = "{{UserID}}";
             Description = "{{Description}}";
             Username = "{{Username}}";
@@ -37,6 +37,13 @@ namespace Vault.Models
             UserDefined2 = "{{UserDefined2}}";
             Notes = "{{Notes}}";
             PwdOptions = "{{PwdOptions}}";
+        }
+
+        public Credential WithNewID()
+        {
+            var credentialWithGuid = (Credential)MemberwiseClone();
+            credentialWithGuid.CredentialID = Guid.NewGuid().ToString();
+            return credentialWithGuid;
         }
     }
 }
