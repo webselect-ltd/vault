@@ -6,7 +6,7 @@
     generateMasterKey,
     hash
 } from '../modules/all';
-import { ICredential, ILoginResult, IRepository } from '../types/all';
+import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails } from '../types/all';
 
 export type XHRSuccessCallback = (data: any, status?: string, request?: JQueryXHR) => void;
 export type XHRErrorCallback = (request: JQueryXHR, status: string, error: string) => void;
@@ -22,7 +22,7 @@ export class Repository implements IRepository {
     private cache: ICredential[];
     private securityKey: any;
 
-    constructor(basePath: string, securityKeyParameterName: string, securityKey: string) {
+    constructor(basePath: string, securityKey: ISecurityKeyDetails) {
         this.basePath = basePath;
         this.userID = null;
         this.password = null;
@@ -30,7 +30,7 @@ export class Repository implements IRepository {
         this.cache = [];
 
         this.securityKey = {};
-        this.securityKey[securityKeyParameterName] = securityKey;
+        this.securityKey[securityKey.parameterName] = securityKey.key;
     }
 
     public async login(username: string, password: string) {

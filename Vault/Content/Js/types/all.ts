@@ -5,4 +5,5 @@ export { ICredentialValidationError } from './ICredentialValidationError';
 export { ILoginResult } from './ILoginResult';
 export { IPasswordSpecification } from './IPasswordSpecification';
 export { IRepository } from './IRepository';
+export { ISecurityKeyDetails } from './ISecurityKeyDetails';
 export { Repository } from './Repository';

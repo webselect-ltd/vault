@@ -109,6 +109,7 @@
     <TypeScriptCompile Include="Content\Js\types\ICredentialSearchQuery.ts" />
     <TypeScriptCompile Include="Content\Js\types\ICredentialValidationError.ts" />
     <TypeScriptCompile Include="Content\Js\types\ILoginResult.ts" />
+    <TypeScriptCompile Include="Content\Js\types\ISecurityKeyDetails.ts" />
     <Content Include="webpack.config.js" />
     <TypeScriptCompile Include="Content\Js\types\IRepository.ts" />
     <TypeScriptCompile Include="Content\Js\modules\Cryptography.ts" />

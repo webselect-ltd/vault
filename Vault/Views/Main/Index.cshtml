@@ -19,8 +19,10 @@
         var _VAULT_GLOBALS = {
             baseUrl: '@(Url.Action("Index", "Main", null))',
             devMode: @(System.Configuration.ConfigurationManager.AppSettings["DevMode"]),
-            securityKeyParameterName: '@(ProtectWithSecurityKeyAttribute.PARAMETER_NAME)',
-            securityKey: '@(Request[ProtectWithSecurityKeyAttribute.PARAMETER_NAME])'
+            securityKey: {
+                parameterName: '@(ProtectWithSecurityKeyAttribute.PARAMETER_NAME)',
+                key: '@(Request[ProtectWithSecurityKeyAttribute.PARAMETER_NAME])'
+            }
         };
     </script>
 
