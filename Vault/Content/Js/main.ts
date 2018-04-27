@@ -29,6 +29,8 @@ import {
 interface IVaultGlobals {
     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
     baseUrl: string;
+    // Current absolute URL (used for app refresh and auto-logout)
+    absoluteUrl: string;
     securityKey?: ISecurityKeyDetails;
     devMode: boolean;
 }
@@ -290,11 +292,6 @@ function optionsDialog() {
         title: 'Admin',
         content: templates.optionsDialog({})
     });
-}
-
-function reloadApp(baseUrl: string) {
-    // Just reload the whole page when we're done to force login
-    location.href = baseUrl.length > 1 ? baseUrl.slice(0, -1) : baseUrl;
 }
 
 async function showDetail(credentialId: string) {
@@ -627,7 +624,7 @@ ui.body.on('click', '#change-password-button', async e => {
 
     ui.spinner.hide();
 
-    reloadApp(_VAULT_GLOBALS.baseUrl);
+    location.href = _VAULT_GLOBALS.absoluteUrl;
 });
 
 ui.body.on('click', '#export-button', async e => {
@@ -645,7 +642,7 @@ ui.body.on('click', '#import-button', async e => {
     const parsedData = parseImportData(rawData);
     await repository.updateMultiple(parsedData);
     ui.spinner.hide();
-    reloadApp(_VAULT_GLOBALS.baseUrl);
+    location.href = _VAULT_GLOBALS.absoluteUrl;
 });
 
 // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
