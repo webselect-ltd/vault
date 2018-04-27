@@ -29,8 +29,8 @@ import {
 interface IVaultGlobals {
     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
     baseUrl: string;
-    devMode: boolean;
     securityKey?: ISecurityKeyDetails;
+    devMode: boolean;
 }
 
 interface IVaultUIElements {

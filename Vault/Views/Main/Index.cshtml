@@ -18,13 +18,13 @@
     <script>
         var _VAULT_GLOBALS = {
             baseUrl: '@(Url.Action("Index", "Main", null))',
-            devMode: @(System.Configuration.ConfigurationManager.AppSettings["DevMode"]),
             @if (!string.IsNullOrWhiteSpace(ProtectWithSecurityKeyAttribute.KEY)) {
             <text>securityKey: {
                 parameterName: '@(ProtectWithSecurityKeyAttribute.PARAMETER_NAME)',
                 key: '@(Request[ProtectWithSecurityKeyAttribute.PARAMETER_NAME])'
-            }</text>
+            },</text>
             }
+            devMode: @(System.Configuration.ConfigurationManager.AppSettings["DevMode"])
         };
     </script>
 
