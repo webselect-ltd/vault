@@ -7,7 +7,7 @@ namespace Vault.Support
 {
     public class ProtectWithSecurityKeyAttribute : FilterAttribute, IActionFilter
     {
-        public static readonly string PARAMETER_NAME = "sk";
+        public static readonly string PARAMETER_NAME = ConfigurationManager.AppSettings["SecurityKeyParameterName"];
         public static readonly string KEY = ConfigurationManager.AppSettings["SecurityKey"];
 
         public void OnActionExecuted(ActionExecutedContext filterContext) { }
