@@ -30,7 +30,10 @@ export class Repository implements IRepository {
         this.cache = [];
 
         this.securityKey = {};
-        this.securityKey[securityKey.parameterName] = securityKey.key;
+
+        if (securityKey) {
+            this.securityKey[securityKey.parameterName] = securityKey.key;
+        }
     }
 
     public async login(username: string, password: string) {
