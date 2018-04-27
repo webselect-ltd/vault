@@ -31,6 +31,7 @@ interface IVaultGlobals {
     baseUrl: string;
     // Current absolute URL (used for app refresh and auto-logout)
     absoluteUrl: string;
+    sessionTimeoutInSeconds: number;
     securityKey?: ISecurityKeyDetails;
     devMode: boolean;
 }
@@ -468,6 +469,8 @@ ui.loginForm.on('submit', async e => {
         ui.loginFormDialog.modal('hide');
         ui.controls.show();
         ui.searchInput.focus();
+        const sessionTimeout = _VAULT_GLOBALS.sessionTimeoutInSeconds * 1000;
+        setTimeout(() => location.href = _VAULT_GLOBALS.absoluteUrl, sessionTimeout);
     } else {
         ui.loginErrorMessage.text('Login failed');
     }

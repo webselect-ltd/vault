@@ -19,6 +19,7 @@
         var _VAULT_GLOBALS = {
             baseUrl: '@(Url.Action("Index", "Main", null))',
             absoluteUrl: '@(Request.Url.AbsoluteUri)',
+            sessionTimeoutInSeconds: @(System.Configuration.ConfigurationManager.AppSettings["SessionTimeoutInSeconds"]),
             @if (!string.IsNullOrWhiteSpace(ProtectWithSecurityKeyAttribute.KEY)) {
             <text>securityKey: {
                 parameterName: '@(ProtectWithSecurityKeyAttribute.PARAMETER_NAME)',
