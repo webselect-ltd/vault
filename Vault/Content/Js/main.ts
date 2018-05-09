@@ -89,6 +89,8 @@ interface IVaultModalOptions {
 
 declare var _VAULT_GLOBALS: IVaultGlobals;
 
+const sessionTimeoutMs = _VAULT_GLOBALS.sessionTimeoutInSeconds * 1000;
+
 const repository = new Repository(
     _VAULT_GLOBALS.baseUrl,
     _VAULT_GLOBALS.securityKey
@@ -149,6 +151,8 @@ Handlebars.registerHelper('truncate', (text: string, size: number) => {
     return new Handlebars.SafeString(escapedText);
 });
 
+let currentSession: number = null;
+
 // Pure functions
 
 export function isChecked(el: JQuery) {
@@ -202,6 +206,13 @@ export function parseImportData(rawData: string) {
 }
 
 // Impure functions
+
+const reloadApp = () => location.href = _VAULT_GLOBALS.absoluteUrl;
+
+function setSession() {
+    clearTimeout(currentSession);
+    currentSession = setTimeout(reloadApp, sessionTimeoutMs);
+}
 
 function search(query: string, credentials: ICredential[]) {
     const parsedQuery = parseSearchQuery(query);
@@ -469,8 +480,8 @@ ui.loginForm.on('submit', async e => {
         ui.loginFormDialog.modal('hide');
         ui.controls.show();
         ui.searchInput.focus();
-        const sessionTimeout = _VAULT_GLOBALS.sessionTimeoutInSeconds * 1000;
-        setTimeout(() => location.href = _VAULT_GLOBALS.absoluteUrl, sessionTimeout);
+        setSession();
+        ui.body.on('click keyup', setSession);
     } else {
         ui.loginErrorMessage.text('Login failed');
     }
@@ -627,7 +638,7 @@ ui.body.on('click', '#change-password-button', async e => {
 
     ui.spinner.hide();
 
-    location.href = _VAULT_GLOBALS.absoluteUrl;
+    reloadApp();
 });
 
 ui.body.on('click', '#export-button', async e => {
@@ -645,7 +656,7 @@ ui.body.on('click', '#import-button', async e => {
     const parsedData = parseImportData(rawData);
     await repository.updateMultiple(parsedData);
     ui.spinner.hide();
-    location.href = _VAULT_GLOBALS.absoluteUrl;
+    reloadApp();
 });
 
 // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
