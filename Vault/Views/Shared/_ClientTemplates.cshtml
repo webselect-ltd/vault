@@ -2,7 +2,7 @@
     var homeUrl = Url.Action("Index", "Main", null).TrimEnd('/');
 }
 
-<script id="tmpl-modalheader" type="text/x-handlebars-template">
+<script id="tmpl-modalheader" type="text/html">
     <div class="modal-header">
         {{#if showClose}}
         <button type="button" class="close btn-close"><span aria-hidden="true">&times;</span><span class="sr-only">{{closeText}}</span></button>
@@ -11,13 +11,13 @@
     </div>
 </script>
 
-<script id="tmpl-modalbody" type="text/x-handlebars-template">
+<script id="tmpl-modalbody" type="text/html">
     <div class="modal-body">
         {{{content}}}
     </div>
 </script>
 
-<script id="tmpl-modalfooter" type="text/x-handlebars-template">
+<script id="tmpl-modalfooter" type="text/html">
     <div class="modal-footer">
         {{#if showEdit}}
         <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialId}}"><span class="fa fa-pencil"></span> {{editText}}</button>
@@ -34,21 +34,21 @@
     </div>
 </script>
 
-<script id="tmpl-urllink" type="text/x-handlebars-template">
+<script id="tmpl-urllink" type="text/html">
     <a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;">{{{UrlText}}}</a>
 </script>
 
-<script id="tmpl-urltext" type="text/x-handlebars-template">
+<script id="tmpl-urltext" type="text/html">
     <span class="full">{{truncate Url 50}}</span>
     <span class="truncated">{{truncate Url 26}}</span>
 </script>
 
-<script id="tmpl-copylink" type="text/x-handlebars-template">
+<script id="tmpl-copylink" type="text/html">
     <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
     <input type="text" class="copy-content" value="{{Content}}" />
 </script>
 
-<script id="tmpl-detail" type="text/x-handlebars-template">
+<script id="tmpl-detail" type="text/html">
     {{#if Url}}
     <div class="row row-detail">
         <div class="col-xs-24 col-sm-5 row-detail-header">Url</div>
@@ -92,15 +92,15 @@
     {{/if}}
 </script>
 
-<script id="tmpl-credentialform" type="text/x-handlebars-template">
-    @{Html.RenderPartial("_CredentialForm", new Credential());}
+<script id="tmpl-credentialform" type="text/html">
+    <partial name="_CredentialForm" model="new Credential()" />
 </script>
 
-<script id="tmpl-deleteconfirmationdialog" type="text/x-handlebars-template">
+<script id="tmpl-deleteconfirmationdialog" type="text/html">
     <p>Are you sure you want to delete this credential?</p>
 </script>
 
-<script id="tmpl-optionsdialog" type="text/x-handlebars-template">
+<script id="tmpl-optionsdialog" type="text/html">
     <p>Enter and confirm a new password:</p>
     <div class="form-horizontal">
         <div class="form-group">
@@ -142,7 +142,7 @@
     </div>
 </script>
 
-<script id="tmpl-exporteddatawindow" type="text/x-handlebars-template">
+<script id="tmpl-exporteddatawindow" type="text/html">
     <html>
     <head>
         <title>Exported Data</title>
@@ -153,17 +153,17 @@
 </html>
 </script>
 
-<script id="tmpl-validationmessage" type="text/x-handlebars-template">
+<script id="tmpl-validationmessage" type="text/html">
     <div class="validation-message"><p>{{{errors}}}</p></div>
 </script>
 
-<script id="tmpl-credentialtable" type="text/x-handlebars-template">
+<script id="tmpl-credentialtable" type="text/html">
     {{#each rows}}
     {{> credentialtablerow}}
     {{/each}}
 </script>
 
-<script id="tmpl-credentialtablerow" type="text/x-handlebars-template">
+<script id="tmpl-credentialtablerow" type="text/html">
     <div id="{{credentialid}}" class="row">
         <div class="col-sm-15 ccol">
             <button class="btn btn-default btn-block btn-l btn-credential-show-detail">

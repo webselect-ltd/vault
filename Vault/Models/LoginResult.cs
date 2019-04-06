@@ -1,10 +1,16 @@
 ﻿namespace Vault.Models
 {
-    public struct LoginResult
+    public class LoginResult
     {
-        public LoginResult(string userID) => UserID = userID;
+        public LoginResult(string userID) =>
+            UserID = userID;
+
+        public static LoginResult Failed =>
+            new LoginResult(null);
 
         public string UserID { get; }
-        public bool Success => !string.IsNullOrWhiteSpace(UserID);
+
+        public bool Success =>
+            !string.IsNullOrWhiteSpace(UserID);
     }
 }

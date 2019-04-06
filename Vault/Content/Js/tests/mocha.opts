@@ -1,7 +1,0 @@
---require jsdom-global/register
---require source-map-support/register
---require ts-node/register
---require Content/js/tests/setup.js
---full-trace
---bail
-Content/js/tests/tests.ts

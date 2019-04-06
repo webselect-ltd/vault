@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Test Suite</title>
+    <link rel="shortcut icon" href="~/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="~/js/dist/tests/mocha.css" />
+</head>
+<body>
+    <div id="mocha"></div>
+    @*@Scripts.Render("~/js/external")*@
+    <script src="~/js/dist/tests/browser-source-map-support.js"></script>
+    <script>sourceMapSupport.install();</script>
+    <script src="~/js/dist/tests/mocha.js"></script>
+    <script src="~/js/dist/tests/chai.js"></script>
+    <script>mocha.setup('tdd');</script>
+    <script src="~/js/dist/tests/tests.js?@(DateTime.Now.Ticks)"></script>
+    <script>
+        mocha.checkLeaks();
+        mocha.run();
+    </script>
+</body>
+</html>

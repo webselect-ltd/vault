@@ -5,10 +5,12 @@ namespace Vault.Support
 {
     public class SQLiteConnectionFactory : IConnectionFactory
     {
-        private string _connectionString;
+        private readonly string _connectionString;
 
-        public SQLiteConnectionFactory(string connectionString) => _connectionString = connectionString;
+        public SQLiteConnectionFactory(string connectionString) =>
+            _connectionString = connectionString;
 
-        public IDbConnection GetConnection() => new SQLiteConnection(_connectionString);
+        public IDbConnection GetConnection() =>
+            new SQLiteConnection(_connectionString);
     }
 }

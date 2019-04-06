@@ -4,8 +4,9 @@ namespace Vault.Models
 {
     public class GenerateVaultCredentialViewModel
     {
-        public GenerateVaultCredentialViewModel() => GUID = Guid.NewGuid().ToString();
+        public GenerateVaultCredentialViewModel() =>
+            UserID = Guid.NewGuid().ToString();
 
-        public string GUID { get; }
+        public string UserID { get; }
     }
 }

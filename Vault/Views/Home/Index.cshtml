@@ -1,0 +1,38 @@
+﻿@inject IConfiguration Config
+
+@{
+    ViewBag.Title = "Index";
+
+    var rq = Context.Request;
+}
+
+@section main {
+
+    <partial name="_LoginForm" model="new LoginViewModel()" />
+
+    <partial name="_StaticHtml" />
+
+    <partial name="_ClientTemplates" />
+
+}
+
+@section foot {
+
+    <script>
+        var _VAULT_GLOBALS = {
+            baseUrl: '@(Url.Action("Index", "Home", null))',
+            absoluteUrl: '@(new Uri($"{rq.Scheme}://{rq.Host}{rq.Path}{rq.QueryString}"))',
+            sessionTimeoutInSeconds: @(Config["SessionTimeoutInSeconds"]),
+            @if (!string.IsNullOrWhiteSpace(Config["SecurityKey"])) {
+<text>            securityKey: {
+                parameterName: '@(Config["SecurityKeyParameterName"])',
+                key: '@(rq.Query[Config["SecurityKeyParameterName"]])'
+            },
+            </text>
+            }devMode: @(Config["DevMode"])
+        };
+    </script>
+
+    <script src="~/js/dist/main.js" asp-append-version="true"></script>
+
+}

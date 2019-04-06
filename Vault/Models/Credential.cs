@@ -5,24 +5,6 @@ namespace Vault.Models
 {
     public class Credential
     {
-        public string CredentialID { get; set; }
-        public string UserID { get; set; }
-        [DisplayName("* Description")]
-        public string Description { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Url { get; set; }
-        [DisplayName("Custom 1 Label")]
-        public string UserDefined1Label { get; set; }
-        [DisplayName("Custom 1")]
-        public string UserDefined1 { get; set; }
-        [DisplayName("Custom 2 Label")]
-        public string UserDefined2Label { get; set; }
-        [DisplayName("Custom 2")]
-        public string UserDefined2 { get; set; }
-        public string Notes { get; set; }
-        public string PwdOptions { get; set; }
-
         public Credential()
         {
             CredentialID = "{{CredentialID}}";
@@ -38,6 +20,37 @@ namespace Vault.Models
             Notes = "{{Notes}}";
             PwdOptions = "{{PwdOptions}}";
         }
+
+        public string CredentialID { get; set; }
+
+        public string UserID { get; set; }
+
+        [DisplayName("* Description")]
+        public string Description { get; set; }
+
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+#pragma warning disable CA1056 // Uri properties should not be strings
+        public string Url { get; set; }
+#pragma warning restore CA1056 // Uri properties should not be strings
+
+        [DisplayName("Custom 1 Label")]
+        public string UserDefined1Label { get; set; }
+
+        [DisplayName("Custom 1")]
+        public string UserDefined1 { get; set; }
+
+        [DisplayName("Custom 2 Label")]
+        public string UserDefined2Label { get; set; }
+
+        [DisplayName("Custom 2")]
+        public string UserDefined2 { get; set; }
+
+        public string Notes { get; set; }
+
+        public string PwdOptions { get; set; }
 
         public Credential WithNewID()
         {

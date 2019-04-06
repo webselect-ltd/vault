@@ -1,4 +1,3 @@
-const webpack = require("webpack");
 const ProvidePlugin = require("webpack").ProvidePlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -7,18 +6,19 @@ module.exports = {
     // Specify the output file name and location
     output: {
         filename: "[name].js",
-        path: __dirname + "/Content/Js/dist",
+        path: __dirname + "/wwwroot/js/dist",
         library: "Vault"
     },
     entry: {
-        main: "./Content/Js/main.ts",
-        tests: "./Content/Js/tests/tests.ts"
+        'main': "./wwwroot/js/main.ts"
     },
     // Enable sourcemaps for debugging webpack's output
     devtool: "source-map",
     plugins: [
         // Remove the output folder before build
-        new CleanWebpackPlugin(['Content/Js/dist']),
+        new CleanWebpackPlugin({
+            cleanAfterEveryBuildPatterns: ['!**/external/*.js'],
+        }),
         // This automatically adds aliases to the application scope for the specified packages
         // So packages which look for the 'jQuery' global alias still work within our app closure
         new ProvidePlugin({
@@ -31,7 +31,7 @@ module.exports = {
             { from: 'node_modules/handlebars/dist/handlebars.js', to: 'external' },
             { from: 'node_modules/js-cookie/src/js.cookie.js', to: 'external' },
             { from: 'node_modules/bootstrap/js/modal.js', to: 'external' }
-        ])
+        ],)
     ],
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
@@ -50,8 +50,6 @@ module.exports = {
     externals: {
         jquery: "jQuery",
         handlebars: "Handlebars",
-        "js-cookie": "Cookies",
-        mocha: "Mocha",
-        chai: "chai"
+        "js-cookie": "Cookies"
     }
 };
