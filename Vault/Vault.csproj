@@ -20,14 +20,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="coverage\**" />
-      <Compile Remove="wwwroot\js\dist\**" />
-      <Content Remove="coverage\**" />
-      <Content Remove="wwwroot\js\dist\**" />
-      <EmbeddedResource Remove="coverage\**" />
-      <EmbeddedResource Remove="wwwroot\js\dist\**" />
-      <None Remove="coverage\**" />
-      <None Remove="wwwroot\js\dist\**" />
+        <Compile Remove="coverage\**" />
+        <Content Remove="coverage\**" />
+        <EmbeddedResource Remove="coverage\**" />
+        <None Remove="coverage\**" />
     </ItemGroup>
 
     <ItemGroup>
