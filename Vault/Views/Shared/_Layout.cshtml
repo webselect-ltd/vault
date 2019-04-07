@@ -30,22 +30,18 @@
     <meta name="msapplication-config" content="~/img/browserconfig.xml">
     <meta name="theme-color" content="#7663de">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    <environment include="Development">
-        <link rel="stylesheet" href="~/css/external/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/main.css" />
-    </environment>
+    <link rel="stylesheet" href="~/css/external/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/main.css" />
     @RenderSection("head", false)
 </head>
 <body>
     <div class="container">
         @RenderSection("main")
     </div>
-    <environment include="Development">
-        <script src="~/js/dist/external/jquery.js"></script>
-        <script src="~/js/dist/external/handlebars.js"></script>
-        <script src="~/js/dist/external/js.cookie.js"></script>
-        <script src="~/js/dist/external/modal.js"></script>
-    </environment>
+    <script src="~/js/dist/external/jquery.js"></script>
+    <script src="~/js/dist/external/handlebars.js"></script>
+    <script src="~/js/dist/external/js.cookie.js"></script>
+    <script src="~/js/dist/external/modal.js"></script>
     @RenderSection("foot", false)
 </body>
 </html>
