@@ -1,5 +1,6 @@
 ﻿import * as Handlebars from 'handlebars';
 import $ from 'jquery';
+import 'bootstrap/js/modal';
 import * as Cookies from 'js-cookie';
 import {
     generatePassword,
