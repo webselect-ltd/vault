@@ -33,6 +33,12 @@
         };
     </script>
 
-    <script src="~/js/dist/main.js" asp-append-version="true"></script>
+    <environment include="Development">
+        <script src="~/js/dist/main.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment include="Production">
+        <script src="~/js/dist/main.js" asp-append-version="true" integrity="sha512-TihacuVo5jKzcpFOyYQAFuwB6J9dIJ/B66BmvO+Ns/Ji9QvjhPlOdgmIoVaoRIS/Slpn/9q3cyMsP0nAkFw1yw=="></script>
+    </environment>
 
 }
