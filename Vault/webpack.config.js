@@ -9,7 +9,9 @@ module.exports = {
         library: 'Vault'
     },
     entry: {
-        'main': './wwwroot/js/main.ts'
+        'index': './wwwroot/js/index.ts',
+        'setdevcookie': './wwwroot/js/setdevcookie.ts',
+        'generatevaultcredential': './wwwroot/js/generatevaultcredential.ts',
     },
     // Enable sourcemaps for debugging webpack's output
     devtool: 'source-map',

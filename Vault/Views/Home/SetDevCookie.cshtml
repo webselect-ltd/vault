@@ -2,27 +2,12 @@
 
 @{
     ViewBag.Title = "Set Dev Cookie";
-}
-
-@section head {
-
-    <script src="~/js/dist/external/js.cookie.js"></script>
-    <script type="text/javascript">
-
-        function setDevCookie() {
-            Cookies.set('vault-dev-username', $('#Username').val());
-            Cookies.set('vault-dev-password', $('#Password').val());
-
-            alert('Cookie set');
-        }
-
-    </script>
-
+    ViewBag.BodyClass = "modal-open";
 }
 
 @section main {
 
-    <div id="set-dev-cookie-form-dialog" class="modal">
+    <div id="set-dev-cookie-form-dialog" class="modal in" style="display: block;">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="generate-form" action="" method="post" class="form-horizontal">
@@ -45,7 +30,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" onclick="setDevCookie(); return false;">Set Dev Cookie</button>
+                        <button class="btn btn-primary">Set Dev Cookie</button>
                     </div>
                 </form>
             </div>
@@ -56,8 +41,14 @@
 
 @section foot {
 
-    <script type="text/javascript">
-        $('#set-dev-cookie-form-dialog').modal();
-    </script>
+    <environment include="Development">
+        <script src="~/js/dist/setdevcookie.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment include="Production">
+        <script src="~/js/dist/setdevcookie.js" asp-append-version="true" integrity="sha512-kh4BJ4u5poeOvBMhPMldZG1SS4Xzt1NUp9mrAIjitGjnWkUsV9C4Zhh6Q4RnmAI+H5qRQ9UpkN6yVhYVFu0/Wg=="></script>
+    </environment>
+
+    <div class="modal-backdrop in"></div>
 
 }
