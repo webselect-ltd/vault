@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,13 @@ namespace Vault
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
-            services.AddScoped<IConnectionFactory>(sp => new SqlConnectionFactory(Configuration.GetConnectionString("Main")));
+            var connectionString = Configuration.GetConnectionString("Main");
+
+            var connectionFactory = Configuration["DbType"] == "SQLite"
+                ? new Func<IServiceProvider, IConnectionFactory>(sp => new SQLiteConnectionFactory(connectionString))
+                : sp => new SqlConnectionFactory(connectionString);
+
+            services.AddScoped(connectionFactory);
         }
 
 #pragma warning disable SA1204 // Static elements should appear before instance elements

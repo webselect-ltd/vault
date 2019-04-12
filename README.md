@@ -11,6 +11,24 @@ Although all data is encrypted before transmission over HTTP, **this application
 * Vault uses [jQuery](http://jquery.com/), [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout/UI widgets. 
 * Encryption is handled by the [Passpack Host-Proof Hosting package](http://code.google.com/p/passpack/).
 
+## Database
+
+Vault supports both SQLite and SQL Server databases. Set the type and connection string accordingly in `appsettings.json`:
+
+### SQL Server
+
+    "DbType": "SQLServer",
+    "ConnectionStrings": {
+        "Main": "Server=YOUR_SERVER_NAME;Database=vault;Trusted_Connection=yes;"
+    }
+
+### SQLite
+
+    "DbType": "SQLite",
+    "ConnectionStrings": {
+        "Main": "Data Source=C:\\PATH_TO_YOUR_DB\\vault.sqlite;Version=3;"
+    }
+
 ## Filters
 
 You can filter credential search results by using query prefixes. Currently available prefixes are:
