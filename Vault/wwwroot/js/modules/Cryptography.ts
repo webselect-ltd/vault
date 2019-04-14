@@ -1,5 +1,12 @@
-﻿import '../legacy/passpack-v1.1.js';
-import { ICredential, IPasswordSpecification } from '../types/all';
+﻿import { ICredential, PasswordCharacterMatrix, PasswordSpecification } from '../types/all';
+
+const charMatrix: PasswordCharacterMatrix = {
+    lowercase: [97, 122],
+    uppercase: [65, 90],
+    numbers: [48, 57],
+    symbols: [33, 33, 35, 47, 58, 64, 91, 96, 123, 126],
+    spaces: [161, 254]
+};
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -54,8 +61,68 @@ async function aesGcmDecrypt(ciphertext: string, password: string) {
 // Bit value below which password is deemed weak
 export const weakPasswordThreshold = 40;
 
+// TODO: Refactoring and cleanup
 export function getPasswordBits(password: string) {
-    return Passpack.utils.getBits(password);
+    if (!password) {
+        return 0;
+    }
+
+    const cset: any = {};
+
+    const ci: number[] = [0, 32, 33, 47, 48, 57, 58, 64, 65, 90, 91, 96, 97, 122, 123, 126, 126, 255, 256, 65535];
+
+    let t: number;
+    let ok: number;
+    let factor: number;
+    let df: number;
+    const vdf: number[] = [];
+    const vcc: number[] = [];
+    let el: number = 0;
+    let ext: number;
+    let exdf: number;
+
+    for (let i = 0; i < password.length; i++) {
+        factor = 1;
+        ok = 0;
+        t = password.charCodeAt(i);
+        for (let j = 0; j < ci.length; j += 2) {
+            if (t >= ci[j] && t <= ci[j + 1]) {
+                cset['' + j] = ci[j + 1] - ci[j];
+                ok = 1;
+                break;
+            }
+        }
+        if (!ok) {
+            cset.x = 65280;
+        }
+        if (i >= 1) {
+            df = t - ext;
+            if (exdf === df) {
+                vdf[df] = 1;
+            } else {
+                vdf[df] = (vdf[df] ? vdf[df] : 0) + 1;
+                factor /= vdf[df];
+            }
+        }
+        if (!vcc[t]) {
+            vcc[t] = 1;
+            el += factor;
+        } else {
+            el += factor * (1 / ++vcc[t]);
+        }
+        exdf = df;
+        ext = t;
+    }
+    let tot = 0;
+    for (const k in cset) {
+        if (!isNaN(parseInt(k, 10))) {
+            tot += cset[k];
+        }
+    }
+    if (!tot) {
+        return 0;
+    }
+    return Math.ceil(el * Math.log(tot) / Math.log(2));
 }
 
 export function hex(buffer: ArrayBuffer) {
@@ -70,37 +137,44 @@ export async function hash(s: string) {
     return await crypto.subtle.digest('SHA-256', encoder.encode(s));
 }
 
-export function generatePassword(specification: IPasswordSpecification) {
+// TODO: Refactoring and cleanup
+export function generatePassword(specification: PasswordSpecification) {
     if (specification.length === 0) {
         return null;
     }
 
-    if (specification.lowercase === false
-        && specification.uppercase === false
-        && specification.numbers === false
-        && specification.symbols === false) {
+    const charTypes = specification.getCharacterTypes();
+
+    if (!charTypes.length) {
         return null;
     }
 
-    const options: IPasspackCharOptions = {};
+    let str = '';
 
-    if (specification.lowercase) {
-        options.lcase = 1;
+    charTypes.forEach(t => {
+        const M = charMatrix[t];
+        for (let u = 0; u < M.length; u += 2) {
+            for (let y = M[u]; y <= M[u + 1]; y++) {
+                str += String.fromCharCode(y);
+            }
+        }
+    });
+
+    let pass = '';
+
+    if (str) {
+        const l = str.length;
+        let v = 0;
+        for (let p = 0; p < specification.length;) {
+            v = Math.floor(Math.random() * l);
+            if (v === l) {
+                continue;
+            }
+            pass += str.substring(v, v + 1);
+            p++;
+        }
     }
-
-    if (specification.uppercase) {
-        options.ucase = 1;
-    }
-
-    if (specification.numbers) {
-        options.nums = 1;
-    }
-
-    if (specification.symbols) {
-        options.symb = 1;
-    }
-
-    return Passpack.utils.passGenerator(options, specification.length);
+    return pass;
 }
 
 export async function generateMasterKey(password: string) {

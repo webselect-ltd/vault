@@ -8,7 +8,7 @@
     hash,
     isWeakPassword
 } from '../modules/all';
-import { ICredential, IPasswordSpecification } from '../types/all';
+import { ICredential, PasswordSpecification } from '../types/all';
 
 const testMasterKey = '%sÁI@YÅG¿µA';
 
@@ -45,15 +45,19 @@ const testCredentialEncrypted: ICredential = {
 function checkEncryption(credential: ICredential, masterKeyPlainText: string) {
     expect(credential.CredentialID).toBe('361fe91a-3dca-4871-b69e-c41c31507c8c');
     expect(credential.UserID).toBe('ef0ee37f-2ace-417c-b30d-ccfaf4450906');
-    expect(Passpack.decode('AES', credential.Description, masterKeyPlainText)).toBe('Test Credential');
-    expect(Passpack.decode('AES', credential.Username, masterKeyPlainText)).toBe('_testuser123');
-    expect(Passpack.decode('AES', credential.Password, masterKeyPlainText)).toBe('8{s?(\'7.171h)3H');
-    expect(Passpack.decode('AES', credential.Url, masterKeyPlainText)).toBe('http://www.test.com?id=23&param=TEST+VALUE');
-    expect(Passpack.decode('AES', credential.UserDefined1, masterKeyPlainText)).toBe('CUSTOM1');
-    expect(Passpack.decode('AES', credential.UserDefined1Label, masterKeyPlainText)).toBe('Custom 1');
-    expect(Passpack.decode('AES', credential.UserDefined2, masterKeyPlainText)).toBe('CUSTOM2');
-    expect(Passpack.decode('AES', credential.UserDefined2Label, masterKeyPlainText)).toBe('Custom 2');
-    expect(Passpack.decode('AES', credential.Notes, masterKeyPlainText)).toBe('Test Notes:\n\nThese are test notes.');
+
+    // TODO: Fix this test
+    expect(1).toBe(2);
+
+    // expect(Passpack.decode('AES', credential.Description, masterKeyPlainText)).toBe('Test Credential');
+    // expect(Passpack.decode('AES', credential.Username, masterKeyPlainText)).toBe('_testuser123');
+    // expect(Passpack.decode('AES', credential.Password, masterKeyPlainText)).toBe('8{s?(\'7.171h)3H');
+    // expect(Passpack.decode('AES', credential.Url, masterKeyPlainText)).toBe('http://www.test.com?id=23&param=TEST+VALUE');
+    // expect(Passpack.decode('AES', credential.UserDefined1, masterKeyPlainText)).toBe('CUSTOM1');
+    // expect(Passpack.decode('AES', credential.UserDefined1Label, masterKeyPlainText)).toBe('Custom 1');
+    // expect(Passpack.decode('AES', credential.UserDefined2, masterKeyPlainText)).toBe('CUSTOM2');
+    // expect(Passpack.decode('AES', credential.UserDefined2Label, masterKeyPlainText)).toBe('Custom 2');
+    // expect(Passpack.decode('AES', credential.Notes, masterKeyPlainText)).toBe('Test Notes:\n\nThese are test notes.');
 }
 
 function checkDecryption(credential: ICredential) {
@@ -94,43 +98,36 @@ describe('Cryptography', () => {
         encrypted.forEach(c => checkEncryption(c, testMasterKey));
     });
 
-    test('generateMasterKey', () => {
-        const k = Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true);
-        expect(k).toBe(generateMasterKey('test123'));
-    });
-
     test('generatePassword', () => {
-        const spec: IPasswordSpecification = {
-            length: 0,
-            lowercase: false,
-            uppercase: false,
-            numbers: false,
-            symbols: false
-        };
+        const spec1 = new PasswordSpecification(0, false, false, false, false);
+        const spec2 = new PasswordSpecification(32, false, false, false, false);
+        const spec3 = new PasswordSpecification(32, true, false, false, false);
+        const spec4 = new PasswordSpecification(32, false, true, false, false);
+        const spec5 = new PasswordSpecification(32, false, false, true, false);
+        const spec6 = new PasswordSpecification(32, false, false, false, true);
 
-        const empty = generatePassword(spec);
-        spec.length = 32;
-        const empty2 = generatePassword(spec);
+        const empty = generatePassword(spec1);
+
         expect(empty).toBe(null);
+
+        const empty2 = generatePassword(spec2);
+
         expect(empty2).toBe(null);
 
-        spec.lowercase = true;
-        const lc = generatePassword(spec);
+        const lc = generatePassword(spec3);
+
         expect(lc.toLowerCase()).toBe(lc);
 
-        spec.lowercase = false;
-        spec.uppercase = true;
-        const uc = generatePassword(spec);
+        const uc = generatePassword(spec4);
+
         expect(uc.toUpperCase()).toBe(uc);
 
-        spec.uppercase = false;
-        spec.numbers = true;
-        const nums = generatePassword(spec);
+        const nums = generatePassword(spec5);
+
         expect(nums.match(/\d+/gi));
 
-        spec.numbers = false;
-        spec.symbols = true;
-        const sym = generatePassword(spec);
+        const sym = generatePassword(spec6);
+
         expect(sym.match(/[^a-z0-9]+/gi));
     });
 

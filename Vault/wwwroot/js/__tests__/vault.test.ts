@@ -7,7 +7,7 @@
     sortCredentials,
     validateCredential
 } from '../modules/all';
-import { ICredential, IPasswordSpecification } from '../types/all';
+import { ICredential, PasswordSpecification } from '../types/all';
 import { FakeRepository } from '../types/FakeRepository';
 
 const testCredentialPlainText: ICredential = {
@@ -155,27 +155,9 @@ describe('Vault', () => {
     });
 
     test('parsePasswordSpecificationString valid inputs', () => {
-        const spec1: IPasswordSpecification = {
-            length: 16,
-            lowercase: true,
-            uppercase: true,
-            numbers: true,
-            symbols: true
-        };
-        const spec2: IPasswordSpecification = {
-            length: 32,
-            lowercase: false,
-            uppercase: true,
-            numbers: false,
-            symbols: true
-        };
-        const spec3: IPasswordSpecification = {
-            length: 64,
-            lowercase: true,
-            uppercase: false,
-            numbers: true,
-            symbols: false
-        };
+        const spec1 = new PasswordSpecification(16, true, true, true, true);
+        const spec2 = new PasswordSpecification(32, false, true, false, true);
+        const spec3 = new PasswordSpecification(64, true, false, true, false);
 
         expect(parsePasswordSpecificationString('16|1|1|1|1')).toEqual(spec1);
         expect(parsePasswordSpecificationString('32|0|1|0|1')).toEqual(spec2);
@@ -188,34 +170,10 @@ describe('Vault', () => {
     });
 
     test('getPasswordSpecificationFromPassword valid inputs', () => {
-        const spec1: IPasswordSpecification = {
-            length: 8,
-            lowercase: true,
-            uppercase: false,
-            numbers: true,
-            symbols: false
-        };
-        const spec2: IPasswordSpecification = {
-            length: 10,
-            lowercase: true,
-            uppercase: true,
-            numbers: true,
-            symbols: true
-        };
-        const spec3: IPasswordSpecification = {
-            length: 12,
-            lowercase: false,
-            uppercase: false,
-            numbers: true,
-            symbols: false
-        };
-        const spec4: IPasswordSpecification = {
-            length: 14,
-            lowercase: false,
-            uppercase: true,
-            numbers: false,
-            symbols: true
-        };
+        const spec1 = new PasswordSpecification(8, true, false, true, false);
+        const spec2 = new PasswordSpecification(10, true, true, true, true);
+        const spec3 = new PasswordSpecification(12, false, false, true, false);
+        const spec4 = new PasswordSpecification(14, false, true, false, true);
 
         expect(getPasswordSpecificationFromPassword('abcd1234')).toEqual(spec1);
         expect(getPasswordSpecificationFromPassword('!aBcd1234^')).toEqual(spec2);

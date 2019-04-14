@@ -3,7 +3,7 @@
     ICredentialSearchQuery,
     ICredentialSummary,
     ICredentialValidationError,
-    IPasswordSpecification
+    PasswordSpecification
 } from '../types/all';
 import { trim } from './Common';
 
@@ -100,13 +100,13 @@ export function parsePasswordSpecificationString(optionString: string) {
 
     const [length, lowercase, uppercase, numbers, symbols] = optionsArray;
 
-    const specification: IPasswordSpecification = {
-        length: parseInt(length, 10),
-        uppercase: uppercase === '1',
-        lowercase: lowercase === '1',
-        numbers: numbers === '1',
-        symbols: symbols === '1'
-    };
+    const specification = new PasswordSpecification(
+        parseInt(length, 10),
+        uppercase === '1',
+        lowercase === '1',
+        numbers === '1',
+        symbols === '1'
+    );
 
     return specification;
 }
@@ -116,13 +116,13 @@ export function getPasswordSpecificationFromPassword(password: string) {
         return null;
     }
 
-    const specification: IPasswordSpecification = {
-        length: password.length,
-        lowercase: /[a-z]+/.test(password),
-        uppercase: /[A-Z]+/.test(password),
-        numbers: /\d+/.test(password),
-        symbols: /[^\dA-Z]+/i.test(password)
-    };
+    const specification = new PasswordSpecification(
+        password.length,
+        /[a-z]+/.test(password),
+        /[A-Z]+/.test(password),
+        /\d+/.test(password),
+        /[^\dA-Z]+/i.test(password)
+    );
 
     return specification;
 }

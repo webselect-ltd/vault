@@ -19,8 +19,8 @@ import {
 } from './modules/all';
 import {
     ICredential,
-    IPasswordSpecification,
     ISecurityKeyDetails,
+    PasswordSpecification,
     Repository
 } from './types/all';
 
@@ -91,13 +91,7 @@ const sessionTimeoutMs = _VAULT_GLOBALS.sessionTimeoutInSeconds * 1000;
 
 const repository = new Repository(_VAULT_GLOBALS.securityKey);
 
-const defaultPasswordSpecification: IPasswordSpecification = {
-    length: 16,
-    lowercase: true,
-    uppercase: true,
-    numbers: true,
-    symbols: true
-};
+const defaultPasswordSpecification = new PasswordSpecification(16, true, true, true, true);
 
 const ui: IVaultUIElements = {
     body: $('body'),
@@ -160,17 +154,17 @@ export function checkIf(el: JQuery, condition: boolean) {
 
 export function getPasswordSpecificationFromUI(container: JQuery, predicate: (element: JQuery) => boolean) {
     const len = container.find('[name=len]').val() as number;
-    const specification: IPasswordSpecification = {
-        length: isNaN(len) ? 16 : len,
-        lowercase: predicate(container.find('[name=lcase]')),
-        uppercase: predicate(container.find('[name=ucase]')),
-        numbers: predicate(container.find('[name=nums]')),
-        symbols: predicate(container.find('[name=symb]'))
-    };
+    const specification = new PasswordSpecification(
+        isNaN(len) ? 16 : len,
+        predicate(container.find('[name=lcase]')),
+        predicate(container.find('[name=ucase]')),
+        predicate(container.find('[name=nums]')),
+        predicate(container.find('[name=symb]'))
+    );
     return specification;
 }
 
-export function updatePasswordSpecificationOptionUI(container: JQuery, specification: IPasswordSpecification) {
+export function updatePasswordSpecificationOptionUI(container: JQuery, specification: PasswordSpecification) {
     container.find('[name=len]').val(specification.length);
     checkIf(container.find('[name=ucase]'), specification.uppercase);
     checkIf(container.find('[name=lcase]'), specification.lowercase);
