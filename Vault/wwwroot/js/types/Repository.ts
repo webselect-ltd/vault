@@ -4,7 +4,8 @@
     encryptCredential,
     encryptCredentials,
     generateMasterKey,
-    hash
+    hash,
+    hex
 } from '../modules/all';
 import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails } from '../types/all';
 
@@ -40,8 +41,8 @@ export class Repository implements IRepository {
         const passwordHash = await hash(password);
 
         const data = {
-            UN1209: usernameHash,
-            PW9804: passwordHash
+            UN1209: hex(usernameHash),
+            PW9804: hex(passwordHash)
         };
 
         const loginResult = await this.post<ILoginResult>('Home/Login', data);
@@ -49,7 +50,7 @@ export class Repository implements IRepository {
         if (loginResult.Success) {
             this.userID = loginResult.UserID;
             this.password = password;
-            this.masterKey = generateMasterKey(this.password);
+            this.masterKey = await generateMasterKey(this.password);
         }
 
         return loginResult;
@@ -57,33 +58,33 @@ export class Repository implements IRepository {
 
     public async loadCredential(credentialId: string) {
         const encryptedCredential = await this.get<ICredential>('Credentials/Read', { id: credentialId });
-        return decryptCredential(encryptedCredential, this.masterKey, this.encryptionExcludes);
+        return await decryptCredential(encryptedCredential, this.masterKey, this.encryptionExcludes);
     }
 
     public async loadCredentialSummaryList() {
         if (!this.cache.length) {
             const encryptedCredentials = await this.get<ICredential[]>('Credentials/ReadSummaries', { userId: this.userID });
-            this.cache = decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
+            this.cache = await decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
         }
         return this.cache;
     }
 
     public async loadCredentials() {
         const encryptedCredentials = await this.get<ICredential[]>('Credentials/ReadAll', { userId: this.userID });
-        return decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
+        return await decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
     }
 
     public async createCredential(credential: ICredential) {
         this.cache.length = 0;
         credential.UserID = this.userID;
-        const encryptedCredential = encryptCredential(credential, this.masterKey, this.encryptionExcludes);
+        const encryptedCredential = await encryptCredential(credential, this.masterKey, this.encryptionExcludes);
         return this.post<ICredential>('Credentials/Create', encryptedCredential);
     }
 
     public async updateCredential(credential: ICredential) {
         this.cache.length = 0;
         credential.UserID = this.userID;
-        const encryptedCredential = encryptCredential(credential, this.masterKey, this.encryptionExcludes);
+        const encryptedCredential = await encryptCredential(credential, this.masterKey, this.encryptionExcludes);
         return this.post<ICredential>('Credentials/Update', encryptedCredential);
     }
 
@@ -96,9 +97,9 @@ export class Repository implements IRepository {
         const newPasswordHash = hash(newPassword);
 
         this.password = newPassword;
-        this.masterKey = generateMasterKey(newPassword);
+        this.masterKey = await generateMasterKey(newPassword);
 
-        const reEncryptedCredentials = encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
+        const reEncryptedCredentials = await encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
 
         const model = {
             UpdatedCredentials: reEncryptedCredentials,
@@ -114,7 +115,7 @@ export class Repository implements IRepository {
         credentials.forEach(c => c.UserID = this.userID);
 
         this.cache.length = 0;
-        const encryptedCredentials = encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
+        const encryptedCredentials = await encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
 
         const model = {
             Credentials: encryptedCredentials

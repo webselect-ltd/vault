@@ -1,8 +1,6 @@
 ﻿export {
     weakPasswordThreshold,
     isWeakPassword,
-    utf8ToBase64,
-    base64ToUtf8,
     decryptCredential,
     decryptCredentials,
     encryptCredential,
@@ -10,7 +8,8 @@
     generateMasterKey,
     generatePassword,
     getPasswordBits,
-    hash
+    hash,
+    hex
 } from './Cryptography';
 export {
     getPasswordSpecificationFromPassword,

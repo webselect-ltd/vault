@@ -1,5 +1,4 @@
 ﻿import {
-    base64ToUtf8,
     decryptCredential,
     decryptCredentials,
     encryptCredential,
@@ -7,8 +6,7 @@
     generateMasterKey,
     generatePassword,
     hash,
-    isWeakPassword,
-    utf8ToBase64
+    isWeakPassword
 } from '../modules/all';
 import { ICredential, IPasswordSpecification } from '../types/all';
 
@@ -74,35 +72,25 @@ function checkDecryption(credential: ICredential) {
 
 describe('Cryptography', () => {
 
-    test('base64ToUtf8', () => {
-        const utf8 = base64ToUtf8('VEVTVA==');
-        expect(utf8).toBe('TEST');
-    });
-
-    test('utf8ToBase64', () => {
-        const b64 = utf8ToBase64('TEST');
-        expect(b64).toBe('VEVTVA==');
-    });
-
-    test('decryptCredential', () => {
-        const decrypted = decryptCredential(testCredentialEncrypted, testMasterKey, ['CredentialID', 'UserID']);
+    test('decryptCredential', async () => {
+        const decrypted = await decryptCredential(testCredentialEncrypted, testMasterKey, ['CredentialID', 'UserID']);
         checkDecryption(decrypted);
     });
 
-    test('decryptCredentials', () => {
+    test('decryptCredentials', async () => {
         const credentials = [testCredentialEncrypted, testCredentialEncrypted];
-        const decrypted = decryptCredentials(credentials, testMasterKey, ['CredentialID', 'UserID']);
+        const decrypted = await decryptCredentials(credentials, testMasterKey, ['CredentialID', 'UserID']);
         decrypted.forEach(c => checkDecryption(c));
     });
 
-    test('encryptCredential', () => {
-        const encrypted = encryptCredential(testCredentialPlainText, testMasterKey, ['CredentialID', 'UserID']);
+    test('encryptCredential', async () => {
+        const encrypted = await encryptCredential(testCredentialPlainText, testMasterKey, ['CredentialID', 'UserID']);
         checkEncryption(encrypted, testMasterKey);
     });
 
-    test('encryptCredentials', () => {
+    test('encryptCredentials', async () => {
         const credentials = [testCredentialPlainText, testCredentialPlainText];
-        const encrypted = encryptCredentials(credentials, testMasterKey, ['CredentialID', 'UserID']);
+        const encrypted = await encryptCredentials(credentials, testMasterKey, ['CredentialID', 'UserID']);
         encrypted.forEach(c => checkEncryption(c, testMasterKey));
     });
 
