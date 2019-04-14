@@ -1,6 +1,14 @@
 ﻿import '../legacy/passpack-v1.1.js';
 import { ICredential, IPasswordSpecification } from '../types/all';
 
+const encoder = new TextEncoder();
+const decoder = new TextDecoder('utf-8');
+
+const hexString = (buffer: ArrayBuffer) =>
+    Array.from(new Uint8Array(buffer))
+        .map(b => ('0' + b.toString(16)).slice(-2))
+        .join('');
+
 // Bit value below which password is deemed weak
 export const weakPasswordThreshold = 40;
 
@@ -16,8 +24,10 @@ export function getPasswordBits(password: string) {
     return Passpack.utils.getBits(password);
 }
 
-export function hash(str: string) {
-    return Passpack.utils.hashx(str);
+export async function hash(str: string) {
+    const textBytes = encoder.encode(str);
+    const hashBytes = await crypto.subtle.digest('SHA-256', textBytes);
+    return hexString(hashBytes);
 }
 
 export function generatePassword(specification: IPasswordSpecification) {

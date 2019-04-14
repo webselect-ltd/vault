@@ -3,11 +3,14 @@ import { hash } from './modules/all';
 
 const dialog = $('#generate-form-dialog');
 
-function generatePassword(e: JQuery.Event) {
+async function generatePassword(e: JQuery.Event) {
     e.preventDefault();
 
-    $('#HashedUsername').attr('value', hash($('#Username').val() as string));
-    $('#HashedPassword').attr('value', hash($('#Password').val() as string));
+    const usernameHash = await hash($('#Username').val() as string);
+    const passwordHash = await hash($('#Password').val() as string);
+
+    $('#HashedUsername').attr('value', usernameHash);
+    $('#HashedPassword').attr('value', passwordHash);
 }
 
 dialog.find('.btn-primary').on('click', generatePassword);

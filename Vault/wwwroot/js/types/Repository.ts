@@ -36,9 +36,12 @@ export class Repository implements IRepository {
     }
 
     public async login(username: string, password: string) {
+        const usernameHash = await hash(username);
+        const passwordHash = await hash(password);
+
         const data = {
-            UN1209: hash(username),
-            PW9804: hash(password)
+            UN1209: usernameHash,
+            PW9804: passwordHash
         };
 
         const loginResult = await this.post<ILoginResult>('Home/Login', data);
