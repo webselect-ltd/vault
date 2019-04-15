@@ -522,7 +522,7 @@ ui.body.on('submit', '#credential-form', async e => {
 
 // Show password strength as it is typed
 ui.body.on('keyup', '#Password', rateLimit(e => {
-    showPasswordStrength($(e.currentTarget));
+    showPasswordStrength($(e.target));
 }, 200));
 
 ui.body.on('click', 'button.generate-password', e => {
