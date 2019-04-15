@@ -193,22 +193,25 @@ async function aesGcmEncrypt(plaintext: string, password: string) {
 
     const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['encrypt']);
 
-    const ptUint8 = encoder.encode(plaintext);
-    const ctBuffer = await crypto.subtle.encrypt(algorithm, key, ptUint8);
+    const buffer = await crypto.subtle.encrypt(algorithm, key, encoder.encode(plaintext));
 
-    const ctArray = Array.from(new Uint8Array(ctBuffer));
-    const ctStr = ctArray.map(byte => String.fromCharCode(byte)).join('');
-    const ctBase64 = btoa(ctStr);
+    const cipherText = Array.from(new Uint8Array(buffer))
+        .map(byte => String.fromCharCode(byte))
+        .join('');
 
-    const ivHex = Array.from(iv).map(b => ('00' + b.toString(16)).slice(-2)).join('');
+    const ivHex = Array.from(iv)
+        .map(b => ('00' + b.toString(16)).slice(-2))
+        .join('');
 
-    return ivHex + ctBase64;
+    return ivHex + btoa(cipherText);
 }
 
-async function aesGcmDecrypt(ciphertext: string, password: string) {
+async function aesGcmDecrypt(cipherTextBase64: string, password: string) {
     const pwHash = await hash(password);
 
-    const iv = ciphertext.slice(0, 24).match(/.{2}/g).map(byte => parseInt(byte, 16));
+    const iv = cipherTextBase64.slice(0, 24)
+        .match(/.{2}/g)
+        .map(byte => parseInt(byte, 16));
 
     const algorithm: AesGcmParams = {
         name: 'AES-GCM',
@@ -217,11 +220,11 @@ async function aesGcmDecrypt(ciphertext: string, password: string) {
 
     const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['decrypt']);
 
-    const ctStr = atob(ciphertext.slice(24));
-    const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0)));
+    const cipherText = atob(cipherTextBase64.slice(24))
+        .match(/[\s\S]/g)
+        .map(ch => ch.charCodeAt(0));
 
-    const plainBuffer = await crypto.subtle.decrypt(algorithm, key, ctUint8);
-    const plaintext = decoder.decode(plainBuffer);
+    const buffer = await crypto.subtle.decrypt(algorithm, key, new Uint8Array(cipherText));
 
-    return plaintext;
+    return decoder.decode(buffer);
 }
