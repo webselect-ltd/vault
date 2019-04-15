@@ -23,5 +23,6 @@ export {
 export {
     trim,
     truncate,
+    range,
     rateLimit
 } from './Common';

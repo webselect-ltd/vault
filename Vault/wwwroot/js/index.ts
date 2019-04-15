@@ -153,7 +153,7 @@ export function checkIf(el: JQuery, condition: boolean) {
 }
 
 export function getPasswordSpecificationFromUI(container: JQuery, predicate: (element: JQuery) => boolean) {
-    const len = container.find('[name=len]').val() as number;
+    const len = parseInt(container.find('[name=len]').val() as string, 10);
     const specification = new PasswordSpecification(
         isNaN(len) ? 16 : len,
         predicate(container.find('[name=lcase]')),

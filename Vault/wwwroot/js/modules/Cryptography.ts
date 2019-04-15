@@ -1,11 +1,11 @@
-﻿import { ICredential, PasswordCharacterMatrix, PasswordSpecification } from '../types/all';
+﻿import { range } from '../modules/all';
+import { ICredential, PasswordCharacterMatrix, PasswordSpecification } from '../types/all';
 
 const charMatrix: PasswordCharacterMatrix = {
-    lowercase: [97, 122],
-    uppercase: [65, 90],
-    numbers: [48, 57],
-    symbols: [33, 33, 35, 47, 58, 64, 91, 96, 123, 126],
-    spaces: [161, 254]
+    lowercase: 'abcdefghijklmnopqrstuvwxyz',
+    uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    numbers: '0123456789',
+    symbols: '!#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'
 };
 
 const encoder = new TextEncoder();
@@ -90,7 +90,6 @@ export async function hash(s: string) {
     return await crypto.subtle.digest('SHA-256', encoder.encode(s));
 }
 
-// TODO: Refactoring and cleanup
 export function generatePassword(specification: PasswordSpecification) {
     if (specification.length === 0) {
         return null;
@@ -102,32 +101,18 @@ export function generatePassword(specification: PasswordSpecification) {
         return null;
     }
 
-    let str = '';
+    const validCharacters = charTypes.map(t => charMatrix[t]).join('');
 
-    charTypes.forEach(t => {
-        const M = charMatrix[t];
-        for (let u = 0; u < M.length; u += 2) {
-            for (let y = M[u]; y <= M[u + 1]; y++) {
-                str += String.fromCharCode(y);
-            }
-        }
+    const len = validCharacters.length;
+
+    const characters = range(0, specification.length);
+
+    const passwordCharacters = characters.map(i => {
+        const r = Math.floor(Math.random() * len);
+        return r < len ? validCharacters.substring(r, r + 1) : '';
     });
 
-    let pass = '';
-
-    if (str) {
-        const l = str.length;
-        let v = 0;
-        for (let p = 0; p < specification.length;) {
-            v = Math.floor(Math.random() * l);
-            if (v === l) {
-                continue;
-            }
-            pass += str.substring(v, v + 1);
-            p++;
-        }
-    }
-    return pass;
+    return passwordCharacters.join('');
 }
 
 export async function generateMasterKey(password: string) {

@@ -1,8 +1,7 @@
 ﻿export class PasswordCharacterMatrix {
-    [key: string]: number[];
-    public lowercase: number[];
-    public uppercase: number[];
-    public numbers: number[];
-    public symbols: number[];
-    public spaces: number[];
+    [key: string]: string;
+    public lowercase: string;
+    public uppercase: string;
+    public numbers: string;
+    public symbols: string;
 }
