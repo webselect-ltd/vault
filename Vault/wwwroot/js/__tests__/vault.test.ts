@@ -1,4 +1,5 @@
-﻿import {
+﻿import 'fast-text-encoding';
+import {
     getPasswordSpecificationFromPassword,
     mapToSummary,
     parsePasswordSpecificationString,
