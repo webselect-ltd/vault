@@ -102,8 +102,8 @@ export function parsePasswordSpecificationString(optionString: string) {
 
     const specification = new PasswordSpecification(
         parseInt(length, 10),
-        uppercase === '1',
         lowercase === '1',
+        uppercase === '1',
         numbers === '1',
         symbols === '1'
     );
