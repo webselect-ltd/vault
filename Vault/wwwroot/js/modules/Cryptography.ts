@@ -11,53 +11,6 @@ const charMatrix: PasswordCharacterMatrix = {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-async function aesGcmEncrypt(plaintext: string, password: string) {
-    const pwUtf8 = encoder.encode(password);                                 // encode password as UTF-8
-    const pwHash = await crypto.subtle.digest('SHA-256', pwUtf8);                      // hash the password
-
-    const iv = crypto.getRandomValues(new Uint8Array(12));                             // get 96-bit random iv
-
-    const algorithm: AesGcmParams = {
-        name: 'AES-GCM',
-        iv: iv
-    };
-
-    const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['encrypt']); // generate key from pw
-
-    const ptUint8 = encoder.encode(plaintext);                               // encode plaintext as UTF-8
-    const ctBuffer = await crypto.subtle.encrypt(algorithm, key, ptUint8);                   // encrypt plaintext using key
-
-    const ctArray = Array.from(new Uint8Array(ctBuffer));                              // ciphertext as byte array
-    const ctStr = ctArray.map(byte => String.fromCharCode(byte)).join('');             // ciphertext as string
-    const ctBase64 = btoa(ctStr);                                                      // encode ciphertext as base64
-
-    const ivHex = Array.from(iv).map(b => ('00' + b.toString(16)).slice(-2)).join(''); // iv as hex string
-
-    return ivHex + ctBase64;                                                             // return iv+ciphertext
-}
-
-async function aesGcmDecrypt(ciphertext: string, password: string) {
-    const pwUtf8 = encoder.encode(password);                                  // encode password as UTF-8
-    const pwHash = await crypto.subtle.digest('SHA-256', pwUtf8);                       // hash the password
-
-    const iv = ciphertext.slice(0, 24).match(/.{2}/g).map(byte => parseInt(byte, 16));   // get iv from ciphertext
-
-    const algorithm: AesGcmParams = {
-        name: 'AES-GCM',
-        iv: new Uint8Array(iv)
-    };
-
-    const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['decrypt']);  // use pw to generate key
-
-    const ctStr = atob(ciphertext.slice(24));                                           // decode base64 ciphertext
-    const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0))); // ciphertext as Uint8Array
-
-    const plainBuffer = await crypto.subtle.decrypt(algorithm, key, ctUint8);                 // decrypt ciphertext using key
-    const plaintext = decoder.decode(plainBuffer);                            // decode password from UTF-8
-
-    return plaintext;                                                                   // return the plaintext
-}
-
 // Bit value below which password is deemed weak
 export const weakPasswordThreshold = 40;
 
@@ -223,4 +176,52 @@ async function forPropertiesOf(credential: ICredential, action: (val: string) =>
     await Promise.all(encryptedMappings);
 
     return (encrypted as ICredential);
+}
+
+// The following functions were adapted from:
+// https://gist.github.com/chrisveness/43bcda93af9f646d083fad678071b90a
+
+async function aesGcmEncrypt(plaintext: string, password: string) {
+    const pwHash = await hash(password);
+
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    const algorithm: AesGcmParams = {
+        name: 'AES-GCM',
+        iv: iv
+    };
+
+    const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['encrypt']);
+
+    const ptUint8 = encoder.encode(plaintext);
+    const ctBuffer = await crypto.subtle.encrypt(algorithm, key, ptUint8);
+
+    const ctArray = Array.from(new Uint8Array(ctBuffer));
+    const ctStr = ctArray.map(byte => String.fromCharCode(byte)).join('');
+    const ctBase64 = btoa(ctStr);
+
+    const ivHex = Array.from(iv).map(b => ('00' + b.toString(16)).slice(-2)).join('');
+
+    return ivHex + ctBase64;
+}
+
+async function aesGcmDecrypt(ciphertext: string, password: string) {
+    const pwHash = await hash(password);
+
+    const iv = ciphertext.slice(0, 24).match(/.{2}/g).map(byte => parseInt(byte, 16));
+
+    const algorithm: AesGcmParams = {
+        name: 'AES-GCM',
+        iv: new Uint8Array(iv)
+    };
+
+    const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['decrypt']);
+
+    const ctStr = atob(ciphertext.slice(24));
+    const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0)));
+
+    const plainBuffer = await crypto.subtle.decrypt(algorithm, key, ctUint8);
+    const plaintext = decoder.decode(plainBuffer);
+
+    return plaintext;
 }
