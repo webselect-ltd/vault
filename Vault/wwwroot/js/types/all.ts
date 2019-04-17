@@ -2,9 +2,9 @@
 export { ICredentialSearchQuery } from './ICredentialSearchQuery';
 export { ICredentialSummary } from './ICredentialSummary';
 export { ICredentialValidationError } from './ICredentialValidationError';
+export { IDictionary } from './IDictionary';
 export { ILoginResult } from './ILoginResult';
 export { IRepository } from './IRepository';
 export { ISecurityKeyDetails } from './ISecurityKeyDetails';
-export { PasswordCharacterMatrix } from './PasswordCharacterMatrix';
 export { PasswordSpecification } from './PasswordSpecification';
 export { Repository } from './Repository';

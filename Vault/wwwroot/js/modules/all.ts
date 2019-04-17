@@ -1,5 +1,5 @@
 ﻿export {
-    weakPasswordThreshold,
+    weakPasswordScoreThreshold,
     isWeakPassword,
     decryptCredential,
     decryptCredentials,
@@ -7,7 +7,7 @@
     encryptCredentials,
     generateMasterKey,
     generatePassword,
-    getPasswordBits,
+    getPasswordScore,
     hash,
     hex
 } from './Cryptography';
@@ -24,5 +24,6 @@ export {
     trim,
     truncate,
     range,
-    rateLimit
+    rateLimit,
+    sum
 } from './Common';

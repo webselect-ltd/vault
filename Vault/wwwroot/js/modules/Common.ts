@@ -1,5 +1,9 @@
 ﻿const rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
 
+export function sum(accumulator: number, value: number): number {
+    return accumulator + value;
+}
+
 export function trim(str: string): string {
     return str === null ? null : (str + '').replace(rtrim, '');
 }

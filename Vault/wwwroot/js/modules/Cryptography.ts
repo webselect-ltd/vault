@@ -1,7 +1,7 @@
-﻿import { range } from '../modules/all';
-import { ICredential, PasswordCharacterMatrix, PasswordSpecification } from '../types/all';
+﻿import { range, sum } from '../modules/all';
+import { ICredential, IDictionary, PasswordSpecification } from '../types/all';
 
-const passwordCharacters: PasswordCharacterMatrix = {
+const passwordCharacters: IDictionary<string> = {
     lowercase: 'abcdefghijklmnopqrstuvwxyz',
     uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     numbers: '0123456789',
@@ -11,71 +11,48 @@ const passwordCharacters: PasswordCharacterMatrix = {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-// Bit value below which password is deemed weak
-export const weakPasswordThreshold = 40;
+// Score below which password is deemed weak
+export const weakPasswordScoreThreshold = 40;
+// Minimum recommended password length
+export const weakPasswordLengthThreshold = 8;
 
-// TODO: Refactoring and cleanup
-export function getPasswordBits(password: string) {
+// Modified from: https://stackoverflow.com/a/11268104/43140
+export function getPasswordScore(password: string) {
+    let score = 0;
+
     if (!password) {
-        return 0;
+        return score;
     }
 
-    const cset: any = {};
+    const letters: any = {};
 
-    const ci: number[] = [0, 32, 33, 47, 48, 57, 58, 64, 65, 90, 91, 96, 97, 122, 123, 126, 126, 255, 256, 65535];
+    // Add a point for every character (until it's been repeated 5 times)
+    for (const char of password) {
+        letters[char] = (letters[char] || 0) + 1;
+        score += 5.0 / letters[char];
+    }
 
-    let t: number;
-    let ok: number;
-    let factor: number;
-    let df: number;
-    const vdf: number[] = [];
-    const vcc: number[] = [];
-    let el: number = 0;
-    let ext: number;
-    let exdf: number;
+    const variations: IDictionary<boolean> = {
+        digits: /\d/.test(password),
+        lower: /[a-z]/.test(password),
+        upper: /[A-Z]/.test(password),
+        nonWords: /\W/.test(password),
+    };
 
-    for (let i = 0; i < password.length; i++) {
-        factor = 1;
-        ok = 0;
-        t = password.charCodeAt(i);
-        for (let j = 0; j < ci.length; j += 2) {
-            if (t >= ci[j] && t <= ci[j + 1]) {
-                cset['' + j] = ci[j + 1] - ci[j];
-                ok = 1;
-                break;
-            }
-        }
-        if (!ok) {
-            cset.x = 65280;
-        }
-        if (i >= 1) {
-            df = t - ext;
-            if (exdf === df) {
-                vdf[df] = 1;
-            } else {
-                vdf[df] = (vdf[df] ? vdf[df] : 0) + 1;
-                factor /= vdf[df];
-            }
-        }
-        if (!vcc[t]) {
-            vcc[t] = 1;
-            el += factor;
-        } else {
-            el += factor * (1 / ++vcc[t]);
-        }
-        exdf = df;
-        ext = t;
-    }
-    let tot = 0;
-    for (const k in cset) {
-        if (!isNaN(parseInt(k, 10))) {
-            tot += cset[k];
-        }
-    }
-    if (!tot) {
-        return 0;
-    }
-    return Math.ceil(el * Math.log(tot) / Math.log(2));
+    // Add points for character type variation
+    const variationCount = Object.keys(variations)
+        .map((k: string): number => variations[k] ? 1 : 0)
+        .reduce(sum);
+
+    score += (variationCount - 1) * 10;
+
+    const lengthCheck = weakPasswordLengthThreshold * 2;
+
+    // If the password is less than N chars long, subtract
+    // points for each character below the threshold
+    score -= lengthCheck - (password.length / lengthCheck);
+
+    return Math.floor(score);
 }
 
 export function hex(buffer: ArrayBuffer) {
@@ -140,10 +117,7 @@ export async function encryptCredentials(credentials: ICredential[], masterKey: 
 }
 
 export function isWeakPassword(password: string) {
-    if (!password) {
-        return true;
-    }
-    return getPasswordBits(password) <= weakPasswordThreshold;
+    return getPasswordScore(password) <= weakPasswordScoreThreshold;
 }
 
 async function forPropertiesOf(credential: ICredential, action: (val: string) => Promise<string>, excludes: string[]) {

@@ -1,5 +1,4 @@
-﻿// TODO: Refactoring and cleanup
-export class PasswordSpecification {
+﻿export class PasswordSpecification {
     public readonly length: number;
     public readonly lowercase: boolean;
     public readonly uppercase: boolean;

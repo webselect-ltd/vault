@@ -4,7 +4,7 @@ import $ from 'jquery';
 import * as Cookies from 'js-cookie';
 import {
     generatePassword,
-    getPasswordBits,
+    getPasswordScore,
     getPasswordSpecificationFromPassword,
     isWeakPassword,
     mapToSummary,
@@ -15,7 +15,7 @@ import {
     sortCredentials,
     truncate,
     validateCredential,
-    weakPasswordThreshold
+    weakPasswordScoreThreshold
 } from './modules/all';
 import {
     ICredential,
@@ -376,7 +376,7 @@ function showPasswordStrength(field: JQuery) {
     const status = strengthIndicator.find('> span');
     const bar = strengthIndicator.find('> div');
     const password = field.val() as string;
-    const strength = getPasswordBits(password);
+    const strength = getPasswordScore(password);
     bar.removeClass();
     if (strength === 0) {
         status.html('No Password');
@@ -389,7 +389,7 @@ function showPasswordStrength(field: JQuery) {
         } else if (strength <= 25) {
             bar.addClass('very-weak');
             status.html('Very Weak (' + strength + ')');
-        } else if (strength <= weakPasswordThreshold) {
+        } else if (strength <= weakPasswordScoreThreshold) {
             bar.addClass('weak');
             status.html('Weak (' + strength + ')');
         } else if (strength <= 55) {
