@@ -1,7 +1,7 @@
 ﻿import { range } from '../modules/all';
 import { ICredential, PasswordCharacterMatrix, PasswordSpecification } from '../types/all';
 
-const charMatrix: PasswordCharacterMatrix = {
+const passwordCharacters: PasswordCharacterMatrix = {
     lowercase: 'abcdefghijklmnopqrstuvwxyz',
     uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     numbers: '0123456789',
@@ -90,6 +90,13 @@ export async function hash(s: string) {
     return await crypto.subtle.digest('SHA-256', encoder.encode(s));
 }
 
+function getRandomCharacterFactory(characters: string) {
+    return (_: number) => {
+        const r = Math.floor(Math.random() * characters.length);
+        return r < characters.length ? characters.substring(r, r + 1) : '';
+    };
+}
+
 export function generatePassword(specification: PasswordSpecification) {
     if (specification.length === 0) {
         return null;
@@ -101,18 +108,13 @@ export function generatePassword(specification: PasswordSpecification) {
         return null;
     }
 
-    const validCharacters = charTypes.map(t => charMatrix[t]).join('');
+    const validCharacters = charTypes.map(t => passwordCharacters[t]).join('');
 
-    const len = validCharacters.length;
+    const randomCharacter = getRandomCharacterFactory(validCharacters);
 
-    const characters = range(0, specification.length);
+    const positions = range(0, specification.length);
 
-    const passwordCharacters = characters.map(i => {
-        const r = Math.floor(Math.random() * len);
-        return r < len ? validCharacters.substring(r, r + 1) : '';
-    });
-
-    return passwordCharacters.join('');
+    return positions.map(randomCharacter).join('');
 }
 
 export async function generateMasterKey(password: string) {
