@@ -97,23 +97,22 @@ export function generatePassword(specification: PasswordSpecification) {
 
 export async function generateMasterKey(password: string) {
     const inner = await hash(password);
-    const outer = await hash(password + plain(inner));
-    return plain(outer);
+    return await hash(password + plain(inner));
 }
 
-export async function decryptCredential(credential: ICredential, masterKey: string, excludes: string[]) {
+export async function decryptCredential(credential: ICredential, masterKey: ArrayBuffer, excludes: string[]) {
     return forPropertiesOf(credential, async val => await aesGcmDecrypt(val, masterKey), excludes);
 }
 
-export async function decryptCredentials(credentials: ICredential[], masterKey: string, excludes: string[]) {
+export async function decryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer, excludes: string[]) {
     return await Promise.all(credentials.map(async item => await decryptCredential(item, masterKey, excludes)));
 }
 
-export async function encryptCredential(credential: ICredential, masterKey: string, excludes: string[]) {
+export async function encryptCredential(credential: ICredential, masterKey: ArrayBuffer, excludes: string[]) {
     return forPropertiesOf(credential, async val => await aesGcmEncrypt(val, masterKey), excludes);
 }
 
-export async function encryptCredentials(credentials: ICredential[], masterKey: string, excludes: string[]) {
+export async function encryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer, excludes: string[]) {
     return await Promise.all(credentials.map(async item => await encryptCredential(item, masterKey, excludes)));
 }
 
@@ -143,9 +142,7 @@ async function forPropertiesOf(credential: ICredential, action: (val: string) =>
 // The following functions were adapted from:
 // https://gist.github.com/chrisveness/43bcda93af9f646d083fad678071b90a
 
-async function aesGcmEncrypt(plaintext: string, password: string) {
-    const pwHash = await hash(password);
-
+async function aesGcmEncrypt(plaintext: string, passwordHash: ArrayBuffer) {
     const iv = crypto.getRandomValues(new Uint8Array(12));
 
     const algorithm: AesGcmParams = {
@@ -153,7 +150,7 @@ async function aesGcmEncrypt(plaintext: string, password: string) {
         iv: iv
     };
 
-    const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['encrypt']);
+    const key = await crypto.subtle.importKey('raw', passwordHash, algorithm.name, false, ['encrypt']);
 
     const buffer = await crypto.subtle.encrypt(algorithm, key, encoder.encode(plaintext));
 
@@ -168,9 +165,7 @@ async function aesGcmEncrypt(plaintext: string, password: string) {
     return ivHex + btoa(cipherText);
 }
 
-async function aesGcmDecrypt(cipherTextBase64: string, password: string) {
-    const pwHash = await hash(password);
-
+async function aesGcmDecrypt(cipherTextBase64: string, passwordHash: ArrayBuffer) {
     const iv = cipherTextBase64.slice(0, 24)
         .match(/.{2}/g)
         .map(byte => parseInt(byte, 16));
@@ -180,7 +175,7 @@ async function aesGcmDecrypt(cipherTextBase64: string, password: string) {
         iv: new Uint8Array(iv)
     };
 
-    const key = await crypto.subtle.importKey('raw', pwHash, algorithm.name, false, ['decrypt']);
+    const key = await crypto.subtle.importKey('raw', passwordHash, algorithm.name, false, ['decrypt']);
 
     const cipherText = atob(cipherTextBase64.slice(24))
         .match(/[\s\S]/g)

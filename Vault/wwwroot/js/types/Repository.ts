@@ -17,7 +17,7 @@ export class Repository implements IRepository {
 
     private userID: string;
     private password: string;
-    private masterKey: string;
+    private masterKey: ArrayBuffer;
     private cache: ICredential[];
     private securityKey: ISecurityKeyDetails;
     private securityKeyParameter: any;
