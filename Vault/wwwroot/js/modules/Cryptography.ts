@@ -13,6 +13,7 @@ const decoder = new TextDecoder();
 
 // Score below which password is deemed weak
 export const weakPasswordScoreThreshold = 40;
+
 // Minimum recommended password length
 export const weakPasswordLengthThreshold = 8;
 

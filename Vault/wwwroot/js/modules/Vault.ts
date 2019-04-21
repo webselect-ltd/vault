@@ -3,13 +3,14 @@
     ICredentialSearchQuery,
     ICredentialSummary,
     ICredentialValidationError,
+    IDictionary,
     PasswordSpecification
 } from '../types/all';
 import { trim } from './Common';
 
 // A map of the properties which can be searched for using the fieldName:query syntax
 // We need this because the search is not case-sensitive, whereas JS properties are!
-const queryablePropertyMap: any = {
+const queryablePropertyMap: IDictionary<string> = {
     description: 'Description',
     username: 'Username',
     password: 'Password',
