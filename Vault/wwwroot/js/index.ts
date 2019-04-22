@@ -10,6 +10,7 @@ import {
     mapToSummary,
     parsePasswordSpecificationString,
     parseSearchQuery,
+    range,
     rateLimit,
     searchCredentials,
     sortCredentials,
@@ -306,11 +307,25 @@ async function showDetail(credentialId: string) {
     const urlText = templates.urlText({ Url: credential.Url });
     const urlHtml = credential.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: credential.Url, UrlText: urlText });
 
+    const charIndexes = range(0, credential.Password.length);
+
+    const passwordCharacterTable = [
+        '<table class="table table-bordered password-character-table">',
+        '<tr>',
+        charIndexes.map(i => `<td class="position">${(i + 1)}</td>`).join(''),
+        '</tr>',
+        '<tr>',
+        charIndexes.map(i => `<td>${credential.Password[i]}</td>`).join(''),
+        '</tr>',
+        '</table>'
+    ];
+
     const detailHtml = templates.detail({
         Url: credential.Url,
         UrlHtml: urlHtml,
         Username: credential.Username,
         Password: credential.Password,
+        PasswordCharacterTable: passwordCharacterTable.join(''),
         UserDefined1: credential.UserDefined1,
         UserDefined1Label: credential.UserDefined1Label,
         UserDefined2: credential.UserDefined2,
@@ -557,6 +572,11 @@ ui.body.on('click', 'a.copy-link', e => {
     } catch (ex) {
         alert('Copy operation is not supported by the current browser: ' + ex.message);
     }
+});
+
+ui.body.on('click', 'a.toggle-password-info', e => {
+    e.preventDefault();
+    $(e.currentTarget).parents('.modal-body').find('.row-detail-password-info').toggle();
 });
 
 ui.body.on('click', 'button.btn-credential-open', e => {

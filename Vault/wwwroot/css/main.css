@@ -236,3 +236,38 @@
 .row-detail-header {
     font-weight: bold;
 }
+
+.row-detail-password-info {
+    display: none;
+}
+
+.password-character-table {
+    font-family: Courier New, Courier, monospace;
+    font-weight: bold;
+    width: auto;
+    margin-bottom: 2px;
+}
+
+.password-character-table td {
+    text-align: center;
+    width: 17px;
+    padding: 3px 0 2px 0 !important;
+}
+
+.password-character-table td.position {
+    font-weight: normal;
+    font-size: 10px;
+    padding: 4px 0 3px 0 !important;
+}
+
+.toggle-password-info {
+    margin-left: 10px;
+}
+
+.toggle-password-info,
+.toggle-password-info:focus,
+.toggle-password-info:hover,
+.toggle-password-info:active,
+.toggle-password-info:visited {
+    text-decoration: none !important;
+}
