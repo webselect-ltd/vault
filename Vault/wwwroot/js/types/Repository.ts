@@ -93,8 +93,8 @@ export class Repository implements IRepository {
 
         const credentials = await this.loadCredentials();
 
-        const oldPasswordHash = hash(this.password);
-        const newPasswordHash = hash(newPassword);
+        const oldPasswordHash = await hash(this.password);
+        const newPasswordHash = await hash(newPassword);
 
         this.password = newPassword;
         this.masterKey = await generateMasterKey(newPassword);
@@ -104,8 +104,8 @@ export class Repository implements IRepository {
         const model = {
             UpdatedCredentials: reEncryptedCredentials,
             UserID: this.userID,
-            OldPasswordHash: oldPasswordHash,
-            NewPasswordHash: newPasswordHash
+            OldPasswordHash: hex(oldPasswordHash),
+            NewPasswordHash: hex(newPasswordHash)
         };
 
         await this.post<void>('Home/UpdatePassword', model);
