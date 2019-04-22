@@ -27,7 +27,7 @@
     },
     "scripts": {
         "build": "webpack --mode=production --display-modules",
-        "watch": "webpack --watch --mode=development",
+        "watch": "webpack --watch --mode=production",
         "test": "jest",
         "coverage": "jest --coverage"
     },

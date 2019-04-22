@@ -6,7 +6,7 @@ void Main()
 {
     Directory.SetCurrentDirectory(Path.GetDirectoryName(Util.CurrentQueryPath));
     
-    var distPath = @"..\Vault\bin\Release\netcoreapp2.2\publish\wwwroot\js\dist";
+    var distPath = @"..\Vault\wwwroot\js\dist";
     
     var files = Directory.GetFiles(distPath, "*.js");
 
