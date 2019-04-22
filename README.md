@@ -1,15 +1,14 @@
 # About Vault
 
-Vault is a very simple ASP.NET MVC web application for storing encrypted personal login details (usernames, passwords etc). It uses the [Passpack Host-Proof Hosting package](http://code.google.com/p/passpack/) to do all encryption and decryption on the client and avoid passing vulnerable plain-text data to the server. 
+Vault is a very simple ASP.NET web application for storing encrypted personal login details (usernames, passwords etc). It uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) to do all encryption and decryption on the client and avoid passing vulnerable plain-text data to the server. 
 
-Although all data is encrypted before transmission over HTTP, **this application should *always* be used over an SSL-encrypted connection**.
+Although all data is encrypted before transmission over HTTP, **this application should *always* be used over an SSL-encrypted connection** to avoid interception of the password hash.
 
-*Please Note:* Due to the use of the native `window.atob` and `window.btoa` functions, Vault only works in Firefox, Chrome, Safari or Internet Explorer *10+*.
+*Please Note:* Due to the use of the Web Crypto API, Vault only works in [recent versions of modern browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API#Browser_compatibility)..
 
 ## External Libraries/Dependencies
 
-* Vault uses [jQuery](http://jquery.com/), [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout/UI widgets. 
-* Encryption is handled by the [Passpack Host-Proof Hosting package](http://code.google.com/p/passpack/).
+* Vault uses [jQuery](http://jquery.com/) for DOM manipulation, [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout/UI widgets.
 
 ## Database
 
