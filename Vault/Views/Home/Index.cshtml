@@ -1,9 +1,7 @@
-﻿@inject IConfiguration Config
+﻿@model IndexViewModel
 
 @{
     ViewBag.Title = "Index";
-
-    var rq = Context.Request;
 }
 
 @section main {
@@ -19,18 +17,7 @@
 @section foot {
 
     <script>
-        var _VAULT_GLOBALS = {
-            baseUrl: '@(Url.Action("Index", "Home", null))',
-            absoluteUrl: '@(new Uri($"{rq.Scheme}://{rq.Host}{rq.Path}{rq.QueryString}"))',
-            sessionTimeoutInSeconds: @(Config["SessionTimeoutInSeconds"]),
-            @if (!string.IsNullOrWhiteSpace(Config["SecurityKey"])) {
-<text>            securityKey: {
-                parameterName: '@(Config["SecurityKeyParameterName"])',
-                key: '@(rq.Query[Config["SecurityKeyParameterName"]])'
-            },
-            </text>
-            }devMode: @(Config["DevMode"])
-        };
+        var _VAULT_GLOBALS = @Html.Raw(Model.AsJson());
     </script>
 
     <script src="~/js/dist/index.js" asp-append-version="true" integrity="sha512-xcDW7Q9EVdX0oPf36cYSPRKn0uVzCFNcWr+uSxlTewd1btOFU7enU0HybPeqBEnZpwW6fgEb+MXjr32BWBiQGg=="></script>

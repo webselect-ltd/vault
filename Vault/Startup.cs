@@ -20,6 +20,8 @@ namespace Vault
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<Settings>(Configuration);
+
             services.Configure<CookiePolicyOptions>(options => {
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.HttpOnly = HttpOnlyPolicy.Always;

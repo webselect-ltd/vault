@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Vault.Models;
 using Vault.Support;
 
@@ -8,13 +10,40 @@ namespace Vault.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly Settings _cfg;
         private readonly SqlExecutor _db;
 
-        public HomeController(IConnectionFactory cf) =>
+        public HomeController(
+            IOptionsMonitor<Settings> optionsMonitor,
+            IConnectionFactory cf)
+        {
+            _cfg = optionsMonitor.CurrentValue;
             _db = new SqlExecutor(cf);
+        }
 
-        public IActionResult Index() =>
-            View();
+        public IActionResult Index()
+        {
+            var req = HttpContext.Request;
+            var securityKey = default(object);
+
+            if (!string.IsNullOrWhiteSpace(_cfg.SecurityKey))
+            {
+                securityKey = new {
+                    ParameterName = _cfg.SecurityKeyParameterName,
+                    Key = req.Query[_cfg.SecurityKeyParameterName].ToString()
+                };
+            }
+
+            var model = new IndexViewModel {
+                BaseUrl = new Uri(Url.Action(nameof(Index)), UriKind.Relative),
+                AbsoluteUrl = new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"),
+                SessionTimeoutInSeconds = _cfg.SessionTimeoutInSeconds,
+                SecurityKey = securityKey,
+                DevMode = _cfg.DevMode
+            };
+
+            return View(model);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
