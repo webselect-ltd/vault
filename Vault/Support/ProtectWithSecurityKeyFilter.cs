@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Vault.Support
 {
     public class ProtectWithSecurityKeyFilter : IActionFilter
     {
-        private readonly IConfiguration _configuration;
+        private readonly Settings _cfg;
 
-        public ProtectWithSecurityKeyFilter(IConfiguration configuration) =>
-            _configuration = configuration;
+        public ProtectWithSecurityKeyFilter(IOptionsMonitor<Settings> optionsMonitor) =>
+            _cfg = optionsMonitor.CurrentValue;
 
         public void OnActionExecuted(ActionExecutedContext filterContext)
         {
@@ -18,8 +18,8 @@ namespace Vault.Support
 
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var securityKey = _configuration["SecurityKey"];
-            var parameterName = _configuration["SecurityKeyParameterName"];
+            var securityKey = _cfg.SecurityKey;
+            var parameterName = _cfg.SecurityKeyParameterName;
 
             if (!string.IsNullOrWhiteSpace(securityKey))
             {
