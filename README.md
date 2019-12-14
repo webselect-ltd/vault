@@ -45,3 +45,14 @@ This bookmarklet will log you in (use at your own risk, and obviously not on sha
 
     javascript:(function(){document.getElementById('UN1209').value='YOUR_USER_NAME';document.getElementById('PW9804').value='YOUR_PASSWORD';document.querySelectorAll('#login-form .btn-primary')[0].click();})();
 
+## Development
+
+Some useful endpoints:
+
+### `/Home/SetDevCookie`
+
+If the `DevMode` config setting is set to `true`, this endpoint will set a cookie which will automatically log you in on page refresh. This is _extremely_ useful during development, because otherwise you'll have to log in every single time you make a change...
+
+### `/Home/GenerateVaultCredential`
+
+This endpoint lets you generate a new hashed credential pair for manual insertion into your Vault database (which is currently the only way to create a new user).
