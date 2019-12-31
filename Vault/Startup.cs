@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
 using Vault.Support;
 
@@ -28,21 +28,22 @@ namespace Vault
                 options.Secure = CookieSecurePolicy.Always;
             });
 
-            services.AddMvc(options => options.Filters.Add<ProtectWithSecurityKeyFilter>())
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            services.AddMvc(options => options.Filters.Add<ProtectWithSecurityKeyFilter>());
 
             var connectionString = Configuration.GetConnectionString("Main");
 
             var connectionFactory = Configuration["DbType"] == "SQLite"
-                ? new Func<IServiceProvider, IConnectionFactory>(sp => new SQLiteConnectionFactory(connectionString))
-                : sp => new SqlConnectionFactory(connectionString);
+                ? new Func<IServiceProvider, IConnectionFactory>(_ => new SQLiteConnectionFactory(connectionString))
+                : _ => new SqlConnectionFactory(connectionString);
 
             services.AddScoped(connectionFactory);
+
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
 #pragma warning disable SA1204 // Static elements should appear before instance elements
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static void Configure(IApplicationBuilder app, IHostEnvironment env)
 #pragma warning restore SA1204 // Static elements should appear before instance elements
         {
             if (env.IsDevelopment())
@@ -57,14 +58,12 @@ namespace Vault
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseRouting();
+
             app.UseCookiePolicy();
 
-            app.UseMvc(routes => {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}"
-                );
-            });
+            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
     }
 }
