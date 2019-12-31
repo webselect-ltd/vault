@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <LangVersion>latest</LangVersion>
-        <TypeScriptToolsVersion>3.4.3</TypeScriptToolsVersion>
+        <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
         <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
         <NoWarn>1701;1702;1591</NoWarn>
         <CodeAnalysisRuleSet>..\Vault.ruleset</CodeAnalysisRuleSet>
