@@ -23,7 +23,7 @@ namespace Vault
             services.Configure<Settings>(Configuration);
 
             services.Configure<CookiePolicyOptions>(options => {
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.MinimumSameSitePolicy = SameSiteMode.Strict;
                 options.HttpOnly = HttpOnlyPolicy.Always;
                 options.Secure = CookieSecurePolicy.Always;
             });
