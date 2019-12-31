@@ -19,14 +19,16 @@ steps:
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - task: Npm@1
+  displayName: 'NPM Package Restore'
   inputs:
     command: 'ci'
-    workingDir: '/Vault'
+    workingDir: '$(Build.SourcesDirectory)/Vault'
 
 - task: Npm@1
+  displayName: 'NPM Build'
   inputs:
     command: 'custom'
-    workingDir: '/Vault'
+    workingDir: '$(Build.SourcesDirectory)/Vault'
     customCommand: 'run build'
 
 - task: DotNetCoreCLI@2
