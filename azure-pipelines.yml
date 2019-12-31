@@ -18,6 +18,17 @@ steps:
     version: 3.1.100
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
+- task: Npm@1
+  inputs:
+    command: 'ci'
+    workingDir: '/Vault'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: '/Vault'
+    customCommand: 'run build'
+
 - task: DotNetCoreCLI@2
   displayName: Publish
   inputs:
