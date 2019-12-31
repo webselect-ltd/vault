@@ -4,7 +4,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
   buildConfiguration: 'Release'
@@ -36,7 +36,7 @@ steps:
   inputs:
     command: publish
     publishWebProjects: True
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --runtime win-x64 --self-contained false'
     zipAfterPublish: True
 
 - task: PublishBuildArtifacts@1
