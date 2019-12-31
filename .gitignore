@@ -337,3 +337,6 @@ Vault/wwwroot/js/dist/
 
 # Test coverage artifacts
 coverage/
+
+# Development settings
+appsettings.*.json
