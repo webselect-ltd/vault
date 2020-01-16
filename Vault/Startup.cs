@@ -28,6 +28,10 @@ namespace Vault
                 options.Secure = CookieSecurePolicy.Always;
             });
 
+            services.AddHsts(options => {
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+
             services.AddMvc(options => options.Filters.Add<ProtectWithSecurityKeyFilter>());
 
             var connectionString = Configuration.GetConnectionString("Main");
