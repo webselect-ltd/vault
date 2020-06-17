@@ -151,8 +151,12 @@ export class Repository implements IRepository {
 
     private post<T>(url: string, data: any) {
         return new Promise<T>((resolve, reject) => {
+            const urlWithSecurityKey = this.securityKey
+                ? `${url}?${this.securityKey.parameterName}=${this.securityKey.key}`
+                : url;
+
             const options: any = {
-                url: `${url}?${this.securityKey.parameterName}=${this.securityKey.key}`,
+                url: urlWithSecurityKey,
                 data: JSON.stringify(data),
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
