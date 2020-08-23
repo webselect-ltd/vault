@@ -17,6 +17,8 @@ namespace Vault.Controllers
             IOptionsMonitor<Settings> optionsMonitor,
             IConnectionFactory cf)
         {
+            Guard.AgainstNull(optionsMonitor, nameof(optionsMonitor));
+
             _cfg = optionsMonitor.CurrentValue;
             _db = new SqlExecutor(cf);
         }
@@ -48,6 +50,8 @@ namespace Vault.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
+            Guard.AgainstNull(model, nameof(model));
+
             var credentials = new {
                 Username = model.UN1209,
                 Password = model.PW9804

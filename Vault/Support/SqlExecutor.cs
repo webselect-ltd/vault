@@ -7,13 +7,15 @@ namespace Vault.Support
 {
     public class SqlExecutor
     {
-        private IConnectionFactory _connectionFactory;
+        private readonly IConnectionFactory _connectionFactory;
 
         public SqlExecutor(IConnectionFactory connectionFactory) =>
             _connectionFactory = connectionFactory;
 
         public async Task<T> Result<T>(Func<IDbConnection, Task<T>> action)
         {
+            Guard.AgainstNull(action, nameof(action));
+
             using (var conn = _connectionFactory.GetConnection())
             {
                 conn.Open();
@@ -24,6 +26,8 @@ namespace Vault.Support
 
         public async Task<T> Result<T>(Func<IDbConnection, IDbTransaction, Task<T>> action)
         {
+            Guard.AgainstNull(action, nameof(action));
+
             using (var conn = _connectionFactory.GetConnection())
             {
                 conn.Open();
