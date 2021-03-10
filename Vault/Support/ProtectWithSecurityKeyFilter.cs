@@ -16,18 +16,18 @@ namespace Vault.Support
             _cfg = optionsMonitor.CurrentValue;
         }
 
-        public void OnActionExecuted(ActionExecutedContext filterContext)
+        public void OnActionExecuted(ActionExecutedContext context)
         {
         }
 
-        public void OnActionExecuting(ActionExecutingContext filterContext)
+        public void OnActionExecuting(ActionExecutingContext context)
         {
             var securityKey = _cfg.SecurityKey;
             var parameterName = _cfg.SecurityKeyParameterName;
 
             if (!string.IsNullOrWhiteSpace(securityKey))
             {
-                var httpContext = filterContext?.HttpContext;
+                var httpContext = context?.HttpContext;
 
                 if (httpContext?.Request != null)
                 {
@@ -35,7 +35,7 @@ namespace Vault.Support
 
                     if (key.SingleOrDefault() != securityKey)
                     {
-                        filterContext.Result = new StatusCodeResult(404);
+                        context.Result = new StatusCodeResult(404);
                     }
                 }
             }
