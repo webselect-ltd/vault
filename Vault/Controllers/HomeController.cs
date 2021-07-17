@@ -14,12 +14,12 @@ namespace Vault.Controllers
         private readonly SqlExecutor _db;
 
         public HomeController(
-            IOptionsMonitor<Settings> optionsMonitor,
+            IOptions<Settings> options,
             IConnectionFactory cf)
         {
-            Guard.AgainstNull(optionsMonitor, nameof(optionsMonitor));
+            Guard.AgainstNull(options, nameof(options));
 
-            _cfg = optionsMonitor.CurrentValue;
+            _cfg = options.Value;
             _db = new SqlExecutor(cf);
         }
 
