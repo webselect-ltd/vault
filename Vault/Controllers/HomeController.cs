@@ -52,12 +52,7 @@ namespace Vault.Controllers
         {
             Guard.AgainstNull(model, nameof(model));
 
-            var credentials = new {
-                Username = model.UN1209,
-                Password = model.PW9804
-            };
-
-            var loginResult = await _db.Result(conn => conn.QuerySingleOrDefaultAsync<LoginResult>(SqlStatements.Login, credentials));
+            var loginResult = await _db.Result(conn => conn.QuerySingleOrDefaultAsync<LoginResult>(SqlStatements.Login, model));
 
             return Json(loginResult ?? LoginResult.Failed);
         }

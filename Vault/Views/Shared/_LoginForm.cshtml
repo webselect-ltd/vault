@@ -9,20 +9,17 @@
                 </div>
                 <div class="modal-body">
                     <p>Enter your username and master password:</p>
-                    <!-- These fake fields are a workaround for Chrome not respecting the autocomplete attribute and autofilling fields with the wrong values... -->
-                    <input class="chrome-autocomplete-fake d-none" type="text" name="chromeusername" />
-                    <input class="chrome-autocomplete-fake d-none" type="password" name="chromepassword" />
                     <div class="row mb-md-@(RowMarginMD)">
-                        <label asp-for="UN1209" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)"></label>
+                        <label asp-for="Username" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)"></label>
                         <div class="col-md-@(FieldColumnWidthMD)">
-                            <input asp-for="UN1209" type="password" class="form-control" autocomplete="un1209" required />
+                            <input asp-for="Username" type="text" class="form-control" required />
                             <div class="invalid-feedback">Please enter a username</div>
                         </div>
                     </div>
                     <div class="row mb-md-@(RowMarginMD)">
-                        <label asp-for="PW9804" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)"></label>
+                        <label asp-for="Password" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)"></label>
                         <div class="col-md-@(FieldColumnWidthMD)">
-                            <input asp-for="PW9804" type="password" class="form-control" autocomplete="un1209" required />
+                            <input asp-for="Password" type="password" class="form-control" required />
                             <div class="invalid-feedback">Please enter a password</div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 ﻿import * as Handlebars from 'handlebars';
-import { dom, DOM } from 'mab-dom';
+import { dom, DOM, DOMEvent } from 'mab-dom';
 import { Modal } from 'bootstrap';
 import * as Cookies from 'js-cookie';
 import Clipboard from 'clipboard';
@@ -37,7 +37,8 @@ interface IVaultGlobals {
 
 interface IVaultUIElements {
     body: DOM;
-    loginFormDialog: Modal;
+    loginFormModalElement: DOM;
+    loginFormModal: Modal;
     loginForm: DOM;
     loginErrorMessage: DOM;
     container: DOM;
@@ -92,9 +93,12 @@ const repository = new Repository(_VAULT_GLOBALS.securityKey);
 
 const defaultPasswordSpecification = new PasswordSpecification(16, true, true, true, true);
 
+const loginFormModalDOM = dom('#login-form-dialog');
+
 const ui: IVaultUIElements = {
     body: dom('body'),
-    loginFormDialog: new Modal(dom('#login-form-dialog').get(), { keyboard: false, backdrop: 'static' }),
+    loginFormModalElement: loginFormModalDOM,
+    loginFormModal: new Modal(loginFormModalDOM.get(), { keyboard: false, backdrop: 'static' }),
     loginForm: dom('#login-form'),
     loginErrorMessage: dom('#login-form-dialog').find('.modal-footer .badge'),
     container: dom('#container'),
@@ -488,8 +492,8 @@ ui.loginForm.on('submit', async e => {
     }
 
     await withLoadSpinner(async () => {
-        const username = ui.loginForm.find('#UN1209').val() as string;
-        const password = ui.loginForm.find('#PW9804').val() as string;
+        const username = ui.loginForm.find('#Username').val() as string;
+        const password = ui.loginForm.find('#Password').val() as string;
 
         ui.loginErrorMessage.addClass('d-none');
 
@@ -497,7 +501,7 @@ ui.loginForm.on('submit', async e => {
 
         if (loginResult.Success) {
             ui.loginForm.get().classList.add('d-none');
-            ui.loginFormDialog.hide();
+            ui.loginFormModal.hide();
             ui.controls.get().classList.remove('d-none');
             ui.searchInput.focus();
             setSession();
@@ -554,20 +558,21 @@ ui.body.onchild('#credential-form', 'submit', async e => {
 });
 
 // Show password strength as it is typed
-ui.body.onchild('#Password', 'keyup', rateLimit(e => showPasswordStrength(dom(e.target)), 200));
+ui.body.onchild('#credential-form [name=Password]', 'keyup', rateLimit((e: DOMEvent) => showPasswordStrength(dom(e.targetElement)), 200));
 
 ui.body.onchild('button.generate-password', 'click', e => {
     e.preventDefault();
     const passwordSpecification = getPasswordSpecificationFromUI(ui.modalContent, isChecked);
     const password = generatePassword(passwordSpecification);
-    dom('#Password').val(password);
+    const passwordInput = dom('#credential-form [name=Password]');
+    passwordInput.val(password);
     const opts = [parseInt(dom('#len').val(), 10),
     isChecked(dom('#ucase')) ? 1 : 0,
     isChecked(dom('#lcase')) ? 1 : 0,
     isChecked(dom('#nums')) ? 1 : 0,
     isChecked(dom('#symb')) ? 1 : 0];
     dom('#PwdOptions').val(opts.join('|'));
-    showPasswordStrength(dom('#Password'));
+    showPasswordStrength(passwordInput);
 });
 
 // Toggle password generation option UI visibility
@@ -696,14 +701,16 @@ ui.body.onchild('#import-button', 'click', async e => {
     reloadApp();
 });
 
+ui.loginFormModalElement.on('shown.bs.modal', function (e) {
+    ui.loginForm.find('#Username').focus();
+})
+
 // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
 if (_VAULT_GLOBALS.devMode) {
-    ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
-    ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
+    ui.loginForm.find('#Username').val(Cookies.get('vault-dev-username'));
+    ui.loginForm.find('#Password').val(Cookies.get('vault-dev-password'));
     const form = ui.loginForm.get() as HTMLFormElement;
     form.requestSubmit();
 } else {
-    ui.loginForm.find('#UN1209').focus();
+    ui.loginFormModal.show();
 }
-
-ui.loginFormDialog.show();

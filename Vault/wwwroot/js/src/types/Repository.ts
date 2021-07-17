@@ -41,8 +41,8 @@ export class Repository implements IRepository {
         const passwordHash = await hash(password);
 
         const data = {
-            UN1209: hex(usernameHash),
-            PW9804: hex(passwordHash)
+            Username: hex(usernameHash),
+            Password: hex(passwordHash)
         };
 
         const loginResult = await this.post<ILoginResult>('Home/Login', data);
