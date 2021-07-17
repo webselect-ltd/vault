@@ -35,34 +35,34 @@
 </script>
 
 <script id="tmpl-urltext" type="text/html">
-    <span class="d-none d-lg-block">{{truncate Url 50}}</span>
+    <span class="d-none d-lg-inline">{{truncate Url 50}}</span>
     <span class="d-lg-none">{{truncate Url 26}}</span>
 </script>
 
 <script id="tmpl-copylink" type="text/html">
-    <a class="copy-link" data-clipboard-text="{{Content}}">Copy <span class="bi bi-clipboard"></span></a>
+    <a class="copy-link" data-clipboard-text="{{Content}}"><span class="bi bi-clipboard"></span></a>
 </script>
 
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Url</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)">{{{UrlHtml}}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Url }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=Url }} </span>{{{UrlHtml}}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink Content=Url }}</div>
     </div>
     {{/if}}
     {{#if Username}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Username</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)">{{Username}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Username }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=Username }} </span>{{Username}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink Content=Username }}</div>
     </div>
     {{/if}}
     {{#if Password}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Password</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="user-select-all">{{Password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Password }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=Password }} </span><span class="user-select-all">{{Password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
+        <div class="col-3 text-end d-md-none">{{> copylink Content=Password }}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
         <div class="col-md-@(DataCopyLinkSpanColumnWidthMD) offset-md-@(LabelColumnWidthMD)">{{{PasswordCharacterTable}}}</div>
@@ -71,21 +71,21 @@
     {{#if UserDefined1}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{UserDefined1Label}}</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined1}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=UserDefined1 }} </span>{{UserDefined1}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink Content=UserDefined1 }}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{UserDefined2Label}}</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined2}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=UserDefined2 }} </span>{{UserDefined2}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink Content=UserDefined2 }}</div>
     </div>
     {{/if}}
     {{#if Notes}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Notes</div>
-        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD)">{{breaklines Notes}}</div>
+        <div class="col-md-@(DataColumnWidthMD)">{{breaklines Notes}}</div>
     </div>
     {{/if}}
 </script>

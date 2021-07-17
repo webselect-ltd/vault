@@ -8,8 +8,6 @@
 
         public static readonly int DataColumnWidthMD = 7;
 
-        public static readonly int CopyLinkColumnWidthMD = 2;
-
         public static readonly int DataCopyLinkSpanColumnWidthMD = 9;
 
         public static readonly int RowMargin = 2;
