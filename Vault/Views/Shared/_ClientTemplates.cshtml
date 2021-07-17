@@ -1,13 +1,9 @@
-﻿@{
-    var homeUrl = Url.Action("Index", "Main", null).TrimEnd('/');
-}
-
-<script id="tmpl-modalheader" type="text/html">
+﻿<script id="tmpl-modalheader" type="text/html">
     <div class="modal-header">
-        {{#if showClose}}
-        <button type="button" class="close btn-close"><span aria-hidden="true">&times;</span><span class="sr-only">{{closeText}}</span></button>
-        {{/if}}
         <h4 class="modal-title">{{title}}</h4>
+        {{#if showClose}}
+        <button type="button" class="close btn-close" data-bs-dismiss="modal" aria-label="{{closeText}}"></button>
+        {{/if}}
     </div>
 </script>
 
@@ -20,16 +16,16 @@
 <script id="tmpl-modalfooter" type="text/html">
     <div class="modal-footer">
         {{#if showEdit}}
-        <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialId}}"><span class="fa fa-pencil"></span> {{editText}}</button>
+        <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialId}}"><span class="bi bi-pencil-square"></span> {{editText}}</button>
         {{/if}}
         {{#if showDelete}}
-        <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialId}}"><span class="fa fa-trash-o"></span> {{deleteText}}</button>
+        <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialId}}"><span class="bi bi-trash"></span> {{deleteText}}</button>
         {{/if}}
         {{#if showAccept}}
-        <button type="submit" class="btn btn-primary btn-accept"><span class="fa fa-check"></span> {{acceptText}}</button>
+        <button type="submit" class="btn btn-primary btn-accept"><span class="bi bi-check-lg"></span> {{acceptText}}</button>
         {{/if}}
         {{#if showClose}}
-        <button type="button" class="btn btn-default btn-close"><span class="fa fa-times"></span> {{closeText}}</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><span class="bi bi-x-lg"></span> {{closeText}}</button>
         {{/if}}
     </div>
 </script>
@@ -39,58 +35,57 @@
 </script>
 
 <script id="tmpl-urltext" type="text/html">
-    <span class="full">{{truncate Url 50}}</span>
-    <span class="truncated">{{truncate Url 26}}</span>
+    <span class="d-none d-lg-block">{{truncate Url 50}}</span>
+    <span class="d-lg-none">{{truncate Url 26}}</span>
 </script>
 
 <script id="tmpl-copylink" type="text/html">
-    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
-    <input type="text" class="copy-content" value="{{Content}}" />
+    <a class="copy-link" data-clipboard-text="{{Content}}">Copy <span class="bi bi-clipboard"></span></a>
 </script>
 
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
-    <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">Url</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=Url }}</div>
-        <div class="col-xs-18 col-sm-15">{{{UrlHtml}}}</div>
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Url</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{{UrlHtml}}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Url }}</div>
     </div>
     {{/if}}
     {{#if Username}}
-    <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">Username</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=Username }}</div>
-        <div class="col-xs-18 col-sm-15">{{Username}}</div>
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Username</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{Username}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Username }}</div>
     </div>
     {{/if}}
     {{#if Password}}
-    <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=Password }}</div>
-        <div class="col-xs-18 col-sm-15">{{Password}}</div>
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Password</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="user-select-all">{{Password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Password }}</div>
     </div>
-    <div class="row row-detail row-detail-password-info">
-        <div class="col-xs-24 col-sm-15 col-sm-offset-9">{{{PasswordCharacterTable}}}</div>
+    <div class="row row-detail row-detail-password-info d-none">
+        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD) offset-md-@(LabelColumnWidthMD)">{{{PasswordCharacterTable}}}</div>
     </div>
     {{/if}}
     {{#if UserDefined1}}
-    <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">{{UserDefined1Label}}</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=UserDefined1 }}</div>
-        <div class="col-xs-18 col-sm-15">{{UserDefined1}}</div>
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{UserDefined1Label}}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined1}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=UserDefined1 }}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
-    <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">{{UserDefined2Label}}</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=UserDefined2 }}</div>
-        <div class="col-xs-18 col-sm-15">{{UserDefined2}}</div>
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{UserDefined2Label}}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined2}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=UserDefined2 }}</div>
     </div>
     {{/if}}
     {{#if Notes}}
-    <div class="row row-detail">
-        <div class="col-xs-24 col-sm-9 row-detail-header">Notes</div>
-        <div class="col-xs-24 col-sm-15">{{breaklines Notes}}</div>
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Notes</div>
+        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD)">{{breaklines Notes}}</div>
     </div>
     {{/if}}
 </script>
@@ -104,43 +99,44 @@
 </script>
 
 <script id="tmpl-optionsdialog" type="text/html">
-    <p>Enter and confirm a new password:</p>
-    <div class="form-horizontal">
-        <div class="form-group">
-            <label for="NewPassword" class="col-sm-8 control-label">New Password</label>
-            <div class="col-sm-16">
-                <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" />
+    <form id="change-password-form" class="needs-validation" novalidate>
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="NewPassword" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">New Password</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
+                <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" required />
+                <div class="invalid-feedback">Please enter a password</div>
             </div>
         </div>
-        <div class="form-group">
-            <label for="NewPasswordConfirm" class="col-sm-8 control-label">Confirm New Password</label>
-            <div class="col-sm-16">
-                <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" />
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="NewPasswordConfirm" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Confirm Password</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
+                <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" required />
+                <div class="invalid-feedback" data-required="Please confirm the password" data-mismatch="Confirmation doesn't match password">Please confirm the password</div>
             </div>
         </div>
-        <div class="form-group">
-            <div class="col-sm-offset-8 col-sm-16">
-                <button class="btn btn-primary" id="change-password-button">Change Password</button>
+        <div class="row mb-md-@(RowMarginMD)">
+            <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
+                <button type="submit" class="btn btn-primary">Change Password</button>
             </div>
         </div>
-        <hr />
-        <div class="form-group">
-            <label for="import-data" class="col-sm-8 control-label">Import Data</label>
-            <div class="col-sm-16">
-                <textarea class="form-control" id="import-data" placeholder="Paste exported JSON data here"></textarea>
-            </div>
+    </form>
+    <hr />
+    <div class="row mb-md-@(RowMarginMD)">
+        <label for="import-data" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Import Data</label>
+        <div class="col-md-@(FieldColumnWidthMD)">
+            <textarea class="form-control" id="import-data" placeholder="Paste exported JSON data here"></textarea>
         </div>
-        <div class="form-group">
-            <div class="col-sm-offset-8 col-sm-16">
-                <button class="btn btn-primary" id="import-button">Import Data</button>
-            </div>
+    </div>
+    <div class="row mb-md-@(RowMarginMD)">
+        <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
+            <button class="btn btn-primary" id="import-button">Import Data</button>
         </div>
-        <hr />
-        <div class="form-group">
-            <label for="export-button" class="col-sm-8 control-label">Export Data</label>
-            <div class="col-sm-16">
-                <button class="btn btn-primary" id="export-button">Export Data</button>
-            </div>
+    </div>
+    <hr />
+    <div class="row mb-md-@(RowMarginMD)">
+        <label for="export-button" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Export Data</label>
+        <div class="col-md-@(FieldColumnWidthMD)">
+            <button class="btn btn-primary" id="export-button">Export Data</button>
         </div>
     </div>
 </script>
@@ -156,10 +152,6 @@
 </html>
 </script>
 
-<script id="tmpl-validationmessage" type="text/html">
-    <div class="validation-message"><p>{{{errors}}}</p></div>
-</script>
-
 <script id="tmpl-credentialtable" type="text/html">
     {{#each rows}}
     {{> credentialtablerow}}
@@ -167,39 +159,32 @@
 </script>
 
 <script id="tmpl-credentialtablerow" type="text/html">
-    <div id="{{credentialid}}" class="row">
-        <div class="col-sm-15 ccol">
-            <button class="btn btn-default btn-block btn-l btn-credential-show-detail">
-                <span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span>
-                <br />
-                <span class="label label-std">{{username}}</span>
-                {{#if weak}}
-                <span class="label label-warning">Weak Password</span>
-                {{/if}}
-            </button>
-        </div>
-        <div class="col-xs-8 col-sm-3 ccol">
-            {{#if url}}
-            <a class="btn btn-primary btn-block btn-credential-open" href="{{url}}" target="_blank">
-                <span class="fa fa-fw fa-external-link-square"></span> Web
-            </a>
+    <div id="{{credentialid}}" class="credential mb-2 mb-md-1">
+        <div class="btn btn-credential-show-detail mb-1 mb-md-0" data-id="{{credentialid}}">
+            <div class="d-none d-md-block">{{description}}</div><div class="d-md-none">{{truncate description 31}}</div>
+            {{#if weak}}
+            {{#if username}}
+            <span class="btn-credential-username me-2">{{username}}</span>
+            {{/if}}
+            <span class="badge rounded-pill bg-warning text-dark">Weak Password</span>
             {{else}}
-            <button class="btn btn-primary btn-block btn-credential-open" disabled="disabled">
-                <span class="fa fa-fw fa-external-link-square"></span> Web
-            </button>
+            <span class="btn-credential-username">{{username}}&nbsp;</span>
             {{/if}}
         </div>
-        <div class="col-xs-8 col-sm-3 ccol">
-            <button class="btn btn-primary btn-block btn-credential-copy btn-credential-copy-username">
-                <span class="fa fa-fw fa-clone"></span> User
-            </button>
-            <input type="text" class="copy-content" name="copy-content" value="{{username}}" />
-        </div>
-        <div class="col-xs-8 col-sm-3 ccol">
-            <button class="btn btn-primary btn-block btn-credential-copy btn-credential-copy-password">
-                <span class="fa fa-fw fa-clone"></span> Pwd
-            </button>
-            <input type="text" class="copy-content" name="copy-content" value="{{password}}" />
-        </div>
+        {{#if url}}
+        <a class="btn btn-primary btn-credential-open ms-1" href="{{url}}" target="_blank">
+            <span class="bi bi-box-arrow-up-right me-1"></span> Web
+        </a>
+        {{else}}
+        <a class="btn btn-primary btn-credential-open disabled ms-1">
+            <span class="bi bi-box-arrow-up-right me-1"></span> Web
+        </a>
+        {{/if}}
+        <a class="btn btn-primary btn-credential-copy btn-credential-copy-username ms-1" data-clipboard-text="{{username}}">
+            <span class="bi bi-clipboard me-1"></span> User
+        </a>
+        <a class="btn btn-primary btn-credential-copy btn-credential-copy-password ms-1" data-clipboard-text="{{password}}">
+            <span class="bi bi-clipboard me-1"></span> Pwd
+        </a>
     </div>
 </script>
