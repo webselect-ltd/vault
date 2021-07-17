@@ -39,6 +39,7 @@ namespace Vault.Controllers
             var model = new IndexViewModel {
                 BaseUrl = new Uri(Url.Action(nameof(Index)), UriKind.Relative),
                 AbsoluteUrl = new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"),
+                EnableSessionTimeout = _cfg.EnableSessionTimeout,
                 SessionTimeoutInSeconds = _cfg.SessionTimeoutInSeconds,
                 SecurityKey = securityKey,
                 DevMode = _cfg.DevMode

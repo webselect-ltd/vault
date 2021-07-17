@@ -30,6 +30,7 @@ interface IVaultGlobals {
     baseUrl: string;
     // Current absolute URL (used for app refresh and auto-logout)
     absoluteUrl: string;
+    enableSessionTimeout: boolean;
     sessionTimeoutInSeconds: number;
     securityKey?: ISecurityKeyDetails;
     devMode: boolean;
@@ -504,8 +505,13 @@ ui.loginForm.on('submit', async e => {
             ui.loginFormModal.hide();
             ui.controls.get().classList.remove('d-none');
             ui.searchInput.focus();
-            setSession();
-            ui.body.on('click keyup', setSession);
+
+            if (_VAULT_GLOBALS.enableSessionTimeout) {
+                setSession();
+                // TODO: mab-dom doesn't support multiple event names in one 'on' call
+                ui.body.on('click', setSession);
+                ui.body.on('keyup', setSession);
+            }
 
             // TODO: REMOVE?
             if (_VAULT_GLOBALS.devMode) {
