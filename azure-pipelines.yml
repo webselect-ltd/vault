@@ -18,8 +18,9 @@ steps:
     workingDir: '$(Build.SourcesDirectory)/Vault'
 
 - task: gulp@0
+  displayName: 'Gulp Build'
   inputs:
-    gulpFile: 'gulpfile.js'
+    gulpFile: '$(Build.SourcesDirectory)/Vault/gulpfile.js'
     targets: 'build'
     workingDirectory: '$(Build.SourcesDirectory)/Vault'
     gulpjs: 'node_modules/gulp/bin/gulp.js'
