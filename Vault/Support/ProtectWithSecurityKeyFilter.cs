@@ -9,11 +9,11 @@ namespace Vault.Support
     {
         private readonly Settings _cfg;
 
-        public ProtectWithSecurityKeyFilter(IOptionsMonitor<Settings> optionsMonitor)
+        public ProtectWithSecurityKeyFilter(IOptions<Settings> options)
         {
-            Guard.AgainstNull(optionsMonitor, nameof(optionsMonitor));
+            Guard.AgainstNull(options, nameof(options));
 
-            _cfg = optionsMonitor.CurrentValue;
+            _cfg = options.Value;
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
