@@ -17,6 +17,14 @@ steps:
     command: 'ci'
     workingDir: '$(Build.SourcesDirectory)/Vault'
 
+- task: gulp@0
+  inputs:
+    gulpFile: 'gulpfile.js'
+    targets: 'build'
+    workingDirectory: '$(Build.SourcesDirectory)/Vault'
+    gulpjs: 'node_modules/gulp/bin/gulp.js'
+    enableCodeCoverage: false
+
 - task: Npm@1
   displayName: 'NPM Build'
   inputs:
