@@ -75,10 +75,22 @@ namespace Vault.Controllers
                 return await conn.ExecuteAsync(SqlStatements.UpdatePassword, passwordUpdateData, tran);
             });
 
-        public IActionResult GenerateVaultCredential() =>
-            View(new GenerateVaultCredentialViewModel());
+        public IActionResult GenerateVaultCredential()
+        {
+            var model = new GenerateVaultCredentialViewModel {
+                DevMode = _cfg.DevMode
+            };
 
-        public IActionResult SetDevCookie() =>
-            View();
+            return View(model);
+        }
+
+        public IActionResult SetDevCookie()
+        {
+            var model = new SetDevCookieViewModel {
+                DevMode = _cfg.DevMode
+            };
+
+            return View(model);
+        }
     }
 }

@@ -41,7 +41,14 @@
 
 @section foot {
 
-    <script src="~/js/dist/setdevcookie.js" asp-append-version="true" integrity="sha512-VaS6/zI8kTUXfQ5amk/Ksname1H9M5TtcyDKuRJ+iG/hdKLHBJ9Zoh8YUmduBXnrbo7RreUxWPSvIvmsxwJOdg=="></script>
+    @if (Model.DevMode)
+    {
+        <script src="~/js/dist/setdevcookie.js" asp-append-version="true"></script>
+    }
+    else
+    {
+        <script src="~/js/dist/setdevcookie.js" asp-append-version="true" integrity="sha512-fwdZV5FDY85hjWdau6Rf+0UOdyeSjdeXz9w4Wot61XxVZ3U7PYy7XGJPC0a+el4/NqQJw1YCI1aNAhYHFnddyA=="></script>
+    }
 
     <div class="modal-backdrop show"></div>
 

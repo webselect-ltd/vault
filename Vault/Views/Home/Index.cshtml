@@ -20,6 +20,13 @@
         var _VAULT_GLOBALS = @Html.Raw(Model.AsJson());
     </script>
 
-    <script src="~/js/dist/index.js" asp-append-version="true" integrity="sha512-o2ap3/VTdesJyrlSxTzvcMdn9iHrh8nu0tplAkxPk92SCEIwjx4zdL2j7XeuC7W4Pw0Ch6ej5N6droBgp1oBXQ=="></script>
+    @if (Model.DevMode)
+    {
+        <script src="~/js/dist/index.js" asp-append-version="true"></script>
+    }
+    else
+    {
+        <script src="~/js/dist/index.js" asp-append-version="true" integrity="sha512-o6waY92QdPZHaPeLxXf0dfEpkJ9GuVuOmoCzfuii3ucyKLURUsgg0E4LNpASWE8EJSYJOS+UCBu3fFzHLFykIw=="></script>
+    }
 
 }
