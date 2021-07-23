@@ -44,7 +44,7 @@
         "css:clean": "del-cli ./wwwroot/css/dist",
         "css:build": "gulp build-css",
         "build": "run-s css:* js:*",
-        "watch": "webpack --watch --mode=production",
+        "watch-js": "webpack --watch --mode=production",
         "test": "jest",
         "coverage": "jest --coverage"
     },
@@ -70,7 +70,7 @@
     },
     "-vs-binding": {
         "ProjectOpened": [
-            "watch"
+            "watch-js"
         ]
     }
 }
