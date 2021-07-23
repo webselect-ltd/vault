@@ -11,7 +11,7 @@ void Main()
     
     var views = new Dictionary<string, string>();
 
-    var files = Directory.GetFiles(distPath, "*.js");
+    var files = Directory.GetFiles(distPath, "*.min.js");
 
     var regex = new Regex("integrity=\"sha512-.*?\"");
 
@@ -27,7 +27,7 @@ void Main()
 
         $"sha512-{hash}".Dump(Path.GetFileName(file));
         
-        var viewPath = $@"{viewsPath}\{Path.GetFileNameWithoutExtension(file)}.cshtml".Dump();
+        var viewPath = $@"{viewsPath}\{Path.GetFileName(file).Replace(".min.js", string.Empty)}.cshtml".Dump();
 
         var content = File.ReadAllText(viewPath);
 

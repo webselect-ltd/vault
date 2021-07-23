@@ -609,11 +609,6 @@ ui.body.onchild('a.toggle-password-info', 'click', e => {
     toggle(dom('#modal').find('.row-detail-password-info'), 'd-none');
 });
 
-ui.body.onchild('a.btn-credential-open', 'click', e => {
-    e.preventDefault();
-    open(dom((e.targetElement as HTMLElement)).data('url'));
-});
-
 ui.body.onchild('.btn-credential-copy', 'click', e => {
     e.preventDefault();
     const allButtons = dom('a.btn-credential-copy');
