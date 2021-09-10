@@ -706,12 +706,12 @@ ui.loginFormModalElement.on('shown.bs.modal', function (e) {
     ui.loginForm.find('#Username').focus();
 })
 
+ui.loginFormModal.show();
+
 // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
 if (_VAULT_GLOBALS.devMode) {
     ui.loginForm.find('#Username').val(Cookies.get('vault-dev-username'));
     ui.loginForm.find('#Password').val(Cookies.get('vault-dev-password'));
     const form = ui.loginForm.get() as HTMLFormElement;
     form.requestSubmit();
-} else {
-    ui.loginFormModal.show();
 }
