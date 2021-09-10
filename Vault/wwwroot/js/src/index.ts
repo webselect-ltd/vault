@@ -1,7 +1,6 @@
 ﻿import * as Handlebars from 'handlebars';
 import { dom, DOM, DOMEvent } from 'mab-dom';
 import { Modal } from 'bootstrap';
-import * as Cookies from 'js-cookie';
 import Clipboard from 'clipboard';
 import {
     generatePassword,
@@ -33,7 +32,6 @@ interface IVaultGlobals {
     enableSessionTimeout: boolean;
     sessionTimeoutInSeconds: number;
     securityKey?: ISecurityKeyDetails;
-    devMode: boolean;
 }
 
 interface IVaultUIElements {
@@ -512,14 +510,6 @@ ui.loginForm.on('submit', async e => {
                 ui.body.on('click', setSession);
                 ui.body.on('keyup', setSession);
             }
-
-            // TODO: REMOVE?
-            if (_VAULT_GLOBALS.devMode) {
-                ui.searchInput.val('filter:all');
-                const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
-                const results = search(ui.searchInput.val(), credentials);
-                updateCredentialListUI(ui.container, results);
-            }
         } else {
             ui.loginErrorMessage.removeClass('d-none');
         }
@@ -707,11 +697,3 @@ ui.loginFormModalElement.on('shown.bs.modal', function (e) {
 })
 
 ui.loginFormModal.show();
-
-// If we're in dev mode, automatically log in with a cookie manually created on the dev machine
-if (_VAULT_GLOBALS.devMode) {
-    ui.loginForm.find('#Username').val(Cookies.get('vault-dev-username'));
-    ui.loginForm.find('#Password').val(Cookies.get('vault-dev-password'));
-    const form = ui.loginForm.get() as HTMLFormElement;
-    form.requestSubmit();
-}

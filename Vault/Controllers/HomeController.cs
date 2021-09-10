@@ -83,14 +83,5 @@ namespace Vault.Controllers
 
             return View(model);
         }
-
-        public IActionResult SetDevCookie()
-        {
-            var model = new SetDevCookieViewModel {
-                DevMode = _cfg.DevMode
-            };
-
-            return View(model);
-        }
     }
 }

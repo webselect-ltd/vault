@@ -8,7 +8,6 @@ module.exports = {
     },
     entry: {
         'index': './wwwroot/js/src/index.ts',
-        'setdevcookie': './wwwroot/js/src/setdevcookie.ts',
         'generatevaultcredential': './wwwroot/js/src/generatevaultcredential.ts',
     },
     devtool: 'source-map',
