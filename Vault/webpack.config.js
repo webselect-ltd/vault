@@ -18,7 +18,7 @@ module.exports = {
         {
             apply: (compiler) => {
                 compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
-                    const child = spawn('../Utils/bin/Release/net5.0/Utils.exe', ['./wwwroot/js/dist', './Views/Home']);
+                    const child = spawn('dotnet', ['run', '-p', '../Utils/Utils.csproj', './wwwroot/js/dist', './Views/Home']);
 
                     child.stdout.on('data', function (data) {
                         process.stdout.write(data.toString());
