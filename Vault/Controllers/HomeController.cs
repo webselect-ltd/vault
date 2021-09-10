@@ -41,8 +41,7 @@ namespace Vault.Controllers
                 AbsoluteUrl = new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"),
                 EnableSessionTimeout = _cfg.EnableSessionTimeout,
                 SessionTimeoutInSeconds = _cfg.SessionTimeoutInSeconds,
-                SecurityKey = securityKey,
-                DevMode = _cfg.DevMode
+                SecurityKey = securityKey
             };
 
             return View(model);
@@ -77,9 +76,7 @@ namespace Vault.Controllers
 
         public IActionResult GenerateVaultCredential()
         {
-            var model = new GenerateVaultCredentialViewModel {
-                DevMode = _cfg.DevMode
-            };
+            var model = new GenerateVaultCredentialViewModel();
 
             return View(model);
         }

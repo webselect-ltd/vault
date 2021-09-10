@@ -13,7 +13,5 @@ namespace Vault.Models
         public int SessionTimeoutInSeconds { get; set; }
 
         public object SecurityKey { get; set; }
-
-        public bool DevMode { get; set; }
     }
 }

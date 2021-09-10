@@ -9,7 +9,5 @@
         public string SecurityKey { get; set; }
 
         public string SecurityKeyParameterName { get; set; }
-
-        public bool DevMode { get; set; }
     }
 }
