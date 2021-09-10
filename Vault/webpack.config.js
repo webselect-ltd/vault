@@ -1,5 +1,7 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
+const { spawn } = require('child_process');
+
 module.exports = {
     output: {
         filename: '[name].min.js',
@@ -12,7 +14,22 @@ module.exports = {
     },
     devtool: 'source-map',
     plugins: [
-        new CleanWebpackPlugin()
+        new CleanWebpackPlugin(),
+        {
+            apply: (compiler) => {
+                compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
+                    const child = spawn('../Utils/bin/Debug/net5.0/Utils.exe', ['./wwwroot/js/dist', './Views/Home']);
+
+                    child.stdout.on('data', function (data) {
+                        process.stdout.write(data.toString());
+                    });
+
+                    child.stderr.on('data', function (data) {
+                        process.stdout.write(data.toString());
+                    });
+                });
+            }
+        }
     ],
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
