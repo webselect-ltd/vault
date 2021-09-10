@@ -9,8 +9,8 @@ module.exports = {
         library: 'Vault'
     },
     entry: {
-        'index': './wwwroot/js/src/index.ts',
-        'generatevaultcredential': './wwwroot/js/src/generatevaultcredential.ts',
+        'Index': './wwwroot/js/src/Index.ts',
+        'GenerateVaultCredential': './wwwroot/js/src/GenerateVaultCredential.ts',
     },
     devtool: 'source-map',
     plugins: [
