@@ -42,7 +42,7 @@
         "js:build": "webpack --mode=production",
         "css:clean": "del-cli ./wwwroot/css/dist",
         "css:build": "gulp build-css",
-        "build": "run-s css:* js:*",
+        "build": "run-s css:clean css:build js:clean js:build",
         "watch-js": "webpack --watch --mode=production",
         "test": "jest",
         "coverage": "jest --coverage"
