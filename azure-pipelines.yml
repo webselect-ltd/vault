@@ -16,7 +16,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(Build.SourcesDirectory)/Utils/Utils.csproj'
-    arguments: '-c Release'
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: Npm@1
   displayName: 'NPM Package Restore'
