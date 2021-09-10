@@ -26,9 +26,9 @@
 
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.0.90" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0" />
-        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.5">
+        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.4.2">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -38,7 +38,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.114.3" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115" />
     </ItemGroup>
 
 </Project>
