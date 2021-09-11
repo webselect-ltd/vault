@@ -554,7 +554,16 @@ ui.body.onchild('#credential-form', 'submit', async e => {
 });
 
 // Show password strength as it is typed
-ui.body.onchild('#credential-form [name=Password]', 'keyup', rateLimit((e: DOMEvent) => showPasswordStrength(dom(e.handlerElement)), 200));
+ui.body.onchild('#credential-form [name=Password]', 'keyup', rateLimit((e: DOMEvent) => {
+    console.group('password keyup');
+    console.log('Handler attached to:', e.handlerAttachedToElement);
+    console.log('Handler triggered by:', e.handlerTriggeredByElement);
+    console.log('Handler child selector:', e.handlerChildSelector);
+    console.log('Handler element:', e.handlerElement);
+    console.groupEnd();
+
+    showPasswordStrength(dom(e.handlerElement));
+}, 200));
 
 ui.body.onchild('button.generate-password', 'click', e => {
     e.preventDefault();
