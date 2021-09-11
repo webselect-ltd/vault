@@ -443,7 +443,7 @@ function showPasswordStrength(field: DOM) {
 
 ui.container.onchild('.btn-credential-show-detail', 'click', e => {
     e.preventDefault();
-    const id = e.targetElement.getAttribute('data-id');
+    const id = e.handlerElement.getAttribute('data-id');
     showDetail(id);
 });
 
@@ -484,7 +484,7 @@ ui.searchInput.on('keyup', rateLimit(async e => {
 ui.loginForm.on('submit', async e => {
     e.preventDefault();
 
-    const form = dom(e.targetElement);
+    const form = dom(e.handlerElement);
 
     if (!validate(form)) {
         return false;
@@ -528,7 +528,7 @@ function validate(form: DOM) {
 ui.body.onchild('#credential-form', 'submit', async e => {
     e.preventDefault();
 
-    const form = dom((e.targetElement as HTMLElement));
+    const form = dom((e.handlerElement as HTMLElement));
 
     if (!validate(form)) {
         return;
@@ -554,12 +554,7 @@ ui.body.onchild('#credential-form', 'submit', async e => {
 });
 
 // Show password strength as it is typed
-ui.body.onchild('#credential-form [name=Password]', 'keyup', rateLimit((e: DOMEvent) => {
-    console.log(e.targetElement);
-    console.log(e.clickedElement);
-
-    showPasswordStrength(dom(e.targetElement));
-}, 200));
+ui.body.onchild('#credential-form [name=Password]', 'keyup', rateLimit((e: DOMEvent) => showPasswordStrength(dom(e.handlerElement)), 200));
 
 ui.body.onchild('button.generate-password', 'click', e => {
     e.preventDefault();
@@ -664,7 +659,7 @@ ui.body.onchild('#change-password-form', 'submit', async e => {
 
     validatePasswordMatch();
 
-    const form = dom(e.targetElement);
+    const form = dom(e.handlerElement);
 
     if (!validate(form)) {
         return false;
