@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
         <NoWarn>1701;1702;1591</NoWarn>
         <CodeAnalysisRuleSet>..\Vault.ruleset</CodeAnalysisRuleSet>
@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\net5.0\Vault.xml</DocumentationFile>
+        <DocumentationFile>bin\Debug\net6.0\Vault.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\net5.0\Vault.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\net6.0\Vault.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,20 +25,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.0.90" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0" />
-        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.4.2">
+        <PackageReference Include="Dapper" Version="2.0.123" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.6" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
+        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.7.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Validation" Version="16.10.34" />
+        <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.53" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
     </ItemGroup>
 
 </Project>
