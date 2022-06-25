@@ -11,6 +11,11 @@ variables:
 
 steps:
 
+- task: NodeTool@0
+  displayName: 'Install NodeJS 16.13.0 Tooling'
+  inputs:
+    versionSpec: '16.13.0'
+
 - task: Npm@1
   displayName: 'NPM Package Restore'
   inputs:
