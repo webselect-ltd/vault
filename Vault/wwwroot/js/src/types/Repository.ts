@@ -9,9 +9,6 @@
 } from '../modules/all';
 import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails } from '../types/all';
 
-export type XHRSuccessCallback = (data: any, status?: string, request?: JQueryXHR) => void;
-export type XHRErrorCallback = (request: JQueryXHR, status: string, error: string) => void;
-
 export class Repository implements IRepository {
     private readonly encryptionExcludes = ['CredentialID', 'UserID'];
 
