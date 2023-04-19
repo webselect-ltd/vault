@@ -12,9 +12,9 @@ variables:
 steps:
 
 - task: NodeTool@0
-  displayName: 'Install NodeJS 16.13.0 Tooling'
+  displayName: 'Install NodeJS 18.16.0 Tooling'
   inputs:
-    versionSpec: '16.13.0'
+    versionSpec: '18.16.0'
 
 - task: Npm@1
   displayName: 'NPM Package Restore'
