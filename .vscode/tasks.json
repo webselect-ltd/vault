@@ -7,6 +7,7 @@
             "type": "process",
             "args": [
                 "build",
+                "--no-incremental",
                 "${workspaceFolder}/Vault/Vault.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
