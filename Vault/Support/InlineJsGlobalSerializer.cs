@@ -24,10 +24,7 @@ namespace Vault.Support
         /// <returns>A formatted JSON string.</returns>
         public static string AsJson(this object o)
         {
-            if (o == null)
-            {
-                throw new ArgumentNullException(nameof(o));
-            }
+            ArgumentNullException.ThrowIfNull(o);
 
             var serializer = JsonSerializer.CreateDefault(_settings);
 

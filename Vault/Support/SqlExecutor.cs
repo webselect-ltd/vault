@@ -14,7 +14,7 @@ namespace Vault.Support
 
         public async Task<T> Result<T>(Func<IDbConnection, Task<T>> action)
         {
-            Guard.AgainstNull(action, nameof(action));
+            ArgumentNullException.ThrowIfNull(action);
 
             using (var conn = _connectionFactory.GetConnection())
             {
@@ -26,7 +26,7 @@ namespace Vault.Support
 
         public async Task<T> Result<T>(Func<IDbConnection, IDbTransaction, Task<T>> action)
         {
-            Guard.AgainstNull(action, nameof(action));
+            ArgumentNullException.ThrowIfNull(action);
 
             using (var conn = _connectionFactory.GetConnection())
             {

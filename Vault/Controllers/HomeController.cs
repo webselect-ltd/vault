@@ -17,7 +17,7 @@ namespace Vault.Controllers
             IOptions<Settings> options,
             IConnectionFactory cf)
         {
-            Guard.AgainstNull(options, nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
 
             _cfg = options.Value;
             _db = new SqlExecutor(cf);
@@ -50,7 +50,7 @@ namespace Vault.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
-            Guard.AgainstNull(model, nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
 
             var loginResult = await _db.Result(conn => conn.QuerySingleOrDefaultAsync<LoginResult>(SqlStatements.Login, model));
 
