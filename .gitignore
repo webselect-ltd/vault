@@ -344,5 +344,8 @@ Vault/wwwroot/css/src/vendor/bootstrap/
 # SCSS artefacts
 Vault/wwwroot/css/dist/
 
-# TypeScript Output
+# TypeScript output
 Vault/wwwroot/js/dist/
+
+# Development settings
+appsettings.Development.json
