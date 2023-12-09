@@ -8,14 +8,6 @@
         <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\net6.0\Vault.xml</DocumentationFile>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\net6.0\Vault.xml</DocumentationFile>
-    </PropertyGroup>
-
     <ItemGroup>
         <Compile Remove="coverage\**" />
         <Content Remove="coverage\**" />
@@ -25,8 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Remove="package.json" />
-        <Content Remove="package-lock.json" />
+        <Content Update="package.json;package-lock.json;tslint.json;tsconfig.json;wwwroot/css/src/**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
     </ItemGroup>
 
     <ItemGroup>
