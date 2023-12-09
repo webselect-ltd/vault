@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -11,7 +12,7 @@ namespace Vault.Support
 
         public ProtectWithSecurityKeyFilter(IOptions<Settings> options)
         {
-            Guard.AgainstNull(options, nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
 
             _cfg = options.Value;
         }
