@@ -1,10 +1,10 @@
 # About Vault
 
-Vault is a very simple ASP.NET web application for storing encrypted personal login details (usernames, passwords etc). It uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) to do all encryption and decryption on the client and avoid passing vulnerable plain-text data to the server. 
+Vault is a very simple ASP.NET web application for storing encrypted personal login details (usernames, passwords etc). It uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) to do all encryption and decryption on the client and avoid passing vulnerable plain-text data to the server.
 
 Although all data is encrypted before transmission over HTTP, **this application should *always* be used over an SSL-encrypted connection** to avoid interception of the password hash.
 
-*Please Note:* Due to the use of the Web Crypto API, Vault only works in [recent versions of modern browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API#Browser_compatibility)..
+*Please Note:* Due to the use of the Web Crypto API, Vault only works in [recent versions of modern browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API#Browser_compatibility).
 
 ## External Libraries/Dependencies
 
@@ -40,12 +40,6 @@ You can filter credential search results by using query prefixes. Currently avai
 * `filter:all`: shows *all* credentials
 
 ## Development
-
-Some useful endpoints:
-
-### `/Home/SetDevCookie`
-
-If the `DevMode` config setting is set to `true`, this endpoint will set a cookie which will automatically log you in on page refresh. This is _extremely_ useful during development, because otherwise you'll have to log in every single time you make a change...
 
 ### `/Home/GenerateVaultCredential`
 
