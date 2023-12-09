@@ -29,12 +29,6 @@ jobs:
       - name: Build UI
         run: ./build-front-end.sh
 
-      - name: Set up application configuration
-        run: |
-          sed -i 's|CI_SECRET_SECURITY_KEY_PARAMETER_NAME|${{ secrets.SECURITY_KEY_PARAMETER_NAME }}|' ./appsettings.json
-          sed -i 's|CI_SECRET_SECURITY_KEY|${{ secrets.SECURITY_KEY }}|' ./appsettings.json
-          sed -i 's|CI_SECRET_CONNECTION_STRING|${{ secrets.CONNECTION_STRING }}|' ./appsettings.json
-
       - name: Publish application
         run: dotnet publish --configuration Release --output ${{ env.PUBLISH_OUTPUT_FOLDER }}
 
