@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/vault
+      DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/Vault
       DATABASE_RELEASE_FOLDER: ${{ github.workspace }}/db/releases
       PUBLISH_OUTPUT_FOLDER: ${{ github.workspace }}/publish-output
     defaults:

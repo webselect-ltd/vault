@@ -11,7 +11,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/vault
+      DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/Vault
     defaults:
       run:
         working-directory: ${{ env.DOTNET_PROJECT_FOLDER }}
