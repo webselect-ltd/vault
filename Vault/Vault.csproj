@@ -18,6 +18,7 @@
     <ItemGroup>
         <Content Update="package.json;package-lock.json;tslint.json;tsconfig.json;wwwroot/css/src/**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
         <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+        <Content Update="appsettings.Development.EXAMPLE.json" CopyToPublishDirectory="Never" />
     </ItemGroup>
 
     <ItemGroup>
