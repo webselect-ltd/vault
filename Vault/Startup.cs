@@ -28,9 +28,7 @@ namespace Vault
                 options.Secure = CookieSecurePolicy.Always;
             });
 
-            services.AddHsts(options => {
-                options.MaxAge = TimeSpan.FromDays(365);
-            });
+            services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
 
             services.AddMvc(options => options.Filters.Add<ProtectWithSecurityKeyFilter>());
 
@@ -60,7 +58,6 @@ namespace Vault
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

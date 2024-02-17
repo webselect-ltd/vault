@@ -6,7 +6,7 @@
             UserID = userID;
 
         public static LoginResult Failed =>
-            new LoginResult(null);
+            new (null);
 
         public string UserID { get; }
 

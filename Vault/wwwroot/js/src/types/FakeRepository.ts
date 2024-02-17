@@ -102,11 +102,11 @@ export class FakeRepository implements IRepository {
     }
 
     public async createCredential(credential: ICredential) {
-        return new Promise<ICredential>(resolve => resolve());
+        return new Promise<ICredential>(resolve => resolve(credential));
     }
 
     public async updateCredential(credential: ICredential) {
-        return new Promise<ICredential>(resolve => resolve());
+        return new Promise<ICredential>(resolve => resolve(credential));
     }
 
     public async updatePassword(newPassword: string) {

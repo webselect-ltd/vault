@@ -1,6 +1,3 @@
-USE Vault
-GO
-
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'Credentials') AND type in (N'U'))
 BEGIN
     CREATE TABLE Credentials (
@@ -48,7 +45,7 @@ BEGIN
 		UserID,
 		UserName,
 		Password
-	FROM 
+	FROM
 		tUser
 END
 GO
@@ -83,7 +80,7 @@ BEGIN
         UserDefined2,
         UserDefined2Label,
 		'16|1|1|1|1' AS PwdOptions
-	FROM 
+	FROM
 		tCredential
 END
 GO

@@ -14,10 +14,12 @@ namespace Vault.Controllers
         private readonly SqlExecutor _db;
 
         public HomeController(
-            IOptionsMonitor<Settings> optionsMonitor,
+            IOptions<Settings> options,
             IConnectionFactory cf)
         {
-            _cfg = optionsMonitor.CurrentValue;
+            ArgumentNullException.ThrowIfNull(options);
+
+            _cfg = options.Value;
             _db = new SqlExecutor(cf);
         }
 
@@ -37,9 +39,9 @@ namespace Vault.Controllers
             var model = new IndexViewModel {
                 BaseUrl = new Uri(Url.Action(nameof(Index)), UriKind.Relative),
                 AbsoluteUrl = new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"),
+                EnableSessionTimeout = _cfg.EnableSessionTimeout,
                 SessionTimeoutInSeconds = _cfg.SessionTimeoutInSeconds,
-                SecurityKey = securityKey,
-                DevMode = _cfg.DevMode
+                SecurityKey = securityKey
             };
 
             return View(model);
@@ -48,12 +50,9 @@ namespace Vault.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
-            var credentials = new {
-                Username = model.UN1209,
-                Password = model.PW9804
-            };
+            ArgumentNullException.ThrowIfNull(model);
 
-            var loginResult = await _db.Result(conn => conn.QuerySingleOrDefaultAsync<LoginResult>(SqlStatements.Login, credentials));
+            var loginResult = await _db.Result(conn => conn.QuerySingleOrDefaultAsync<LoginResult>(SqlStatements.Login, model));
 
             return Json(loginResult ?? LoginResult.Failed);
         }
@@ -75,10 +74,11 @@ namespace Vault.Controllers
                 return await conn.ExecuteAsync(SqlStatements.UpdatePassword, passwordUpdateData, tran);
             });
 
-        public IActionResult GenerateVaultCredential() =>
-            View(new GenerateVaultCredentialViewModel());
+        public IActionResult GenerateVaultCredential()
+        {
+            var model = new GenerateVaultCredentialViewModel();
 
-        public IActionResult SetDevCookie() =>
-            View();
+            return View(model);
+        }
     }
 }
