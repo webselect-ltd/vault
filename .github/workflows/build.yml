@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: [self-hosted, dev-build-server]
+    env:
+      DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/Vault
+    defaults:
+      run:
+        working-directory: ${{ env.DOTNET_PROJECT_FOLDER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.0
