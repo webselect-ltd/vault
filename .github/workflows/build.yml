@@ -25,7 +25,7 @@ jobs:
       - name: Restore NPM dependencies
         run: npm ci
 
-      - name: Build UI
+      - name: Build/test UI
         run: ./build-front-end.sh
 
       - name: Build application

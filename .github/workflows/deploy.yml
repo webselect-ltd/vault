@@ -25,11 +25,8 @@ jobs:
       - name: Restore NPM dependencies
         run: npm ci
 
-      - name: Build UI
-        run: npm run build
-
-      - name: Run Tests
-        run: npm run test
+      - name: Build/test UI
+        run: ./build-front-end.sh
 
       - name: Publish application
         run: dotnet publish --configuration Release --output ${{ env.PUBLISH_OUTPUT_FOLDER }}
@@ -45,24 +42,3 @@ jobs:
         with:
             name: vault-db
             path: ${{ env.DATABASE_RELEASE_FOLDER }}
-
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: [self-hosted, web-vm]
-    environment: production
-    steps:
-      - name: Clean work folder
-        run: rm -rf ${{ github.workspace }}/*
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v3.0.2
-
-      - name: Apply database release scripts
-        run: ~/dbup-cli/dbup ${{ github.workspace }}/vault-db "${{ secrets.CONNECTION_STRING_DEPLOY }}"
-
-      - name: Copy files
-        run: sudo cp -a ${{ github.workspace }}/vault-app/* /var/www/vault
-
-      - name: Restart service
-        run: sudo systemctl restart vault.service
