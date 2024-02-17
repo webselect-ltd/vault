@@ -25,8 +25,11 @@ jobs:
       - name: Restore NPM dependencies
         run: npm ci
 
-      - name: Build/test UI
-        run: ./build-front-end.sh
+      - name: Build UI
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
 
       - name: Build application
         run: dotnet build
