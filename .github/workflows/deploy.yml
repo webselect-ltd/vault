@@ -8,7 +8,6 @@ jobs:
   build:
     name: Publish
     runs-on: ubuntu-latest
-    environment: production
     env:
       DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/Vault
       DATABASE_RELEASE_FOLDER: ${{ github.workspace }}/db/releases
