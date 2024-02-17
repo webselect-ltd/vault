@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, dev-build-server]
+    runs-on: ubuntu-latest
     env:
       DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/Vault
     defaults:

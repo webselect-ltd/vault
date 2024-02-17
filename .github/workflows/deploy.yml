@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Publish
-    runs-on: [self-hosted, dev-build-server]
+    runs-on: ubuntu-latest
     env:
       DOTNET_PROJECT_FOLDER: ${{ github.workspace }}/Vault
       DATABASE_RELEASE_FOLDER: ${{ github.workspace }}/db/releases
