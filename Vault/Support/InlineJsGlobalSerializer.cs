@@ -10,7 +10,7 @@ namespace Vault.Support
     public static class InlineJsGlobalSerializer
     {
         private static readonly JsonSerializerSettings _settings =
-            new JsonSerializerSettings {
+            new () {
                 NullValueHandling = NullValueHandling.Ignore,
                 ContractResolver = new DefaultContractResolver {
                     NamingStrategy = new CamelCaseNamingStrategy()
@@ -24,10 +24,7 @@ namespace Vault.Support
         /// <returns>A formatted JSON string.</returns>
         public static string AsJson(this object o)
         {
-            if (o == null)
-            {
-                throw new ArgumentNullException(nameof(o));
-            }
+            ArgumentNullException.ThrowIfNull(o);
 
             var serializer = JsonSerializer.CreateDefault(_settings);
 
@@ -43,7 +40,7 @@ namespace Vault.Support
         }
 
         private static JsonTextWriter GetJsonWriter(StringWriter sw) =>
-            new JsonTextWriter(sw) {
+            new (sw) {
                 Formatting = Formatting.Indented,
                 IndentChar = ' ',
                 Indentation = 4,

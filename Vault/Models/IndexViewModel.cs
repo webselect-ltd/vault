@@ -8,10 +8,10 @@ namespace Vault.Models
 
         public Uri AbsoluteUrl { get; set; }
 
+        public bool EnableSessionTimeout { get; set; }
+
         public int SessionTimeoutInSeconds { get; set; }
 
         public object SecurityKey { get; set; }
-
-        public bool DevMode { get; set; }
     }
 }

@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# OSX Finder cache files
+.DS_Store
+
 # User-specific files
 *.suo
 *.user
@@ -332,11 +335,17 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
-# TypeScript Output
-Vault/wwwroot/js/dist/
-
 # Test coverage artifacts
 coverage/
 
+# Bootstrap sources (pulled in by gulp task)
+Vault/wwwroot/css/src/vendor/bootstrap/
+
+# SCSS artefacts
+Vault/wwwroot/css/dist/
+
+# TypeScript output
+Vault/wwwroot/js/dist/
+
 # Development settings
-appsettings.*.json
+appsettings.Development.json

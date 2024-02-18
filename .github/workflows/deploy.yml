@@ -17,4 +17,31 @@ jobs:
         working-directory: ${{ env.DOTNET_PROJECT_FOLDER }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+      - name: Restore NuGet dependencies
+        run: dotnet restore
+
+      - name: Restore NPM dependencies
+        run: npm ci
+
+      - name: Build UI
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Publish application
+        run: dotnet publish --configuration Release --output ${{ env.PUBLISH_OUTPUT_FOLDER }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3
+        with:
+            name: vault-app
+            path: ${{ env.PUBLISH_OUTPUT_FOLDER }}
+
+      - name: Upload database release artifact
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3
+        with:
+            name: vault-db
+            path: ${{ env.DATABASE_RELEASE_FOLDER }}

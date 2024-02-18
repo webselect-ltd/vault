@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -9,21 +10,25 @@ namespace Vault.Support
     {
         private readonly Settings _cfg;
 
-        public ProtectWithSecurityKeyFilter(IOptionsMonitor<Settings> optionsMonitor) =>
-            _cfg = optionsMonitor.CurrentValue;
+        public ProtectWithSecurityKeyFilter(IOptions<Settings> options)
+        {
+            ArgumentNullException.ThrowIfNull(options);
 
-        public void OnActionExecuted(ActionExecutedContext filterContext)
+            _cfg = options.Value;
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
         {
         }
 
-        public void OnActionExecuting(ActionExecutingContext filterContext)
+        public void OnActionExecuting(ActionExecutingContext context)
         {
             var securityKey = _cfg.SecurityKey;
             var parameterName = _cfg.SecurityKeyParameterName;
 
             if (!string.IsNullOrWhiteSpace(securityKey))
             {
-                var httpContext = filterContext?.HttpContext;
+                var httpContext = context?.HttpContext;
 
                 if (httpContext?.Request != null)
                 {
@@ -31,7 +36,7 @@ namespace Vault.Support
 
                     if (key.SingleOrDefault() != securityKey)
                     {
-                        filterContext.Result = new StatusCodeResult(404);
+                        context.Result = new StatusCodeResult(404);
                     }
                 }
             }

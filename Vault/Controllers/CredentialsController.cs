@@ -9,7 +9,7 @@ namespace Vault.Controllers
 {
     public class CredentialsController : Controller
     {
-        private SqlExecutor _db;
+        private readonly SqlExecutor _db;
 
         public CredentialsController(IConnectionFactory cf) =>
             _db = new SqlExecutor(cf);
