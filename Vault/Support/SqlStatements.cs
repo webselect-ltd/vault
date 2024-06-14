@@ -1,4 +1,7 @@
-﻿namespace Vault.Support
+﻿using System;
+using Vault.Models;
+
+namespace Vault.Support
 {
     public static class SqlStatements
     {
@@ -77,5 +80,7 @@
 
         public const string Login =
             "SELECT UserID FROM Users WHERE Username = @Username AND Password = @Password";
+
+        public static DatabaseType DatabaseType { get; internal set; }
     }
 }
