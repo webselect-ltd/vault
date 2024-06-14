@@ -21,7 +21,7 @@ const copyBootstrapSource = () =>
         .pipe(dest('./wwwroot/css/src/vendor/bootstrap'));
 
 const copyBootstrapIconsFonts = () =>
-    src('./node_modules/bootstrap-icons/font/**/*.{woff,woff2}')
+    src('./node_modules/bootstrap-icons/font/**/*.{woff,woff2}', { encoding: false })
         .pipe(dest('./wwwroot/css/dist'));
 
 const copyBootstrapIconsCss = () =>
