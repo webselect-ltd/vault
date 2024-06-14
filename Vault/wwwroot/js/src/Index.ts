@@ -1,5 +1,6 @@
 ﻿import * as Handlebars from 'handlebars';
 import { dom, DOM, DOMEvent } from 'mab-dom';
+import { TagInput } from 'mab-bootstrap-taginput';
 import { Modal } from 'bootstrap';
 import Clipboard from 'clipboard';
 import {
@@ -20,6 +21,8 @@ import {
 import {
     ICredential,
     ISecurityKeyDetails,
+    ITag,
+    ITagIndex,
     PasswordSpecification,
     Repository
 } from './types/all';
@@ -49,6 +52,7 @@ interface IVaultUIElements {
     clearSearchButton: DOM;
     searchInput: DOM;
     spinner: DOM;
+    tagsInput: DOM;
 }
 
 interface IVaultUITemplates {
@@ -108,7 +112,8 @@ const ui: IVaultUIElements = {
     adminButton: dom('#admin'),
     clearSearchButton: dom('#clear-search'),
     searchInput: dom('#search'),
-    spinner: dom('#spinner')
+    spinner: dom('#spinner'),
+    tagsInput: dom('#tags')
 };
 
 const templates: IVaultUITemplates = {
@@ -142,6 +147,8 @@ Handlebars.registerHelper('truncate', (text: string, size: number) => {
 });
 
 let currentSession: any = null;
+
+let tagIndex: ITagIndex = null;
 
 // Pure functions
 
@@ -499,6 +506,26 @@ ui.loginForm.on('submit', async e => {
         const loginResult = await repository.login(username, password);
 
         if (loginResult.Success) {
+            tagIndex = await repository.loadTagIndex(loginResult.UserID);
+
+            console.log(tagIndex);
+
+            const tagInput = new TagInput<ITag>({
+                input: ui.tagsInput.get(0),
+                data: tagIndex.tags || [],
+                maxNumberOfSuggestions: 5,
+                getId: (item) => item.TagID,
+                getLabel: (item) => item.Label,
+                allowNewTags: false,
+                itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
+                onTagsChanged: async (instance, added, removed, selected) => {
+                    const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
+                    const matches = selected.map(t => tagIndex.index.get(t.id)).flat();
+                    const results = credentials.filter(c => matches.includes(c.CredentialID));
+                    updateCredentialListUI(ui.container, results);
+                }
+            });
+
             ui.loginForm.get().classList.add('d-none');
             ui.loginFormModal.hide();
             ui.controls.get().classList.remove('d-none');

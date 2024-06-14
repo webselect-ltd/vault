@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,28 @@ namespace Vault.Controllers
 
         public CredentialsController(IConnectionFactory cf) =>
             _db = new SqlExecutor(cf);
+
+        public async Task<ActionResult> ReadTagIndex(string userId) =>
+            await _db.ResultAsJson(async conn => {
+                var sql = @"SELECT TagID, Label FROM Tags WHERE UserID = @UserID;
+SELECT tc.TagID, tc.CredentialID FROM Tags_Credentials tc INNER JOIN Tags t ON t.TagID = tc.TagID WHERE t.UserID = @UserID;
+";
+
+                var reader = await conn.QueryMultipleAsync(sql, new { UserID = userId });
+
+                var tags = await reader.ReadAsync<(string TagID, string Label)>();
+                var index = await reader.ReadAsync<(string TagID, string CredentialID)>();
+
+                return new {
+                    tags = tags.Select(t => new {
+                        t.TagID,
+                        t.Label,
+                    }),
+                    index = index
+                        .GroupBy(i => i.TagID)
+                        .ToDictionary(g => g.Key, g => g.Select(i => i.CredentialID))
+                };
+            });
 
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] Credential model) =>

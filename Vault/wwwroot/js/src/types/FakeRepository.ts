@@ -1,4 +1,4 @@
-﻿import { ICredential, IRepository } from './all';
+﻿import { ICredential, IRepository, ITag, ITagIndex } from './all';
 
 export class FakeRepository implements IRepository {
     public credentials: ICredential[];
@@ -87,6 +87,15 @@ export class FakeRepository implements IRepository {
 
     public async login(hashedUsername: string, hashedPassword: string) {
         return { UserID: 'user1', Success: true };
+    }
+
+    public async loadTagIndex(userId: string) {
+        const tmp: ITagIndex = {
+            tags: [],
+            index: new Map()
+        };
+
+        return new Promise<ITagIndex>(resolve => resolve(tmp)); ;
     }
 
     public async loadCredential(credentialId: string) {
