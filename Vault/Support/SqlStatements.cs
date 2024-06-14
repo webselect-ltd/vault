@@ -8,7 +8,6 @@ namespace Vault.Support
         public const string SelectSummary =
             @"SELECT
                   CredentialID,
-                  UserID,
                   Description,
                   Username,
                   Password,
