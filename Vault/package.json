@@ -3,9 +3,9 @@
     "name": "vault",
     "private": true,
     "devDependencies": {
-        "@tsconfig/recommended": "^1.0.3",
+        "@tsconfig/recommended": "^1.0.6",
         "@types/bootstrap": "^5.2.10",
-        "@types/jest": "^29.5.11",
+        "@types/jest": "^29.5.12",
         "@types/js-cookie": "^3.0.6",
         "autoprefixer": "^10.4.16",
         "clean-webpack-plugin": "^4.0.0",
@@ -23,7 +23,7 @@
         "postcss": "^8.4.32",
         "sass": "^1.69.5",
         "source-map-loader": "^4.0.1",
-        "ts-jest": "^29.1.1",
+        "ts-jest": "^29.1.4",
         "ts-loader": "^9.5.1",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3",
@@ -36,7 +36,7 @@
         "clipboard": "^2.0.11",
         "handlebars": "^4.7.8",
         "mab-dom": "^0.12.1",
-        "tslib": "^2.6.2"
+        "tslib": "^2.6.3"
     },
     "scripts": {
         "js:clean": "del-cli ./wwwroot/js/dist",
