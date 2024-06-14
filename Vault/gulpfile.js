@@ -25,9 +25,7 @@ const copyBootstrapIconsFonts = () =>
         .pipe(dest('./wwwroot/css/dist'));
 
 const copyBootstrapIconsCss = () =>
-    src('./node_modules/bootstrap-icons/font/**/*.css')
-        .pipe(postcss([cssnano()]))
-        .pipe(rename({ extname: '.min.css' }))
+    src('./node_modules/bootstrap-icons/font/**/*.min.css')
         .pipe(dest('./wwwroot/css/dist'));
 
 const compileScss = () =>
