@@ -281,6 +281,19 @@ async function editCredential(credentialId: string) {
         }
     });
 
+    const tagInput = new TagInput<ITag>({
+        input: ui.modalContent.find('#Tags').get(0),
+        data: tagIndex.tags || [],
+        maxNumberOfSuggestions: 5,
+        getId: (item) => item.TagID,
+        getLabel: (item) => item.Label,
+        allowNewTags: false,
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
+        onTagsChanged: async (instance, added, removed, selected) => {
+            console.log(selected);
+        }
+    });
+
     ui.modalContent.find('#Description').focus();
 
     showPasswordStrength(ui.modalContent.find('#Password'));
@@ -463,6 +476,18 @@ ui.newButton.on('click', e => {
         acceptText: 'Save',
         onaccept: (): void => {
             (dom('#credential-form').get() as HTMLFormElement).requestSubmit();
+        }
+    });
+    const tagInput = new TagInput<ITag>({
+        input: ui.modalContent.find('#Tags').get(0),
+        data: tagIndex.tags || [],
+        maxNumberOfSuggestions: 5,
+        getId: (item) => item.TagID,
+        getLabel: (item) => item.Label,
+        allowNewTags: false,
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
+        onTagsChanged: async (instance, added, removed, selected) => {
+            console.log(selected);
         }
     });
     ui.modalContent.find('#Description').focus();

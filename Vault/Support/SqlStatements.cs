@@ -21,38 +21,44 @@ namespace Vault.Support
             "SELECT * FROM Credentials WHERE UserID = @UserID";
 
         public const string SelectSingle =
-            "SELECT * FROM Credentials WHERE CredentialID = @CredentialID";
+            """
+            SELECT * FROM Credentials WHERE CredentialID = @CredentialID;
+
+            SELECT TagID FROM Tags_Credentials WHERE CredentialID = @CredentialID;
+            """;
 
         public const string Insert =
-            @"INSERT INTO
-                  Credentials (
-                      CredentialID,
-                      UserID,
-                      Description,
-                      Username,
-                      Password,
-                      Url,
-                      UserDefined1Label,
-                      UserDefined1,
-                      UserDefined2Label,
-                      UserDefined2,
-                      Notes,
-                      PwdOptions
-                  )
-              VALUES (
-                  @CredentialID,
-                  @UserID,
-                  @Description,
-                  @Username,
-                  @Password,
-                  @Url,
-                  @UserDefined1Label,
-                  @UserDefined1,
-                  @UserDefined2Label,
-                  @UserDefined2,
-                  @Notes,
-                  @PwdOptions
-              )";
+            """
+            INSERT INTO
+                Credentials (
+                    CredentialID,
+                    UserID,
+                    Description,
+                    Username,
+                    Password,
+                    Url,
+                    UserDefined1Label,
+                    UserDefined1,
+                    UserDefined2Label,
+                    UserDefined2,
+                    Notes,
+                    PwdOptions
+                )
+            VALUES (
+                @CredentialID,
+                @UserID,
+                @Description,
+                @Username,
+                @Password,
+                @Url,
+                @UserDefined1Label,
+                @UserDefined1,
+                @UserDefined2Label,
+                @UserDefined2,
+                @Notes,
+                @PwdOptions
+            );
+            """;
 
         public const string Update =
             @"UPDATE
@@ -100,6 +106,21 @@ namespace Vault.Support
                     ON t.TagID = tc.TagID
             WHERE
                 t.UserID = @UserID;
+            """;
+
+        public const string TagsToCredential =
+            """
+            DELETE FROM Tags_Credentials WHERE CredentialID = @CredentialID;
+
+            INSERT INTO
+                Tags_Credentials (
+                    TagID,
+                    CredentialID
+                )
+            VALUES (
+                @TagID,
+                @CredentialID
+            );
             """;
 
         public static DatabaseType DatabaseType { get; internal set; }
