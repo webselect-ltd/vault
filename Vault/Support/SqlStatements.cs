@@ -82,8 +82,24 @@ namespace Vault.Support
 
         public const string TagIndex =
             """
-            SELECT TagID, Label FROM Tags WHERE UserID = @UserID;
-            SELECT tc.TagID, tc.CredentialID FROM Tags_Credentials tc INNER JOIN Tags t ON t.TagID = tc.TagID WHERE t.UserID = @UserID;
+            SELECT
+                TagID,
+                Label
+            FROM
+                Tags
+            WHERE
+                UserID = @UserID;
+
+            SELECT
+                tc.TagID,
+                tc.CredentialID
+            FROM
+                Tags_Credentials tc
+            INNER JOIN
+                Tags t
+                    ON t.TagID = tc.TagID
+            WHERE
+                t.UserID = @UserID;
             """;
 
         public static DatabaseType DatabaseType { get; internal set; }
