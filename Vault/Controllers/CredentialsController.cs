@@ -17,11 +17,7 @@ namespace Vault.Controllers
 
         public async Task<ActionResult> ReadTagIndex(string userId) =>
             await _db.ResultAsJson(async conn => {
-                var sql = @"SELECT TagID, Label FROM Tags WHERE UserID = @UserID;
-SELECT tc.TagID, tc.CredentialID FROM Tags_Credentials tc INNER JOIN Tags t ON t.TagID = tc.TagID WHERE t.UserID = @UserID;
-";
-
-                var reader = await conn.QueryMultipleAsync(sql, new { UserID = userId });
+                var reader = await conn.QueryMultipleAsync(SqlStatements.TagIndex, new { UserID = userId });
 
                 var tags = await reader.ReadAsync<(string TagID, string Label)>();
                 var index = await reader.ReadAsync<(string TagID, string CredentialID)>();
