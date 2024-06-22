@@ -593,6 +593,8 @@ ui.body.onchild('#credential-form', 'submit', async e => {
             await repository.updateCredential(credential);
         }
 
+        tagIndex = await repository.loadTagIndex();
+
         const updatedCredentials = await repository.loadCredentialSummaryList();
 
         return search(ui.searchInput.val() as string, updatedCredentials);
