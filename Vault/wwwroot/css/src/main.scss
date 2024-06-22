@@ -187,6 +187,10 @@
     margin-top: .375rem;
 }
 
+.mab-bootstrap-taginput-input::placeholder {
+    text-transform: none;
+}
+
 .mab-bootstrap-taginput-input.mab-bootstrap-taginput-input-multicase {
     text-transform: none;
 }
