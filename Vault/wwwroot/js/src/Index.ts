@@ -533,8 +533,6 @@ ui.loginForm.on('submit', async e => {
         if (loginResult.Success) {
             tagIndex = await repository.loadTagIndex();
 
-            console.log(tagIndex);
-
             const tagInput = new TagInput<ITag>({
                 input: ui.tagsInput.get(0),
                 data: tagIndex.tags || [],
