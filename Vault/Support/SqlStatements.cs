@@ -94,7 +94,9 @@ namespace Vault.Support
             FROM
                 Tags
             WHERE
-                UserID = @UserID;
+                UserID = @UserID
+            ORDER BY
+                Label;
 
             SELECT
                 tc.TagID,
@@ -105,7 +107,9 @@ namespace Vault.Support
                 Tags t
                     ON t.TagID = tc.TagID
             WHERE
-                t.UserID = @UserID;
+                t.UserID = @UserID
+            ORDER BY
+                t.Label;
             """;
 
         public const string DeleteTagsFromCredential =
