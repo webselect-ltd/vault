@@ -89,7 +89,7 @@ export class FakeRepository implements IRepository {
         return { UserID: 'user1', Success: true };
     }
 
-    public async loadTagIndex(userId: string) {
+    public async loadTagIndex() {
         const tmp: ITagIndex = {
             tags: [],
             index: new Map()

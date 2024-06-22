@@ -3,7 +3,7 @@
 export interface IRepository {
     login(hashedUsername: string, hashedPassword: string): Promise<ILoginResult>;
 
-    loadTagIndex(userId: string): Promise<ITagIndex>;
+    loadTagIndex(): Promise<ITagIndex>;
 
     loadCredential(credentialId: string): Promise<ICredential>;
     loadCredentialSummaryList(): Promise<ICredential[]>;

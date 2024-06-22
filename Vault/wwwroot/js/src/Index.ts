@@ -531,7 +531,7 @@ ui.loginForm.on('submit', async e => {
         const loginResult = await repository.login(username, password);
 
         if (loginResult.Success) {
-            tagIndex = await repository.loadTagIndex(loginResult.UserID);
+            tagIndex = await repository.loadTagIndex();
 
             console.log(tagIndex);
 

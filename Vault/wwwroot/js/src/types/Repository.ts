@@ -53,7 +53,7 @@ export class Repository implements IRepository {
         return loginResult;
     }
 
-    public async loadTagIndex(userId: string) {
+    public async loadTagIndex() {
         interface Temp {
             tags: ITag[];
             index: { [key: string]: string[] };
