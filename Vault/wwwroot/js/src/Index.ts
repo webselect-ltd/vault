@@ -357,6 +357,10 @@ async function showDetail(credentialId: string) {
         '</table>'
     ];
 
+    const tagDisplay = credential.TagDisplay
+        ? credential.TagDisplay.split('|').map(t => ({ Label: t }))
+        : [];
+
     const detailHtml = templates.detail({
         Url: credential.Url,
         UrlHtml: urlHtml,
@@ -368,7 +372,7 @@ async function showDetail(credentialId: string) {
         UserDefined2: credential.UserDefined2,
         UserDefined2Label: credential.UserDefined2Label,
         Notes: credential.Notes,
-        TagDisplay: credential.TagDisplay?.split('|').map(t => ({ Label: t }))
+        TagDisplay: tagDisplay
     });
 
     showModal({
