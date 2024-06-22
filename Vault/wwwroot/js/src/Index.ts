@@ -288,10 +288,7 @@ async function editCredential(credentialId: string) {
         getId: (item) => item.TagID,
         getLabel: (item) => item.Label,
         allowNewTags: false,
-        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
-        onTagsChanged: async (instance, added, removed, selected) => {
-            console.log(selected);
-        }
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
     });
 
     ui.modalContent.find('#Description').focus();
@@ -486,10 +483,7 @@ ui.newButton.on('click', e => {
         getId: (item) => item.TagID,
         getLabel: (item) => item.Label,
         allowNewTags: false,
-        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
-        onTagsChanged: async (instance, added, removed, selected) => {
-            console.log(selected);
-        }
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
     });
     ui.modalContent.find('#Description').focus();
     showPasswordStrength(ui.modalContent.find('#Password'));
