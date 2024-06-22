@@ -48,9 +48,10 @@ namespace Vault.Controllers
                 var reader = await conn.QueryMultipleAsync(SqlStatements.SelectSingle, new { CredentialID = id });
 
                 var credential = await reader.ReadSingleAsync<Credential>();
-                var tags = await reader.ReadAsync<string>();
+                var tags = await reader.ReadAsync<(string TagID, string Label)>();
 
-                credential.Tags = string.Join('|', tags);
+                credential.Tags = string.Join('|', tags.Select(t => t.TagID));
+                credential.TagDisplay = string.Join('|', tags.Select(t => t.Label));
 
                 return credential;
             });

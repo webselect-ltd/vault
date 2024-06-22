@@ -22,9 +22,25 @@ namespace Vault.Support
 
         public const string SelectSingle =
             """
-            SELECT * FROM Credentials WHERE CredentialID = @CredentialID;
+            SELECT
+                *
+            FROM
+                Credentials
+            WHERE
+                CredentialID = @CredentialID;
 
-            SELECT TagID FROM Tags_Credentials WHERE CredentialID = @CredentialID;
+            SELECT
+                tc.TagID,
+                t.Label
+            FROM
+                Tags_Credentials tc
+            INNER JOIN
+                Tags t
+                    ON t.TagID = tc.TagID
+            WHERE
+                tc.CredentialID = @CredentialID
+            ORDER BY
+                t.Label;
             """;
 
         public const string Insert =

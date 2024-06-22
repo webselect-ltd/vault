@@ -10,7 +10,7 @@
 import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails, ITag, ITagIndex } from '../types/all';
 
 export class Repository implements IRepository {
-    private readonly encryptionExcludes = ['CredentialID', 'UserID', 'Tags', 'TagArray'];
+    private readonly encryptionExcludes = ['CredentialID', 'UserID', 'Tags', 'TagArray', 'TagDisplay'];
 
     private userID: string;
     private password: string;

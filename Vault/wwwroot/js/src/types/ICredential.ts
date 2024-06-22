@@ -12,5 +12,6 @@
     Notes?: string;
     PwdOptions?: string;
     Tags?: string;
+    TagDisplay?: string;
     [propertyName: string]: string;
 }

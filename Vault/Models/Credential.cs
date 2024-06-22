@@ -54,6 +54,8 @@ namespace Vault.Models
 
         public string Tags { get; set; }
 
+        public string TagDisplay { get; set; }
+
         public object[] TagArray =>
             Tags?
                 .Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)

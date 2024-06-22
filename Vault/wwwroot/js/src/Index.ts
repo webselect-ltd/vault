@@ -362,7 +362,8 @@ async function showDetail(credentialId: string) {
         UserDefined1Label: credential.UserDefined1Label,
         UserDefined2: credential.UserDefined2,
         UserDefined2Label: credential.UserDefined2Label,
-        Notes: credential.Notes
+        Notes: credential.Notes,
+        TagDisplay: credential.TagDisplay?.split('|').map(t => ({ Label: t }))
     });
 
     showModal({
