@@ -65,8 +65,9 @@ namespace Vault.Controllers
         public async Task<ActionResult> Update([FromBody] Credential model) =>
             await _db.ResultAsJson(async conn => {
                 var a = await conn.ExecuteAsync(SqlStatements.Update, model);
-                var b = await conn.ExecuteAsync(SqlStatements.TagsToCredential, model.TagArray);
-                return a + b;
+                var b = await conn.ExecuteAsync(SqlStatements.DeleteTagsFromCredential, model);
+                var c = await conn.ExecuteAsync(SqlStatements.TagsToCredential, model.TagArray);
+                return a + b + c;
             });
 
         [HttpPost]

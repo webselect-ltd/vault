@@ -108,10 +108,16 @@ namespace Vault.Support
                 t.UserID = @UserID;
             """;
 
+        public const string DeleteTagsFromCredential =
+            """
+            DELETE FROM
+                Tags_Credentials
+            WHERE
+                CredentialID = @CredentialID;
+            """;
+
         public const string TagsToCredential =
             """
-            DELETE FROM Tags_Credentials WHERE CredentialID = @CredentialID;
-
             INSERT INTO
                 Tags_Credentials (
                     TagID,
