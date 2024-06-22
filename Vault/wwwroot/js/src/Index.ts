@@ -260,7 +260,7 @@ function confirmDelete(id: string) {
                 return await repository.loadCredentialSummaryList();
             });
 
-            const results = search(ui.searchInput.val() as string, updatedCredentials);
+            const results = search(ui.searchInput.val(),  updatedCredentials);
             updateCredentialListUI(ui.container, results);
 
             ui.modal.hide();
@@ -592,7 +592,7 @@ ui.body.onchild('#credential-form', 'submit', async e => {
 
         const updatedCredentials = await repository.loadCredentialSummaryList();
 
-        return search(ui.searchInput.val() as string, updatedCredentials);
+        return search(ui.searchInput.val(), updatedCredentials);
     });
 
     ui.modal.hide();
