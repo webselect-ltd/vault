@@ -17,7 +17,7 @@ export class FakeRepository implements IRepository {
             UserDefined2: 'catud1',
             Notes: 'Cat notes',
             PwdOptions: '12|1|1|1|1',
-            Tags: 'a|b'
+            Tags: 'cat'
         }, {
             CredentialID: 'cr2',
             UserID: 'user1',
@@ -31,7 +31,7 @@ export class FakeRepository implements IRepository {
             UserDefined2: 'dogud1',
             Notes: 'Dog notes',
             PwdOptions: '12|1|1|1|1',
-            Tags: 'b'
+            Tags: 'dog'
         }, {
             CredentialID: 'cr3',
             UserID: 'user1',
@@ -45,7 +45,7 @@ export class FakeRepository implements IRepository {
             UserDefined2: 'fishud1',
             Notes: 'Fish notes',
             PwdOptions: '12|1|1|1|1',
-            Tags: 'b|c'
+            Tags: 'fish'
         }, {
             CredentialID: 'cr4',
             UserID: 'user1',
@@ -59,7 +59,7 @@ export class FakeRepository implements IRepository {
             UserDefined2: 'catfishud1',
             Notes: 'Catfish notes',
             PwdOptions: '12|1|1|1|1',
-            Tags: 'b|c'
+            Tags: 'cat|fish'
         }, {
             CredentialID: 'cr5',
             UserID: 'user1',
@@ -73,7 +73,7 @@ export class FakeRepository implements IRepository {
             UserDefined2: 'dogfishud1',
             Notes: 'Dogfish notes',
             PwdOptions: '12|1|1|1|1',
-            Tags: 'c'
+            Tags: 'dog|fish'
         }, {
             CredentialID: 'cr6',
             UserID: 'user1',
@@ -87,7 +87,7 @@ export class FakeRepository implements IRepository {
             UserDefined2: 'owlud1',
             Notes: 'Owl notes',
             PwdOptions: '12|1|1|1|1',
-            Tags: 'd'
+            Tags: ''
         }];
     }
 
@@ -98,17 +98,15 @@ export class FakeRepository implements IRepository {
     public async loadTagIndex() {
         const map = new Map();
 
-        map.set('a', ['cr1']);
-        map.set('b', ['cr2', 'cr3', 'cr4']);
-        map.set('c', ['cr3', 'cr4', 'cr5']);
-        map.set('d', ['cr6']);
+        map.set('cat', ['cr1', 'cr4']);
+        map.set('dog', ['cr2', 'cr5']);
+        map.set('fish', ['cr3', 'cr4', 'cr5']);
 
         const testTagIndex: ITagIndex = {
             tags: [
-                { TagID: 'a', Label: 'Tag A' },
-                { TagID: 'b', Label: 'Tag B' },
-                { TagID: 'c', Label: 'Tag C' },
-                { TagID: 'd', Label: 'Tag D' }
+                { TagID: 'cat', Label: 'Cat' },
+                { TagID: 'dog', Label: 'Dog' },
+                { TagID: 'fish', Label: 'Fish' }
             ],
             index: map
         };

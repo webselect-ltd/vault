@@ -141,6 +141,17 @@ describe('Vault', () => {
         expect(results[1].Description).toBe('Dog');
     });
 
+    test('searchCredentials tag query', async () => {
+        const testCredentials = getTestCredentials();
+        const testTagIndex = await getTestTagIndex();
+        const results = searchCredentials({ property: 'Description', text: '' }, testTagIndex, ['cat', 'fish'], nw, testCredentials);
+        expect(results.length).toBe(4);
+        expect(results[0].Description).toBe('Cat');
+        expect(results[1].Description).toBe('Fish');
+        expect(results[2].Description).toBe('Catfish');
+        expect(results[3].Description).toBe('Dogfish');
+    });
+
     test('mapToSummary', () => {
         const summary = mapToSummary(testCredentialPlainText, c => true);
         expect(summary.credentialid).toBe('361fe91a-3dca-4871-b69e-c41c31507c8c');
