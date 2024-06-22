@@ -52,7 +52,7 @@ interface IVaultUIElements {
     clearSearchButton: DOM;
     searchInput: DOM;
     spinner: DOM;
-    tagsInput: DOM;
+    tagsInput: TagInput<ITag>;
 }
 
 interface IVaultUITemplates {
@@ -113,7 +113,7 @@ const ui: IVaultUIElements = {
     clearSearchButton: dom('#clear-search'),
     searchInput: dom('#search'),
     spinner: dom('#spinner'),
-    tagsInput: dom('#tags')
+    tagsInput: null
 };
 
 const templates: IVaultUITemplates = {
@@ -227,9 +227,17 @@ function setSession() {
     currentSession = setTimeout(reloadApp, sessionTimeoutMs);
 }
 
-function search(query: string, credentials: ICredential[]) {
+function getTagIdListFromInput() {
+    const value = ui.tagsInput.getValue();
+
+    return value
+        ? value.split('|') as string[]
+        : [];
+}
+
+function search(query: string, tags: string[], credentials: ICredential[]) {
     const parsedQuery = parseSearchQuery(query);
-    const results = searchCredentials(parsedQuery, isWeakPassword, credentials);
+    const results = searchCredentials(parsedQuery, tagIndex, tags, isWeakPassword, credentials);
     return sortCredentials(results);
 }
 
@@ -260,7 +268,7 @@ function confirmDelete(id: string) {
                 return await repository.loadCredentialSummaryList();
             });
 
-            const results = search(ui.searchInput.val(),  updatedCredentials);
+            const results = search(ui.searchInput.val(), getTagIdListFromInput(), updatedCredentials);
             updateCredentialListUI(ui.container, results);
 
             ui.modal.hide();
@@ -497,14 +505,16 @@ ui.adminButton.on('click', e => {
 
 ui.clearSearchButton.on('click', async e => {
     e.preventDefault();
-    updateCredentialListUI(ui.container, []);
-    ui.searchInput.val('')
+    ui.searchInput.val('');
+    const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
+    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
+    updateCredentialListUI(ui.container, results);
     ui.searchInput.focus();
 });
 
 ui.searchInput.on('keyup', rateLimit(async e => {
     const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
-    const results = search(ui.searchInput.val(), credentials);
+    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
     updateCredentialListUI(ui.container, results);
 }, 200));
 
@@ -528,8 +538,8 @@ ui.loginForm.on('submit', async e => {
         if (loginResult.Success) {
             tagIndex = await repository.loadTagIndex();
 
-            const tagInput = new TagInput<ITag>({
-                input: ui.tagsInput.get(0),
+            ui.tagsInput = new TagInput<ITag>({
+                input: document.getElementById('tags'),
                 data: tagIndex.tags || [],
                 maxNumberOfSuggestions: 5,
                 getId: (item) => item.TagID,
@@ -537,9 +547,8 @@ ui.loginForm.on('submit', async e => {
                 allowNewTags: false,
                 itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
                 onTagsChanged: async (instance, added, removed, selected) => {
-                    const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
-                    const matches = selected.map(t => tagIndex.index.get(t.id)).flat();
-                    const results = credentials.filter(c => matches.includes(c.CredentialID));
+                    const credentials = await repository.loadCredentialSummaryList();
+                    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
                     updateCredentialListUI(ui.container, results);
                 }
             });
@@ -592,7 +601,7 @@ ui.body.onchild('#credential-form', 'submit', async e => {
 
         const updatedCredentials = await repository.loadCredentialSummaryList();
 
-        return search(ui.searchInput.val(), updatedCredentials);
+        return search(ui.searchInput.val(), getTagIdListFromInput(), updatedCredentials);
     });
 
     ui.modal.hide();
