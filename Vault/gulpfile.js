@@ -11,9 +11,7 @@ const sass = require('gulp-sass')(sassCompiler);
 const sourcemaps = require('gulp-sourcemaps');
 
 const scssOptions = {
-    precision: 10,
-    outputStyle: 'expanded',
-    indentWidth: 4
+    style: 'expanded'
 };
 
 const copyBootstrapSource = () =>

@@ -17,14 +17,15 @@
 
     <ItemGroup>
         <Content Update="package.json;package-lock.json;tslint.json;tsconfig.json;wwwroot/css/src/**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-        <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+        <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
+        <Content Update="appsettings.*.EXAMPLE.json" CopyToPublishDirectory="Never" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.1.35" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.6" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
-        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.4.5">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -34,7 +35,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     </ItemGroup>
 
 </Project>
