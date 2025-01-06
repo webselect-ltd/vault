@@ -58,8 +58,11 @@ export function searchCredentials(query: ICredentialSearchQuery, tagIndex: ITagI
     let tagged = list;
 
     if (tagIds.length) {
-        const matches = tagIds.map(t => tagIndex.index.get(t)).flat();
-        tagged = list.filter(c => matches.includes(c.CredentialID));
+        const matches = tagIds.map(t => tagIndex.index.get(t)).flat().reduce((acc, v) => {
+            acc.set(v, acc.has(v) ? acc.get(v) + 1 : 1);
+            return acc;
+        }, new Map<string, number>());
+        tagged = list.filter(c => matches.has(c.CredentialID) && matches.get(c.CredentialID) == tagIds.length);
     }
 
     if (emptyQuery) {
