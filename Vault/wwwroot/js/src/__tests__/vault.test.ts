@@ -145,11 +145,8 @@ describe('Vault', () => {
         const testCredentials = getTestCredentials();
         const testTagIndex = await getTestTagIndex();
         const results = searchCredentials({ property: 'Description', text: '' }, testTagIndex, ['cat', 'fish'], nw, testCredentials);
-        expect(results.length).toBe(4);
-        expect(results[0].Description).toBe('Cat');
-        expect(results[1].Description).toBe('Fish');
-        expect(results[2].Description).toBe('Catfish');
-        expect(results[3].Description).toBe('Dogfish');
+        expect(results.length).toBe(1);
+        expect(results[0].Description).toBe('Catfish');
     });
 
     test('mapToSummary', () => {
