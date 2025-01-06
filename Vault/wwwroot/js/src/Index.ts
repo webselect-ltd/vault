@@ -86,6 +86,8 @@ interface IVaultModalOptions {
     showDelete?: boolean;
     deleteText?: string;
     ondelete?: (e: Event) => void;
+    onshow?: (e: Event) => void;
+    onhide?: (e: Event) => void;
 }
 
 declare var _VAULT_GLOBALS: IVaultGlobals;
@@ -149,6 +151,8 @@ Handlebars.registerHelper('truncate', (text: string, size: number) => {
 let currentSession: any = null;
 
 let tagIndex: ITagIndex = null;
+
+let deleteTagsTagInput: TagInput<ITag> = null;
 
 // Pure functions
 
@@ -295,7 +299,10 @@ async function editCredential(credentialId: string) {
         maxNumberOfSuggestions: 5,
         getId: (item) => item.TagID,
         getLabel: (item) => item.Label,
-        allowNewTags: false,
+        allowNewTags: true,
+        newItemFactory: async label => {
+            return await repository.createTag({ TagID: crypto.randomUUID(), Label: label });
+        },
         itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
     });
 
@@ -329,7 +336,21 @@ function openExportPopup(data: ICredential[]) {
 function optionsDialog() {
     showModal({
         title: 'Admin',
-        content: templates.optionsDialog({})
+        content: templates.optionsDialog({}),
+        onshow: e => {
+            deleteTagsTagInput = new TagInput<ITag>({
+                input: ui.modalContent.find('#delete-tags').get(0),
+                data: tagIndex.tags || [],
+                maxNumberOfSuggestions: 5,
+                getId: (item) => item.TagID,
+                getLabel: (item) => item.Label,
+                allowNewTags: false,
+                itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
+            });
+        },
+        onhide: e => {
+            deleteTagsTagInput = null;
+        }
     });
 }
 
@@ -426,6 +447,20 @@ function showModal(options: IVaultModalOptions) {
     ui.modalContent.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
     ui.modalContent.onchild('button.btn-delete', 'click', options.ondelete || (() => alert('NOT BOUND')));
 
+    if (typeof options.onshow === 'function') {
+        ui.body.on('shown.bs.modal', e => {
+            options.onshow(e);
+            ui.body.off('shown.bs.modal');
+        });
+    }
+
+    if (typeof options.onhide === 'function') {
+        ui.body.on('hide.bs.modal', e => {
+            options.onhide(e);
+            ui.body.off('hide.bs.modal');
+        });
+    }
+
     ui.modal.show();
 }
 
@@ -469,6 +504,23 @@ function showPasswordStrength(field: DOM) {
     }
 }
 
+function createTagSearchInput() {
+    return new TagInput<ITag>({
+        input: document.getElementById('tags'),
+        data: tagIndex.tags || [],
+        maxNumberOfSuggestions: 5,
+        getId: (item) => item.TagID,
+        getLabel: (item) => item.Label,
+        allowNewTags: false,
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
+        onTagsChanged: async (instance, added, removed, selected) => {
+            const credentials = await repository.loadCredentialSummaryList();
+            const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
+            updateCredentialListUI(ui.container, results);
+        }
+    })
+}
+
 // Event handlers
 
 ui.container.onchild('.btn-credential-show-detail', 'click', e => {
@@ -494,7 +546,10 @@ ui.newButton.on('click', e => {
         maxNumberOfSuggestions: 5,
         getId: (item) => item.TagID,
         getLabel: (item) => item.Label,
-        allowNewTags: false,
+        allowNewTags: true,
+        newItemFactory: label => {
+            return Promise.resolve({ TagID: crypto.randomUUID(), Label: label });
+        },
         itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
     });
     ui.modalContent.find('#Description').focus();
@@ -542,20 +597,7 @@ ui.loginForm.on('submit', async e => {
         if (loginResult.Success) {
             tagIndex = await repository.loadTagIndex();
 
-            ui.tagsInput = new TagInput<ITag>({
-                input: document.getElementById('tags'),
-                data: tagIndex.tags || [],
-                maxNumberOfSuggestions: 5,
-                getId: (item) => item.TagID,
-                getLabel: (item) => item.Label,
-                allowNewTags: false,
-                itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
-                onTagsChanged: async (instance, added, removed, selected) => {
-                    const credentials = await repository.loadCredentialSummaryList();
-                    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
-                    updateCredentialListUI(ui.container, results);
-                }
-            });
+            ui.tagsInput = createTagSearchInput();
 
             ui.loginForm.get().classList.add('d-none');
             ui.loginFormModal.hide();
@@ -602,6 +644,8 @@ ui.body.onchild('#credential-form', 'submit', async e => {
         }
 
         tagIndex = await repository.loadTagIndex();
+
+        ui.tagsInput.updateData(tagIndex.tags);
 
         const updatedCredentials = await repository.loadCredentialSummaryList();
 
@@ -742,6 +786,15 @@ ui.body.onchild('#change-password-form', 'submit', async e => {
     }
 
     await withLoadSpinner(async () => await repository.updatePassword(dom('#NewPassword').val()));
+
+    reloadApp();
+});
+
+ui.body.onchild('#delete-tags-button', 'click', async e => {
+    const tagsToDelete: ITag[] = (deleteTagsTagInput?.getValue().split('|') || [] as string[])
+        .map(id => ({ TagID: id, Label: '' }));
+
+    await withLoadSpinner(async () => await repository.deleteTags(tagsToDelete));
 
     reloadApp();
 });

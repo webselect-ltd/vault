@@ -110,6 +110,18 @@
 </script>
 
 <script id="tmpl-optionsdialog" type="text/html">
+    <div class="row mb-md-@(RowMarginMD)">
+        <label for="delete-tags" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Delete Tags</label>
+        <div class="col-md-@(FieldColumnWidthMD)">
+            <input type="text" id="delete-tags" name="delete-tags" class="form-control" value="" required />
+        </div>
+    </div>
+    <div class="row mb-md-@(RowMarginMD)">
+        <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
+            <button class="btn btn-primary" id="delete-tags-button">Delete Selected Tags</button>
+        </div>
+    </div>
+    <hr />
     <form id="change-password-form" class="needs-validation" novalidate>
         <div class="row mb-md-@(RowMarginMD)">
             <label for="NewPassword" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">New Password</label>

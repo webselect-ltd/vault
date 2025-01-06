@@ -75,6 +75,15 @@ export class Repository implements IRepository {
         return new Promise<ITagIndex>(resolve => resolve(index));
     }
 
+    public async createTag(tag: ITag) {
+        // TODO: Encrypt
+        return await this.post<ITag>('Credentials/CreateTag', { tagId: tag.TagID, userId: this.userID, label: tag.Label });
+    }
+
+    public async deleteTags(tags: ITag[]) {
+        return await this.post<void>('Credentials/DeleteTags', tags);
+    }
+
     public async loadCredential(credentialId: string) {
         const encryptedCredential = await this.get<ICredential>('Credentials/Read', { id: credentialId });
         return await decryptCredential(encryptedCredential, this.masterKey, this.encryptionExcludes);

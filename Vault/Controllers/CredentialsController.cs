@@ -35,6 +35,17 @@ namespace Vault.Controllers
             });
 
         [HttpPost]
+        public async Task<ActionResult> CreateTag([FromBody] Tag model) =>
+            await _db.ResultAsJson(async conn => {
+                await conn.ExecuteAsync(SqlStatements.InsertNewTags, new[] { model });
+                return model;
+            });
+
+        [HttpPost]
+        public async Task<ActionResult> DeleteTags([FromBody] Tag[] model) =>
+            await _db.ResultAsJson(async conn => await conn.ExecuteAsync(SqlStatements.DeleteTags, new { TagIDs = model.Select(t => t.TagID) }));
+
+        [HttpPost]
         public async Task<ActionResult> Create([FromBody] Credential model) =>
             await _db.ResultAsJson(async conn => {
                 var c = model.WithNewID();

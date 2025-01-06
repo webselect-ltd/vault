@@ -128,12 +128,40 @@ namespace Vault.Support
                 t.Label;
             """;
 
+        public const string InsertNewTags =
+            $"""
+            INSERT INTO
+                Tags (
+                    TagID,
+                    UserID,
+                    Label
+                )
+            VALUES (
+                    @TagID,
+                    @UserID,
+                    @Label
+                )
+            """;
+
         public const string DeleteTagsFromCredential =
             """
             DELETE FROM
                 Tags_Credentials
             WHERE
                 CredentialID = @CredentialID;
+            """;
+
+        public const string DeleteTags =
+            """
+            DELETE FROM
+                Tags_Credentials
+            WHERE
+                TagID IN @TagIDs;
+
+            DELETE FROM
+                Tags
+            WHERE
+                TagID IN @TagIDs;
             """;
 
         public const string TagsToCredential =

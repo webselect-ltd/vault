@@ -114,6 +114,16 @@ export class FakeRepository implements IRepository {
         return new Promise<ITagIndex>(resolve => resolve(testTagIndex));
     }
 
+    // TODO: NOT IMPLEMENTED
+    public async createTag(tag: ITag) {
+        return Promise.resolve({ TagID: null, Label: '' });
+    }
+
+    // TODO: NOT IMPLEMENTED
+    public async deleteTags(tags: ITag[]) {
+        return Promise.resolve();
+    }
+
     public async loadCredential(credentialId: string) {
         return this.credentials.filter(c => c.CredentialID === credentialId)[0];
     }
