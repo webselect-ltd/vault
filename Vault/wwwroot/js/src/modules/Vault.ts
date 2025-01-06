@@ -48,17 +48,17 @@ export function parseSearchQuery(queryText: string) {
     return parsedQuery;
 }
 
-export function searchCredentials(query: ICredentialSearchQuery, tagIndex: ITagIndex, tags: string[], isWeakPassword: (password: string) => boolean, list: ICredential[]) {
+export function searchCredentials(query: ICredentialSearchQuery, tagIndex: ITagIndex, tagIds: string[], isWeakPassword: (password: string) => boolean, list: ICredential[]) {
     const emptyQuery = !query || !query.property || !query.text;
 
-    if (!tags.length && emptyQuery) {
+    if (!tagIds.length && emptyQuery) {
         return [];
     }
 
     let tagged = list;
 
-    if (tags.length) {
-        const matches = tags.map(t => tagIndex.index.get(t)).flat();
+    if (tagIds.length) {
+        const matches = tagIds.map(t => tagIndex.index.get(t)).flat();
         tagged = list.filter(c => matches.includes(c.CredentialID));
     }
 
