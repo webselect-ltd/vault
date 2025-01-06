@@ -100,6 +100,10 @@ const defaultPasswordSpecification = new PasswordSpecification(16, true, true, t
 
 const loginFormModalDOM = dom('#login-form-dialog');
 
+const tagInputItemTemplate = '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>';
+const tagInputSuggestionLimit = 10;
+const tagInputMinChars = 1;
+
 const ui: IVaultUIElements = {
     body: dom('body'),
     loginFormModalElement: loginFormModalDOM,
@@ -296,14 +300,15 @@ async function editCredential(credentialId: string) {
     const tagInput = new TagInput<ITag>({
         input: ui.modalContent.find('#Tags').get(0),
         data: tagIndex.tags || [],
-        maxNumberOfSuggestions: 5,
+        maxNumberOfSuggestions: tagInputSuggestionLimit,
+        minCharsBeforeShowingSuggestions: tagInputMinChars,
         getId: (item) => item.TagID,
         getLabel: (item) => item.Label,
         allowNewTags: true,
         newItemFactory: async label => {
             return await repository.createTag({ TagID: crypto.randomUUID(), Label: label });
         },
-        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
+        itemTemplate: tagInputItemTemplate
     });
 
     ui.modalContent.find('#Description').focus();
@@ -341,11 +346,12 @@ function optionsDialog() {
             deleteTagsTagInput = new TagInput<ITag>({
                 input: ui.modalContent.find('#delete-tags').get(0),
                 data: tagIndex.tags || [],
-                maxNumberOfSuggestions: 5,
+                maxNumberOfSuggestions: tagInputSuggestionLimit,
+                minCharsBeforeShowingSuggestions: tagInputMinChars,
                 getId: (item) => item.TagID,
                 getLabel: (item) => item.Label,
                 allowNewTags: false,
-                itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
+                itemTemplate: tagInputItemTemplate
             });
         },
         onhide: e => {
@@ -444,7 +450,7 @@ function showModal(options: IVaultModalOptions) {
     ui.modalContent.offchild('button.btn-edit', 'click');
     ui.modalContent.offchild('button.btn-delete', 'click');
     ui.modalContent.onchild('button.btn-accept', 'click', options.onaccept || ui.modal.hide);
-    ui.modalContent.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
+    ui.modalContent.onchild('button.btn-edit', 'click', options.onedit || (() => alert('NOT BOUND')));
     ui.modalContent.onchild('button.btn-delete', 'click', options.ondelete || (() => alert('NOT BOUND')));
 
     if (typeof options.onshow === 'function') {
@@ -504,23 +510,6 @@ function showPasswordStrength(field: DOM) {
     }
 }
 
-function createTagSearchInput() {
-    return new TagInput<ITag>({
-        input: document.getElementById('tags'),
-        data: tagIndex.tags || [],
-        maxNumberOfSuggestions: 5,
-        getId: (item) => item.TagID,
-        getLabel: (item) => item.Label,
-        allowNewTags: false,
-        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
-        onTagsChanged: async (instance, added, removed, selected) => {
-            const credentials = await repository.loadCredentialSummaryList();
-            const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
-            updateCredentialListUI(ui.container, results);
-        }
-    })
-}
-
 // Event handlers
 
 ui.container.onchild('.btn-credential-show-detail', 'click', e => {
@@ -543,14 +532,15 @@ ui.newButton.on('click', e => {
     const tagInput = new TagInput<ITag>({
         input: ui.modalContent.find('#Tags').get(0),
         data: tagIndex.tags || [],
-        maxNumberOfSuggestions: 5,
+        maxNumberOfSuggestions: tagInputSuggestionLimit,
+        minCharsBeforeShowingSuggestions: tagInputMinChars,
         getId: (item) => item.TagID,
         getLabel: (item) => item.Label,
         allowNewTags: true,
         newItemFactory: label => {
             return Promise.resolve({ TagID: crypto.randomUUID(), Label: label });
         },
-        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
+        itemTemplate: tagInputItemTemplate
     });
     ui.modalContent.find('#Description').focus();
     showPasswordStrength(ui.modalContent.find('#Password'));
@@ -597,7 +587,21 @@ ui.loginForm.on('submit', async e => {
         if (loginResult.Success) {
             tagIndex = await repository.loadTagIndex();
 
-            ui.tagsInput = createTagSearchInput();
+            ui.tagsInput = new TagInput<ITag>({
+                input: document.getElementById('tags'),
+                data: tagIndex.tags || [],
+                maxNumberOfSuggestions: tagInputSuggestionLimit,
+                minCharsBeforeShowingSuggestions: tagInputMinChars,
+                getId: (item) => item.TagID,
+                getLabel: (item) => item.Label,
+                allowNewTags: false,
+                itemTemplate: tagInputItemTemplate,
+                onTagsChanged: async (instance, added, removed, selected) => {
+                    const credentials = await repository.loadCredentialSummaryList();
+                    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
+                    updateCredentialListUI(ui.container, results);
+                }
+            });
 
             ui.loginForm.get().classList.add('d-none');
             ui.loginFormModal.hide();
