@@ -26,6 +26,7 @@ import {
     PasswordSpecification,
     Repository
 } from './types/all';
+import { sortCredentials } from './modules/Vault';
 
 interface IVaultGlobals {
     // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
@@ -805,7 +806,7 @@ ui.body.onchild('#delete-tags-button', 'click', async e => {
 
 ui.body.onchild('#export-button', 'click', async e => {
     const exportedData = await withLoadSpinner(async () => await repository.loadCredentials());
-    openExportPopup(exportedData);
+    openExportPopup(sortCredentials(exportedData));
 });
 
 ui.body.onchild('#import-button', 'click', async e => {

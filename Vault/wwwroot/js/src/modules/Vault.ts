@@ -140,6 +140,14 @@ export function getPasswordSpecificationFromPassword(password: string) {
     return specification;
 }
 
+export function sortCredentials(credentials: ICredential[]) {
+    return credentials.slice().sort((a: ICredential, b: ICredential) => {
+        const desca = a.description.toUpperCase();
+        const descb = b.description.toUpperCase();
+        return desca < descb ? -1 : desca > descb ? 1 : 0;
+    });
+}
+
 export function sortCredentialSummaries(credentials: ICredentialSummary[]) {
     return credentials.slice().sort((a: ICredentialSummary, b: ICredentialSummary) => {
         const desca = a.description.toUpperCase();

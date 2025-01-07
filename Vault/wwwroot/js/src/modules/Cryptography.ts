@@ -110,7 +110,7 @@ export async function decryptCredentialSummary(credentialSummary: ICredentialSum
     };
 }
 
-export async function decryptCredentialSummaries(credentialSummaries: ICredentialSummary[], masterKey: ArrayBuffer) {
+export async function decryptCredentialSummaries(credentialSummaries: ICredentialSummary[], masterKey: ArrayBuffer): Promise<ICredentialSummary[]> {
     return await Promise.all(credentialSummaries.map(async item => await decryptCredentialSummary(item, masterKey)));
 }
 
@@ -135,15 +135,15 @@ export async function decryptCredential(credential: ICredential, masterKey: Arra
     };
 }
 
-export async function decryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer) {
+export async function decryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer): Promise<ICredential[]> {
     return await Promise.all(credentials.map(async item => await decryptCredential(item, masterKey)));
 }
 
-export async function decryptTag(tag: ITag, masterKey: ArrayBuffer) {
+export async function decryptTag(tag: ITag, masterKey: ArrayBuffer): Promise<ITag> {
     return { ...tag, label: await aesGcmDecrypt(tag.label, masterKey) };
 }
 
-export async function decryptTags(tags: ITag[], masterKey: ArrayBuffer) {
+export async function decryptTags(tags: ITag[], masterKey: ArrayBuffer): Promise<ITag[]> {
     return await Promise.all(tags.map(async item => await decryptTag(item, masterKey)));
 }
 
@@ -163,15 +163,15 @@ export async function encryptCredential(credential: ICredential, masterKey: Arra
     };
 }
 
-export async function encryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer) {
+export async function encryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer): Promise<ICredential[]> {
     return await Promise.all(credentials.map(async item => await encryptCredential(item, masterKey)));
 }
 
-export async function encryptTag(tag: ITag, masterKey: ArrayBuffer) {
+export async function encryptTag(tag: ITag, masterKey: ArrayBuffer): Promise<ITag> {
     return { ...tag, label: await aesGcmEncrypt(tag.label, masterKey) };
 }
 
-export async function encryptTags(tags: ITag[], masterKey: ArrayBuffer) {
+export async function encryptTags(tags: ITag[], masterKey: ArrayBuffer): Promise<ITag[]> {
     return await Promise.all(tags.map(async item => await encryptTag(item, masterKey)));
 }
 

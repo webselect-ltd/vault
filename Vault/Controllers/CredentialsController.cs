@@ -16,9 +16,9 @@ namespace Vault.Controllers
         public CredentialsController(IConnectionFactory cf) =>
             _db = new SqlExecutor(cf);
 
-        public async Task<ActionResult> ReadTagIndex(string userId) =>
+        public async Task<ActionResult> ReadTagIndex(string userID) =>
             await _db.ResultAsJson(async conn => {
-                var reader = await conn.QueryMultipleAsync(SqlStatements.TagIndex, new { UserID = userId });
+                var reader = await conn.QueryMultipleAsync(SqlStatements.TagIndex, new { UserID = userID });
 
                 var tags = await reader.ReadAsync<(string TagID, string Label)>();
                 var index = await reader.ReadAsync<(string TagID, string CredentialID)>();
@@ -54,9 +54,9 @@ namespace Vault.Controllers
                 return a + b;
             });
 
-        public async Task<ActionResult> Read(string id) =>
+        public async Task<ActionResult> Read(string userID, string id) =>
             await _db.ResultAsJson(async conn => {
-                var reader = await conn.QueryMultipleAsync(SqlStatements.SelectSingle, new { CredentialID = id });
+                var reader = await conn.QueryMultipleAsync(SqlStatements.SelectSingle, new { UserID = userID, CredentialID = id });
 
                 var credential = await reader.ReadSingleAsync<Credential>();
                 var tags = await reader.ReadAsync<(string TagID, string Label)>();
@@ -67,11 +67,26 @@ namespace Vault.Controllers
                 return credential;
             });
 
-        public async Task<ActionResult> ReadAll(string userId) =>
-            await _db.ResultAsJson(conn => conn.QueryAsync<Credential>(SqlStatements.Select, new { UserID = userId }));
+        public async Task<ActionResult> ReadAll(string userID) =>
+            await _db.ResultAsJson(async conn => {
+                var reader = await conn.QueryMultipleAsync(SqlStatements.Select, new { UserID = userID });
 
-        public async Task<ActionResult> ReadSummaries(string userId) =>
-            await _db.ResultAsJson(conn => conn.QueryAsync<CredentialSummary>(SqlStatements.SelectSummary, new { UserID = userId }));
+                var credentials = (await reader.ReadAsync<Credential>()).ToList();
+                var tagAssociations = await reader.ReadAsync<(string CredentialID, string TagID, string Label)>();
+
+                credentials.ForEach(c => {
+                    var tags = tagAssociations.Where(ta => ta.CredentialID == c.CredentialID);
+
+                    // TODO: Support tag data in import
+                    // c.TagIDs = string.Join('|', tags.Select(t => t.TagID));
+                    c.TagLabels = tags.Select(t => t.Label).ToArray();
+                });
+
+                return credentials;
+            });
+
+        public async Task<ActionResult> ReadSummaries(string userID) =>
+            await _db.ResultAsJson(conn => conn.QueryAsync<CredentialSummary>(SqlStatements.SelectSummary, new { UserID = userID }));
 
         [HttpPost]
         public async Task<ActionResult> Update([FromBody] Credential model) =>
@@ -87,6 +102,7 @@ namespace Vault.Controllers
             await _db.ResultAsJson(async (conn, tran) => {
                 foreach (var credential in model.Credentials)
                 {
+                    // TODO: Support tag data in import
                     credential.CredentialID = Guid.NewGuid().ToString();
                     await conn.ExecuteAsync(SqlStatements.Insert, credential, tran);
                 }

@@ -18,7 +18,27 @@ namespace Vault.Support
                   UserID = @UserID";
 
         public const string Select =
-            "SELECT * FROM Credentials WHERE UserID = @UserID";
+            """
+            SELECT
+                *
+            FROM
+                Credentials
+            WHERE
+                UserID = @UserID;
+
+            SELECT
+                tc.CredentialID,
+                tc.TagID,
+                t.Label
+            FROM
+                Tags_Credentials tc
+            INNER JOIN
+                Tags t
+                    ON t.TagID = tc.TagID
+                    AND t.UserID = @UserID
+            ORDER BY
+                t.Label;
+            """;
 
         public const string SelectSingle =
             """
@@ -27,6 +47,8 @@ namespace Vault.Support
             FROM
                 Credentials
             WHERE
+                UserID = @UserID
+            AND
                 CredentialID = @CredentialID;
 
             SELECT
@@ -175,6 +197,16 @@ namespace Vault.Support
                 @TagID,
                 @CredentialID
             );
+            """;
+
+        public const string UpdateTagLabel =
+            """
+            UPDATE
+                Tags
+            SET
+                Label = @Label
+            WHERE
+                TagID = @TagID
             """;
 
         public static DatabaseType DatabaseType { get; internal set; }

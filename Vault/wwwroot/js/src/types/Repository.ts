@@ -7,7 +7,7 @@
     hash,
     hex
 } from '../modules/all';
-import { decryptCredentialSummaries, decryptTags, encryptTag } from '../modules/Cryptography';
+import { decryptCredentialSummaries, decryptTags, encryptTag, encryptTags } from '../modules/Cryptography';
 import { ICredential, ICredentialSummary, ILoginResult, IRepository, ISecurityKeyDetails, ITag, ITagIndex } from '../types/all';
 
 export class Repository implements IRepository {
@@ -85,7 +85,7 @@ export class Repository implements IRepository {
     }
 
     public async loadCredential(credentialID: string) {
-        const encryptedCredential = await this.get<ICredential>('Credentials/Read', { id: credentialID });
+        const encryptedCredential = await this.get<ICredential>('Credentials/Read', { userID: this.userID, id: credentialID });
         return await decryptCredential(encryptedCredential, this.masterKey);
     }
 
@@ -120,6 +120,7 @@ export class Repository implements IRepository {
         this.cache.length = 0;
 
         const credentials = await this.loadCredentials();
+        const tagIndex = await this.loadTagIndex();
 
         const oldPasswordHash = await hash(this.password);
         const newPasswordHash = await hash(newPassword);
@@ -128,9 +129,11 @@ export class Repository implements IRepository {
         this.masterKey = await generateMasterKey(newPassword);
 
         const reEncryptedCredentials = await encryptCredentials(credentials, this.masterKey);
+        const reEncryptedTags = await encryptTags(tagIndex.tags, this.masterKey);
 
         const model = {
             UpdatedCredentials: reEncryptedCredentials,
+            UpdatedTags: reEncryptedTags,
             UserID: this.userID,
             OldPasswordHash: hex(oldPasswordHash),
             NewPasswordHash: hex(newPasswordHash)
