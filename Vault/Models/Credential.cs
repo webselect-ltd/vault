@@ -70,7 +70,7 @@ namespace Vault.Models
         public string TagIDs { get; set; }
 
         [JsonProperty("tagLabels")]
-        public string TagLabels { get; set; }
+        public string[] TagLabels { get; set; }
 
         [JsonIgnore]
         public object[] TagAssociations =>

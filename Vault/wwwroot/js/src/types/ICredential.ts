@@ -12,5 +12,5 @@
     notes?: string;
     pwdOptions?: string;
     tagIDs?: string;
-    tagLabels?: string;
+    tagLabels?: string[];
 }

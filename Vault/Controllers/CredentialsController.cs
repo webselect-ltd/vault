@@ -62,7 +62,7 @@ namespace Vault.Controllers
                 var tags = await reader.ReadAsync<(string TagID, string Label)>();
 
                 credential.TagIDs = string.Join('|', tags.Select(t => t.TagID));
-                credential.TagLabels = string.Join('|', tags.Select(t => t.Label));
+                credential.TagLabels = tags.Select(t => t.Label).ToArray();
 
                 return credential;
             });

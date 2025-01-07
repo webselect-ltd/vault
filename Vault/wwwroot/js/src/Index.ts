@@ -385,7 +385,7 @@ async function showDetail(credentialId: string) {
     ];
 
     const tagLabels = credential.tagLabels
-        ? credential.tagLabels.split('|').map(t => ({ label: t }))
+        ? credential.tagLabels.map(t => ({ label: t }))
         : [];
 
     const detailHtml = templates.detail({

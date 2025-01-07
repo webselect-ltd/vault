@@ -129,7 +129,9 @@ export async function decryptCredential(credential: ICredential, masterKey: Arra
         pwdOptions: await aesGcmDecrypt(credential.pwdOptions, masterKey),
 
         // TODO: This should just be returned as an array to begin with
-        tagLabels: (await Promise.all(credential.tagLabels.split('|').map(async l => await aesGcmDecrypt(l, masterKey)))).join('|')
+        tagLabels: typeof credential.tagLabels !== 'undefined'
+            ? (await Promise.all(credential.tagLabels.map(async l => await aesGcmDecrypt(l, masterKey))))
+            : []
     };
 }
 
