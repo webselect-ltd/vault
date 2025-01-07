@@ -1,15 +1,16 @@
 ﻿export interface ICredential {
-    CredentialID: string;
-    UserID: string;
-    Description: string;
-    Username?: string;
-    Password?: string;
-    Url?: string;
-    UserDefined1Label?: string;
-    UserDefined1?: string;
-    UserDefined2Label?: string;
-    UserDefined2?: string;
-    Notes?: string;
-    PwdOptions?: string;
-    [propertyName: string]: string;
+    credentialID: string;
+    userID: string;
+    description: string;
+    username?: string;
+    password?: string;
+    url?: string;
+    userDefined1Label?: string;
+    userDefined1?: string;
+    userDefined2Label?: string;
+    userDefined2?: string;
+    notes?: string;
+    pwdOptions?: string;
+    tagIDs?: string;
+    tagLabels?: string[];
 }

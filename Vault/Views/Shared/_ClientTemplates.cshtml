@@ -16,10 +16,10 @@
 <script id="tmpl-modalfooter" type="text/html">
     <div class="modal-footer">
         {{#if showEdit}}
-        <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialId}}"><span class="bi bi-pencil-square"></span> {{editText}}</button>
+        <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialID}}"><span class="bi bi-pencil-square"></span> {{editText}}</button>
         {{/if}}
         {{#if showDelete}}
-        <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialId}}"><span class="bi bi-trash"></span> {{deleteText}}</button>
+        <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialID}}"><span class="bi bi-trash"></span> {{deleteText}}</button>
         {{/if}}
         {{#if showAccept}}
         <button type="submit" class="btn btn-primary btn-accept"><span class="bi bi-check-lg"></span> {{acceptText}}</button>
@@ -31,61 +31,72 @@
 </script>
 
 <script id="tmpl-urllink" type="text/html">
-    <a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;">{{{UrlText}}}</a>
+    <a class="display-link" href="{{url}}" onclick="window.open(this.href); return false;">{{{urlText}}}</a>
 </script>
 
 <script id="tmpl-urltext" type="text/html">
-    <span class="d-none d-lg-inline">{{truncate Url 50}}</span>
-    <span class="d-lg-none">{{truncate Url 26}}</span>
+    <span class="d-none d-lg-inline">{{truncate url 50}}</span>
+    <span class="d-lg-none">{{truncate url 26}}</span>
 </script>
 
 <script id="tmpl-copylink" type="text/html">
-    <a class="copy-link" data-clipboard-text="{{Content}}"><span class="bi bi-clipboard"></span></a>
+    <a class="copy-link" data-clipboard-text="{{content}}"><span class="bi bi-clipboard"></span></a>
 </script>
 
 <script id="tmpl-detail" type="text/html">
-    {{#if Url}}
+    {{#if url}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Url</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=Url }} </span>{{{UrlHtml}}}</div>
-        <div class="col-3 text-end d-md-none">{{> copylink Content=Url }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink content=url }} </span>{{{urlHtml}}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink content=url }}</div>
     </div>
     {{/if}}
-    {{#if Username}}
+    {{#if username}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Username</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=Username }} </span>{{Username}}</div>
-        <div class="col-3 text-end d-md-none">{{> copylink Content=Username }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink content=username }} </span>{{username}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink content=username }}</div>
     </div>
     {{/if}}
-    {{#if Password}}
+    {{#if password}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Password</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=Password }} </span><span class="user-select-all">{{Password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
-        <div class="col-3 text-end d-md-none">{{> copylink Content=Password }}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink content=password }} </span><span class="user-select-all">{{password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
+        <div class="col-3 text-end d-md-none">{{> copylink content=password }}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
-        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD) offset-md-@(LabelColumnWidthMD)">{{{PasswordCharacterTable}}}</div>
+        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD) offset-md-@(LabelColumnWidthMD)">{{{passwordCharacterTable}}}</div>
     </div>
     {{/if}}
-    {{#if UserDefined1}}
+    {{#if userDefined1}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
-        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{UserDefined1Label}}</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=UserDefined1 }} </span>{{UserDefined1}}</div>
-        <div class="col-3 text-end d-md-none">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{userDefined1Label}}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink content=userDefined1 }} </span>{{userDefined1}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink content=userDefined1 }}</div>
     </div>
     {{/if}}
-    {{#if UserDefined2}}
+    {{#if userDefined2}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
-        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{UserDefined2Label}}</div>
-        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink Content=UserDefined2 }} </span>{{UserDefined2}}</div>
-        <div class="col-3 text-end d-md-none">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">{{userDefined2Label}}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="d-none d-md-inline me-3">{{> copylink content=userDefined2 }} </span>{{userDefined2}}</div>
+        <div class="col-3 text-end d-md-none">{{> copylink content=userDefined2 }}</div>
     </div>
     {{/if}}
-    {{#if Notes}}
+    {{#if notes}}
     <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Notes</div>
-        <div class="col-md-@(DataColumnWidthMD)">{{breaklines Notes}}</div>
+        <div class="col-md-@(DataColumnWidthMD)">{{breaklines notes}}</div>
+    </div>
+    {{/if}}
+
+    {{#if tagLabels}}
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Tags</div>
+        <div class="col-md-@(DataColumnWidthMD)">
+            {{#each tagLabels}}
+                <div class="mab-bootstrap-taginput-tag mab-bootstrap-taginput-tag no-margin">{{label}}</div>
+            {{/each}}
+        </div>
     </div>
     {{/if}}
 </script>
@@ -99,6 +110,18 @@
 </script>
 
 <script id="tmpl-optionsdialog" type="text/html">
+    <div class="row mb-md-@(RowMarginMD)">
+        <label for="delete-tags" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Delete Tags</label>
+        <div class="col-md-@(FieldColumnWidthMD)">
+            <input type="text" id="delete-tags" name="delete-tags" class="form-control" value="" required />
+        </div>
+    </div>
+    <div class="row mb-md-@(RowMarginMD)">
+        <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
+            <button class="btn btn-primary" id="delete-tags-button">Delete Selected Tags</button>
+        </div>
+    </div>
+    <hr />
     <form id="change-password-form" class="needs-validation" novalidate>
         <div class="row mb-md-@(RowMarginMD)">
             <label for="NewPassword" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">New Password</label>
@@ -160,7 +183,7 @@
 
 <script id="tmpl-credentialtablerow" type="text/html">
     <div id="{{credentialid}}" class="credential mb-2 mb-md-1">
-        <div class="btn btn-credential-show-detail mb-1 mb-md-0" data-id="{{credentialid}}">
+        <div class="btn btn-credential-show-detail mb-1 mb-md-0" data-id="{{credentialID}}">
             <div class="d-none d-md-block">{{description}}</div><div class="d-md-none">{{truncate description 31}}</div>
             {{#if weak}}
             {{#if username}}
