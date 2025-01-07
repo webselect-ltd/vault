@@ -7,15 +7,14 @@
     hash,
     hex
 } from '../modules/all';
-import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails, ITag, ITagIndex } from '../types/all';
+import { decryptCredentialSummaries, decryptTags, encryptTag } from '../modules/Cryptography';
+import { ICredential, ICredentialSummary, ILoginResult, IRepository, ISecurityKeyDetails, ITag, ITagIndex } from '../types/all';
 
 export class Repository implements IRepository {
-    private readonly encryptionExcludes = ['CredentialID', 'UserID', 'Tags', 'TagArray', 'TagDisplay'];
-
     private userID: string;
     private password: string;
     private masterKey: ArrayBuffer;
-    private cache: ICredential[];
+    private cache: ICredentialSummary[];
     private securityKey: ISecurityKeyDetails;
     private securityKeyParameter: any;
 
@@ -44,8 +43,8 @@ export class Repository implements IRepository {
 
         const loginResult = await this.post<ILoginResult>('Home/Login', data);
 
-        if (loginResult.Success) {
-            this.userID = loginResult.UserID;
+        if (loginResult.success) {
+            this.userID = loginResult.userID;
             this.password = password;
             this.masterKey = await generateMasterKey(this.password);
         }
@@ -59,7 +58,7 @@ export class Repository implements IRepository {
             index: { [key: string]: string[] };
         }
 
-        const data = await this.get<Temp>('Credentials/ReadTagIndex', { userId: this.userID });
+        const data = await this.get<Temp>('Credentials/ReadTagIndex', { userID: this.userID });
 
         const map = new Map();
 
@@ -68,7 +67,7 @@ export class Repository implements IRepository {
         }
 
         const index: ITagIndex = {
-            tags: data.tags,
+            tags: await decryptTags(data.tags, this.masterKey),
             index: map
         };
 
@@ -76,43 +75,44 @@ export class Repository implements IRepository {
     }
 
     public async createTag(tag: ITag) {
-        // TODO: Encrypt
-        return await this.post<ITag>('Credentials/CreateTag', { tagId: tag.TagID, userId: this.userID, label: tag.Label });
+        const encryptedTag = await encryptTag(tag, this.masterKey);
+        await this.post<ITag>('Credentials/CreateTag', { ...encryptedTag, userID: this.userID });
+        return tag;
     }
 
     public async deleteTags(tags: ITag[]) {
         return await this.post<void>('Credentials/DeleteTags', tags);
     }
 
-    public async loadCredential(credentialId: string) {
-        const encryptedCredential = await this.get<ICredential>('Credentials/Read', { id: credentialId });
-        return await decryptCredential(encryptedCredential, this.masterKey, this.encryptionExcludes);
+    public async loadCredential(credentialID: string) {
+        const encryptedCredential = await this.get<ICredential>('Credentials/Read', { id: credentialID });
+        return await decryptCredential(encryptedCredential, this.masterKey);
     }
 
     public async loadCredentialSummaryList() {
         if (!this.cache.length) {
-            const encryptedCredentials = await this.get<ICredential[]>('Credentials/ReadSummaries', { userId: this.userID });
-            this.cache = await decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
+            const encryptedCredentialSummaries = await this.get<ICredentialSummary[]>('Credentials/ReadSummaries', { userID: this.userID });
+            this.cache = await decryptCredentialSummaries(encryptedCredentialSummaries, this.masterKey);
         }
         return this.cache;
     }
 
     public async loadCredentials() {
-        const encryptedCredentials = await this.get<ICredential[]>('Credentials/ReadAll', { userId: this.userID });
-        return await decryptCredentials(encryptedCredentials, this.masterKey, this.encryptionExcludes);
+        const encryptedCredentials = await this.get<ICredential[]>('Credentials/ReadAll', { userID: this.userID });
+        return await decryptCredentials(encryptedCredentials, this.masterKey);
     }
 
     public async createCredential(credential: ICredential) {
         this.cache.length = 0;
-        credential.UserID = this.userID;
-        const encryptedCredential = await encryptCredential(credential, this.masterKey, this.encryptionExcludes);
+        credential.userID = this.userID;
+        const encryptedCredential = await encryptCredential(credential, this.masterKey);
         return this.post<ICredential>('Credentials/Create', encryptedCredential);
     }
 
     public async updateCredential(credential: ICredential) {
         this.cache.length = 0;
-        credential.UserID = this.userID;
-        const encryptedCredential = await encryptCredential(credential, this.masterKey, this.encryptionExcludes);
+        credential.userID = this.userID;
+        const encryptedCredential = await encryptCredential(credential, this.masterKey);
         return this.post<ICredential>('Credentials/Update', encryptedCredential);
     }
 
@@ -127,7 +127,7 @@ export class Repository implements IRepository {
         this.password = newPassword;
         this.masterKey = await generateMasterKey(newPassword);
 
-        const reEncryptedCredentials = await encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
+        const reEncryptedCredentials = await encryptCredentials(credentials, this.masterKey);
 
         const model = {
             UpdatedCredentials: reEncryptedCredentials,
@@ -140,10 +140,10 @@ export class Repository implements IRepository {
     }
 
     public async import(credentials: ICredential[]) {
-        credentials.forEach(c => c.UserID = this.userID);
+        credentials.forEach(c => c.userID = this.userID);
 
         this.cache.length = 0;
-        const encryptedCredentials = await encryptCredentials(credentials, this.masterKey, this.encryptionExcludes);
+        const encryptedCredentials = await encryptCredentials(credentials, this.masterKey);
 
         const model = {
             Credentials: encryptedCredentials
@@ -152,11 +152,11 @@ export class Repository implements IRepository {
         return this.post<void>('Credentials/Import', model);
     }
 
-    public async deleteCredential(credentialId: string) {
+    public async deleteCredential(credentialID: string) {
         this.cache.length = 0;
         const data = {
-            userId: this.userID,
-            credentialId: credentialId
+            userID: this.userID,
+            credentialID: credentialID
         };
         return this.post<void>('Credentials/Delete', data);
     }

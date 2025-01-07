@@ -25,8 +25,8 @@ namespace Vault.Controllers
 
                 return new {
                     tags = tags.Select(t => new {
-                        t.TagID,
-                        t.Label,
+                        tagID = t.TagID,
+                        label = t.Label,
                     }),
                     index = index
                         .GroupBy(i => i.TagID)
@@ -50,7 +50,7 @@ namespace Vault.Controllers
             await _db.ResultAsJson(async conn => {
                 var c = model.WithNewID();
                 var a = await conn.ExecuteAsync(SqlStatements.Insert, c);
-                var b = await conn.ExecuteAsync(SqlStatements.TagsToCredential, c.TagArray);
+                var b = await conn.ExecuteAsync(SqlStatements.TagsToCredential, c.TagAssociations);
                 return a + b;
             });
 
@@ -61,8 +61,8 @@ namespace Vault.Controllers
                 var credential = await reader.ReadSingleAsync<Credential>();
                 var tags = await reader.ReadAsync<(string TagID, string Label)>();
 
-                credential.Tags = string.Join('|', tags.Select(t => t.TagID));
-                credential.TagDisplay = string.Join('|', tags.Select(t => t.Label));
+                credential.TagIDs = string.Join('|', tags.Select(t => t.TagID));
+                credential.TagLabels = string.Join('|', tags.Select(t => t.Label));
 
                 return credential;
             });
@@ -78,7 +78,7 @@ namespace Vault.Controllers
             await _db.ResultAsJson(async conn => {
                 var a = await conn.ExecuteAsync(SqlStatements.Update, model);
                 var b = await conn.ExecuteAsync(SqlStatements.DeleteTagsFromCredential, model);
-                var c = await conn.ExecuteAsync(SqlStatements.TagsToCredential, model.TagArray);
+                var c = await conn.ExecuteAsync(SqlStatements.TagsToCredential, model.TagAssociations);
                 return a + b + c;
             });
 

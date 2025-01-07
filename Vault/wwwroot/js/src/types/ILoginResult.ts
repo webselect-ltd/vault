@@ -1,4 +1,4 @@
 ﻿export interface ILoginResult {
-    UserID: string;
-    Success: boolean;
+    userID: string;
+    success: boolean;
 }

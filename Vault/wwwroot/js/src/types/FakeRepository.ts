@@ -1,98 +1,98 @@
-﻿import { ICredential, IRepository, ITag, ITagIndex } from './all';
+﻿import { ICredential, ICredentialSummary, IRepository, ITag, ITagIndex } from './all';
 
 export class FakeRepository implements IRepository {
     public credentials: ICredential[];
 
     constructor() {
         this.credentials = [{
-            CredentialID: 'cr1',
-            UserID: 'user1',
-            Description: 'Cat',
-            Username: 'cat',
-            Password: 'cat123',
-            Url: 'http://cat.com',
-            UserDefined1Label: 'Cat UD 1',
-            UserDefined1: 'catud1',
-            UserDefined2Label: 'Cat UD 1',
-            UserDefined2: 'catud1',
-            Notes: 'Cat notes',
-            PwdOptions: '12|1|1|1|1',
-            Tags: 'cat'
+            credentialID: 'cr1',
+            userID: 'user1',
+            description: 'Cat',
+            username: 'cat',
+            password: 'cat123',
+            url: 'http://cat.com',
+            userDefined1Label: 'Cat UD 1',
+            userDefined1: 'catud1',
+            userDefined2Label: 'Cat UD 1',
+            userDefined2: 'catud1',
+            notes: 'Cat notes',
+            pwdOptions: '12|1|1|1|1',
+            tagIDs: 'cat'
         }, {
-            CredentialID: 'cr2',
-            UserID: 'user1',
-            Description: 'Dog',
-            Username: 'dog',
-            Password: 'dog123',
-            Url: 'http://dog.com',
-            UserDefined1Label: 'Dog UD 1',
-            UserDefined1: 'dogud1',
-            UserDefined2Label: 'Dog UD 1',
-            UserDefined2: 'dogud1',
-            Notes: 'Dog notes',
-            PwdOptions: '12|1|1|1|1',
-            Tags: 'dog'
+            credentialID: 'cr2',
+            userID: 'user1',
+            description: 'Dog',
+            username: 'dog',
+            password: 'dog123',
+            url: 'http://dog.com',
+            userDefined1Label: 'Dog UD 1',
+            userDefined1: 'dogud1',
+            userDefined2Label: 'Dog UD 1',
+            userDefined2: 'dogud1',
+            notes: 'Dog notes',
+            pwdOptions: '12|1|1|1|1',
+            tagIDs: 'dog'
         }, {
-            CredentialID: 'cr3',
-            UserID: 'user1',
-            Description: 'Fish',
-            Username: 'fish',
-            Password: 'fish123',
-            Url: 'http://fish.com',
-            UserDefined1Label: 'Fish UD 1',
-            UserDefined1: 'fishud1',
-            UserDefined2Label: 'Fish UD 1',
-            UserDefined2: 'fishud1',
-            Notes: 'Fish notes',
-            PwdOptions: '12|1|1|1|1',
-            Tags: 'fish'
+            credentialID: 'cr3',
+            userID: 'user1',
+            description: 'Fish',
+            username: 'fish',
+            password: 'fish123',
+            url: 'http://fish.com',
+            userDefined1Label: 'Fish UD 1',
+            userDefined1: 'fishud1',
+            userDefined2Label: 'Fish UD 1',
+            userDefined2: 'fishud1',
+            notes: 'Fish notes',
+            pwdOptions: '12|1|1|1|1',
+            tagIDs: 'fish'
         }, {
-            CredentialID: 'cr4',
-            UserID: 'user1',
-            Description: 'Catfish',
-            Username: 'catfish',
-            Password: 'catfish123',
-            Url: 'http://catfish.com',
-            UserDefined1Label: 'Catfish UD 1',
-            UserDefined1: 'catfishud1',
-            UserDefined2Label: 'Catfish UD 1',
-            UserDefined2: 'catfishud1',
-            Notes: 'Catfish notes',
-            PwdOptions: '12|1|1|1|1',
-            Tags: 'cat|fish'
+            credentialID: 'cr4',
+            userID: 'user1',
+            description: 'Catfish',
+            username: 'catfish',
+            password: 'catfish123',
+            url: 'http://catfish.com',
+            userDefined1Label: 'Catfish UD 1',
+            userDefined1: 'catfishud1',
+            userDefined2Label: 'Catfish UD 1',
+            userDefined2: 'catfishud1',
+            notes: 'Catfish notes',
+            pwdOptions: '12|1|1|1|1',
+            tagIDs: 'cat|fish'
         }, {
-            CredentialID: 'cr5',
-            UserID: 'user1',
-            Description: 'Dogfish',
-            Username: 'dogfish',
-            Password: 'dogfish123',
-            Url: 'http://dogfish.com',
-            UserDefined1Label: 'Dogfish UD 1',
-            UserDefined1: 'dogfishud1',
-            UserDefined2Label: 'Dogfish UD 1',
-            UserDefined2: 'dogfishud1',
-            Notes: 'Dogfish notes',
-            PwdOptions: '12|1|1|1|1',
-            Tags: 'dog|fish'
+            credentialID: 'cr5',
+            userID: 'user1',
+            description: 'Dogfish',
+            username: 'dogfish',
+            password: 'dogfish123',
+            url: 'http://dogfish.com',
+            userDefined1Label: 'Dogfish UD 1',
+            userDefined1: 'dogfishud1',
+            userDefined2Label: 'Dogfish UD 1',
+            userDefined2: 'dogfishud1',
+            notes: 'Dogfish notes',
+            pwdOptions: '12|1|1|1|1',
+            tagIDs: 'dog|fish'
         }, {
-            CredentialID: 'cr6',
-            UserID: 'user1',
-            Description: 'Owl',
-            Username: 'owl',
-            Password: '_nT:NP?uovID8,TE',
-            Url: 'http://owl.com',
-            UserDefined1Label: 'Owl UD 1',
-            UserDefined1: 'owlud1',
-            UserDefined2Label: 'Owl UD 1',
-            UserDefined2: 'owlud1',
-            Notes: 'Owl notes',
-            PwdOptions: '12|1|1|1|1',
-            Tags: ''
+            credentialID: 'cr6',
+            userID: 'user1',
+            description: 'Owl',
+            username: 'owl',
+            password: '_nT:NP?uovID8,TE',
+            url: 'http://owl.com',
+            userDefined1Label: 'Owl UD 1',
+            userDefined1: 'owlud1',
+            userDefined2Label: 'Owl UD 1',
+            userDefined2: 'owlud1',
+            notes: 'Owl notes',
+            pwdOptions: '12|1|1|1|1',
+            tagIDs: ''
         }];
     }
 
     public async login(hashedUsername: string, hashedPassword: string) {
-        return { UserID: 'user1', Success: true };
+        return { userID: 'user1', success: true };
     }
 
     public async loadTagIndex() {
@@ -104,9 +104,9 @@ export class FakeRepository implements IRepository {
 
         const testTagIndex: ITagIndex = {
             tags: [
-                { TagID: 'cat', Label: 'Cat' },
-                { TagID: 'dog', Label: 'Dog' },
-                { TagID: 'fish', Label: 'Fish' }
+                { tagID: 'cat', label: 'Cat' },
+                { tagID: 'dog', label: 'Dog' },
+                { tagID: 'fish', label: 'Fish' }
             ],
             index: map
         };
@@ -116,7 +116,7 @@ export class FakeRepository implements IRepository {
 
     // TODO: NOT IMPLEMENTED
     public async createTag(tag: ITag) {
-        return Promise.resolve({ TagID: null, Label: '' });
+        return Promise.resolve({ tagID: null, label: '' });
     }
 
     // TODO: NOT IMPLEMENTED
@@ -124,12 +124,18 @@ export class FakeRepository implements IRepository {
         return Promise.resolve();
     }
 
-    public async loadCredential(credentialId: string) {
-        return this.credentials.filter(c => c.CredentialID === credentialId)[0];
+    public async loadCredential(credentialID: string) {
+        return this.credentials.filter(c => c.credentialID === credentialID)[0];
     }
 
     public async loadCredentialSummaryList() {
-        return this.credentials;
+        return this.credentials.map(c => ({
+            credentialID: c.credentialID,
+            description: c.description,
+            username: c.username,
+            password: c.password,
+            url: c.url
+        } as ICredentialSummary));
     }
 
     public async loadCredentials() {
@@ -153,8 +159,8 @@ export class FakeRepository implements IRepository {
         return new Promise<void>(resolve => resolve());
     }
 
-    public async deleteCredential(credentialId: string) {
-        this.credentials = this.credentials.filter(c => c.CredentialID !== credentialId);
+    public async deleteCredential(credentialID: string) {
+        this.credentials = this.credentials.filter(c => c.credentialID !== credentialID);
         return new Promise<void>(resolve => resolve());
     }
 }

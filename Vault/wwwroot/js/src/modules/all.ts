@@ -13,11 +13,10 @@
 } from './Cryptography';
 export {
     getPasswordSpecificationFromPassword,
-    mapToSummary,
     parsePasswordSpecificationString,
     parseSearchQuery,
     searchCredentials,
-    sortCredentials
+    sortCredentialSummaries
 } from './Vault';
 export {
     trim,

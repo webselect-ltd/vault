@@ -2,7 +2,6 @@
     ICredential,
     ICredentialSearchQuery,
     ICredentialSummary,
-    ICredentialValidationError,
     IDictionary,
     ITagIndex,
     PasswordSpecification
@@ -12,10 +11,10 @@ import { trim } from './Common';
 // A map of the properties which can be searched for using the fieldName:query syntax
 // We need this because the search is not case-sensitive, whereas JS properties are!
 const queryablePropertyMap: IDictionary<string> = {
-    description: 'Description',
-    username: 'Username',
-    password: 'Password',
-    url: 'Url',
+    description: 'description',
+    username: 'username',
+    password: 'password',
+    url: 'url',
     filter: 'FILTER'
 };
 
@@ -48,7 +47,12 @@ export function parseSearchQuery(queryText: string) {
     return parsedQuery;
 }
 
-export function searchCredentials(query: ICredentialSearchQuery, tagIndex: ITagIndex, tagIds: string[], isWeakPassword: (password: string) => boolean, list: ICredential[]) {
+export function searchCredentials(
+    query: ICredentialSearchQuery,
+    tagIndex: ITagIndex,
+    tagIds: string[],
+    isWeakPassword: (password: string) => boolean,
+    list: ICredentialSummary[]) {
     const emptyQuery = !query || !query.property || !query.text;
 
     if (!tagIds.length && emptyQuery) {
@@ -62,7 +66,7 @@ export function searchCredentials(query: ICredentialSearchQuery, tagIndex: ITagI
             .map(t => tagIndex.index.get(t)).flat()
             .reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map<string, number>());
 
-        tagged = list.filter(c => matches.get(c.CredentialID) == tagIds.length);
+        tagged = list.filter(c => matches.get(c.credentialID) == tagIds.length);
     }
 
     if (emptyQuery) {
@@ -74,25 +78,26 @@ export function searchCredentials(query: ICredentialSearchQuery, tagIndex: ITagI
             case 'all':
                 return tagged;
             case 'weak':
-                return tagged.filter(c => c.Password && isWeakPassword(c.Password));
+                return tagged.filter(c => c.password && isWeakPassword(c.password));
             default:
                 return [];
         }
     }
 
-    return tagged.filter(item => item[query.property].toLowerCase().indexOf(query.text) > -1);
-}
+    function getValue(item: ICredentialSummary) {
+        switch (query.property) {
+            case 'username':
+                return item.username;
+            case 'password':
+                return item.password;
+            case 'url':
+                return item.url;
+            default:
+                return item.description;
+        }
+    }
 
-export function mapToSummary(credential: ICredential, isWeakPassword: (password: string) => boolean) {
-    const credentialSummary: ICredentialSummary = {
-        credentialid: credential.CredentialID,
-        description: credential.Description,
-        username: credential.Username,
-        password: credential.Password,
-        url: credential.Url,
-        weak: credential.Password && isWeakPassword(credential.Password)
-    };
-    return credentialSummary;
+    return tagged.filter(item => getValue(item).toLowerCase().indexOf(query.text) > -1);
 }
 
 export function parsePasswordSpecificationString(optionString: string) {
@@ -135,10 +140,10 @@ export function getPasswordSpecificationFromPassword(password: string) {
     return specification;
 }
 
-export function sortCredentials(credentials: ICredential[]) {
-    return credentials.slice().sort((a: ICredential, b: ICredential) => {
-        const desca = a.Description.toUpperCase();
-        const descb = b.Description.toUpperCase();
+export function sortCredentialSummaries(credentials: ICredentialSummary[]) {
+    return credentials.slice().sort((a: ICredentialSummary, b: ICredentialSummary) => {
+        const desca = a.description.toUpperCase();
+        const descb = b.description.toUpperCase();
         return desca < descb ? -1 : desca > descb ? 1 : 0;
     });
 }

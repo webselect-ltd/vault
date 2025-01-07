@@ -8,18 +8,18 @@ import {
     getPasswordScore,
     getPasswordSpecificationFromPassword,
     isWeakPassword,
-    mapToSummary,
     parsePasswordSpecificationString,
     parseSearchQuery,
     range,
     rateLimit,
     searchCredentials,
-    sortCredentials,
+    sortCredentialSummaries,
     truncate,
     weakPasswordScoreThreshold
 } from './modules/all';
 import {
     ICredential,
+    ICredentialSummary,
     ISecurityKeyDetails,
     ITag,
     ITagIndex,
@@ -203,7 +203,7 @@ export function parseImportData(rawData: string) {
     const newData = jsonImportData.map(item => {
         // Null out any existing credential ID so that the UpdateMultipleCredentials
         // endpoint knows that this is a new record, not an update
-        item.CredentialID = null;
+        item.credentialID = null;
         return item;
     });
 
@@ -243,14 +243,14 @@ function getTagIdListFromInput() {
         : [];
 }
 
-function search(query: string, tags: string[], credentials: ICredential[]) {
+function search(query: string, tags: string[], credentials: ICredentialSummary[]) {
     const parsedQuery = parseSearchQuery(query);
     const results = searchCredentials(parsedQuery, tagIndex, tags, isWeakPassword, credentials);
-    return sortCredentials(results);
+    return sortCredentialSummaries(results);
 }
 
-function updateCredentialListUI(container: DOM, data: ICredential[]) {
-    const rows = data.map(c => mapToSummary(c, isWeakPassword));
+function updateCredentialListUI(container: DOM, data: ICredentialSummary[]) {
+    const rows = data.map(c => ({ ...c, weak: isWeakPassword(c.password) }));
     container.html(templates.credentialTable({ rows: rows }));
 }
 
@@ -298,15 +298,15 @@ async function editCredential(credentialId: string) {
     });
 
     const tagInput = new TagInput<ITag>({
-        input: ui.modalContent.find('#Tags').get(0),
+        input: ui.modalContent.find('#TagIDs').get(0),
         data: tagIndex.tags || [],
         maxNumberOfSuggestions: tagInputSuggestionLimit,
         minCharsBeforeShowingSuggestions: tagInputMinChars,
-        getId: (item) => item.TagID,
-        getLabel: (item) => item.Label,
+        getId: (item) => item.tagID,
+        getLabel: (item) => item.label,
         allowNewTags: true,
         newItemFactory: async label => {
-            return await repository.createTag({ TagID: crypto.randomUUID(), Label: label });
+            return await repository.createTag({ tagID: crypto.randomUUID(), label: label });
         },
         itemTemplate: tagInputItemTemplate
     });
@@ -315,8 +315,8 @@ async function editCredential(credentialId: string) {
 
     showPasswordStrength(ui.modalContent.find('#Password'));
 
-    const savedPasswordSpecification = parsePasswordSpecificationString(credential.PwdOptions);
-    const currentPasswordSpecification = getPasswordSpecificationFromPassword(credential.Password);
+    const savedPasswordSpecification = parsePasswordSpecificationString(credential.pwdOptions);
+    const currentPasswordSpecification = getPasswordSpecificationFromPassword(credential.password);
 
     // Rather convoluted, but this is why:
     // - If there's a valid password spec stored against the credential, use that
@@ -348,8 +348,8 @@ function optionsDialog() {
                 data: tagIndex.tags || [],
                 maxNumberOfSuggestions: tagInputSuggestionLimit,
                 minCharsBeforeShowingSuggestions: tagInputMinChars,
-                getId: (item) => item.TagID,
-                getLabel: (item) => item.Label,
+                getId: (item) => item.tagID,
+                getLabel: (item) => item.label,
                 allowNewTags: false,
                 itemTemplate: tagInputItemTemplate
             });
@@ -364,10 +364,10 @@ async function showDetail(credentialId: string) {
     const credential = await withLoadSpinner(async () => await repository.loadCredential(credentialId));
 
     // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
-    const urlText = templates.urlText({ Url: credential.Url });
-    const urlHtml = credential.Url.indexOf('//') === -1 ? urlText : templates.urlLink({ Url: credential.Url, UrlText: urlText });
+    const urlText = templates.urlText({ url: credential.url });
+    const urlHtml = credential.url.indexOf('//') === -1 ? urlText : templates.urlLink({ url: credential.url, urlText: urlText });
 
-    const charIndexes = range(0, credential.Password.length);
+    const charIndexes = range(0, credential.password.length);
 
     const passwordCharacterTable = [
         '<table class="table table-bordered password-character-table">',
@@ -378,33 +378,33 @@ async function showDetail(credentialId: string) {
         '</thead>',
         '<tbody>',
         '<tr>',
-        charIndexes.map(i => `<td>${credential.Password[i]}</td>`).join(''),
+        charIndexes.map(i => `<td>${credential.password[i]}</td>`).join(''),
         '</tr>',
         '</tbody>',
         '</table>'
     ];
 
-    const tagDisplay = credential.TagDisplay
-        ? credential.TagDisplay.split('|').map(t => ({ Label: t }))
+    const tagLabels = credential.tagLabels
+        ? credential.tagLabels.split('|').map(t => ({ label: t }))
         : [];
 
     const detailHtml = templates.detail({
-        Url: credential.Url,
-        UrlHtml: urlHtml,
-        Username: credential.Username,
-        Password: credential.Password,
-        PasswordCharacterTable: passwordCharacterTable.join(''),
-        UserDefined1: credential.UserDefined1,
-        UserDefined1Label: credential.UserDefined1Label,
-        UserDefined2: credential.UserDefined2,
-        UserDefined2Label: credential.UserDefined2Label,
-        Notes: credential.Notes,
-        TagDisplay: tagDisplay
+        url: credential.url,
+        urlHtml: urlHtml,
+        username: credential.username,
+        password: credential.password,
+        passwordCharacterTable: passwordCharacterTable.join(''),
+        userDefined1: credential.userDefined1,
+        userDefined1Label: credential.userDefined1Label,
+        userDefined2: credential.userDefined2,
+        userDefined2Label: credential.userDefined2Label,
+        notes: credential.notes,
+        tagLabels: tagLabels
     });
 
     showModal({
         credentialId: credentialId,
-        title: credential.Description,
+        title: credential.description,
         content: detailHtml,
         showEdit: true,
         showDelete: true,
@@ -530,15 +530,15 @@ ui.newButton.on('click', e => {
         }
     });
     const tagInput = new TagInput<ITag>({
-        input: ui.modalContent.find('#Tags').get(0),
+        input: ui.modalContent.find('#TagIDs').get(0),
         data: tagIndex.tags || [],
         maxNumberOfSuggestions: tagInputSuggestionLimit,
         minCharsBeforeShowingSuggestions: tagInputMinChars,
-        getId: (item) => item.TagID,
-        getLabel: (item) => item.Label,
+        getId: (item) => item.tagID,
+        getLabel: (item) => item.label,
         allowNewTags: true,
         newItemFactory: label => {
-            return Promise.resolve({ TagID: crypto.randomUUID(), Label: label });
+            return Promise.resolve({ tagID: crypto.randomUUID(), label: label });
         },
         itemTemplate: tagInputItemTemplate
     });
@@ -584,7 +584,7 @@ ui.loginForm.on('submit', async e => {
 
         const loginResult = await repository.login(username, password);
 
-        if (loginResult.Success) {
+        if (loginResult.success) {
             tagIndex = await repository.loadTagIndex();
 
             ui.tagsInput = new TagInput<ITag>({
@@ -592,8 +592,8 @@ ui.loginForm.on('submit', async e => {
                 data: tagIndex.tags || [],
                 maxNumberOfSuggestions: tagInputSuggestionLimit,
                 minCharsBeforeShowingSuggestions: tagInputMinChars,
-                getId: (item) => item.TagID,
-                getLabel: (item) => item.Label,
+                getId: (item) => item.tagID,
+                getLabel: (item) => item.label,
                 allowNewTags: false,
                 itemTemplate: tagInputItemTemplate,
                 onTagsChanged: async (instance, added, removed, selected) => {
@@ -641,7 +641,7 @@ ui.body.onchild('#credential-form', 'submit', async e => {
     const credential = getCredentialFromUI(form);
 
     const results = await withLoadSpinner(async () => {
-        if (!credential.CredentialID) {
+        if (!credential.credentialID) {
             await repository.createCredential(credential);
         } else {
             await repository.updateCredential(credential);
@@ -662,7 +662,7 @@ ui.body.onchild('#credential-form', 'submit', async e => {
 });
 
 // Show password strength as it is typed
-ui.body.onchild('#credential-form [name=Password]', 'keyup', e => {
+ui.body.onchild('#credential-form [name=password]', 'keyup', e => {
     console.group('password keyup');
     console.log('Handler attached to:', e.handlerAttachedToElement);
     console.log('Handler triggered by:', e.handlerTriggeredByElement);
@@ -677,7 +677,7 @@ ui.body.onchild('button.generate-password', 'click', e => {
     e.preventDefault();
     const passwordSpecification = getPasswordSpecificationFromUI(ui.modalContent, isChecked);
     const password = generatePassword(passwordSpecification);
-    const passwordInput = dom('#credential-form [name=Password]');
+    const passwordInput = dom('#credential-form [name=password]');
     passwordInput.val(password);
     const opts = [parseInt(dom('#len').val(), 10),
     isChecked(dom('#ucase')) ? 1 : 0,
@@ -796,7 +796,7 @@ ui.body.onchild('#change-password-form', 'submit', async e => {
 
 ui.body.onchild('#delete-tags-button', 'click', async e => {
     const tagsToDelete: ITag[] = (deleteTagsTagInput?.getValue().split('|') || [] as string[])
-        .map(id => ({ TagID: id, Label: '' }));
+        .map(id => ({ tagID: id, label: '' }));
 
     await withLoadSpinner(async () => await repository.deleteTags(tagsToDelete));
 
