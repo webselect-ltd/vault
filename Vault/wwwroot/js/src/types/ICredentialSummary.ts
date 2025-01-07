@@ -1,5 +1,5 @@
 ﻿export interface ICredentialSummary {
-    credentialid: string;
+    credentialID: string;
     description: string;
     username: string;
     password: string;

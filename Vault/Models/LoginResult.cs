@@ -1,4 +1,6 @@
-﻿namespace Vault.Models
+﻿using Newtonsoft.Json;
+
+namespace Vault.Models
 {
     public class LoginResult
     {
@@ -6,10 +8,12 @@
             UserID = userID;
 
         public static LoginResult Failed =>
-            new (null);
+            new(null);
 
+        [JsonProperty("userID")]
         public string UserID { get; }
 
+        [JsonProperty("success")]
         public bool Success =>
             !string.IsNullOrWhiteSpace(UserID);
     }

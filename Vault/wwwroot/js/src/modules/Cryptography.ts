@@ -1,5 +1,5 @@
 ﻿import { range, sum } from '../modules/all';
-import { ICredential, IDictionary, PasswordSpecification } from '../types/all';
+import { ICredential, ICredentialSummary, IDictionary, ITag, PasswordSpecification } from '../types/all';
 
 const passwordCharacters: IDictionary<string> = {
     lowercase: 'abcdefghijklmnopqrstuvwxyz',
@@ -100,43 +100,83 @@ export async function generateMasterKey(password: string) {
     return await hash(password + plain(inner));
 }
 
-export async function decryptCredential(credential: ICredential, masterKey: ArrayBuffer, excludes: string[]) {
-    return forPropertiesOf(credential, async val => await aesGcmDecrypt(val, masterKey), excludes);
+export async function decryptCredentialSummary(credentialSummary: ICredentialSummary, masterKey: ArrayBuffer): Promise<ICredentialSummary> {
+    return {
+        ...credentialSummary,
+        description: await aesGcmDecrypt(credentialSummary.description, masterKey),
+        username: await aesGcmDecrypt(credentialSummary.username, masterKey),
+        password: await aesGcmDecrypt(credentialSummary.password, masterKey),
+        url: await aesGcmDecrypt(credentialSummary.url, masterKey),
+    };
 }
 
-export async function decryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer, excludes: string[]) {
-    return await Promise.all(credentials.map(async item => await decryptCredential(item, masterKey, excludes)));
+export async function decryptCredentialSummaries(credentialSummaries: ICredentialSummary[], masterKey: ArrayBuffer): Promise<ICredentialSummary[]> {
+    return await Promise.all(credentialSummaries.map(async item => await decryptCredentialSummary(item, masterKey)));
 }
 
-export async function encryptCredential(credential: ICredential, masterKey: ArrayBuffer, excludes: string[]) {
-    return forPropertiesOf(credential, async val => await aesGcmEncrypt(val, masterKey), excludes);
+export async function decryptCredential(credential: ICredential, masterKey: ArrayBuffer): Promise<ICredential> {
+    return {
+        ...credential,
+        description: await aesGcmDecrypt(credential.description, masterKey),
+        username: await aesGcmDecrypt(credential.username, masterKey),
+        password: await aesGcmDecrypt(credential.password, masterKey),
+        url: await aesGcmDecrypt(credential.url, masterKey),
+        userDefined1Label: await aesGcmDecrypt(credential.userDefined1Label, masterKey),
+        userDefined1: await aesGcmDecrypt(credential.userDefined1, masterKey),
+        userDefined2Label: await aesGcmDecrypt(credential.userDefined2Label, masterKey),
+        userDefined2: await aesGcmDecrypt(credential.userDefined2, masterKey),
+        notes: await aesGcmDecrypt(credential.notes, masterKey),
+        pwdOptions: await aesGcmDecrypt(credential.pwdOptions, masterKey),
+
+        // TODO: This should just be returned as an array to begin with
+        tagLabels: typeof credential.tagLabels !== 'undefined'
+            ? (await Promise.all(credential.tagLabels.map(async l => await aesGcmDecrypt(l, masterKey))))
+            : []
+    };
 }
 
-export async function encryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer, excludes: string[]) {
-    return await Promise.all(credentials.map(async item => await encryptCredential(item, masterKey, excludes)));
+export async function decryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer): Promise<ICredential[]> {
+    return await Promise.all(credentials.map(async item => await decryptCredential(item, masterKey)));
+}
+
+export async function decryptTag(tag: ITag, masterKey: ArrayBuffer): Promise<ITag> {
+    return { ...tag, label: await aesGcmDecrypt(tag.label, masterKey) };
+}
+
+export async function decryptTags(tags: ITag[], masterKey: ArrayBuffer): Promise<ITag[]> {
+    return await Promise.all(tags.map(async item => await decryptTag(item, masterKey)));
+}
+
+export async function encryptCredential(credential: ICredential, masterKey: ArrayBuffer): Promise<ICredential> {
+    return {
+        ...credential,
+        description: await aesGcmEncrypt(credential.description, masterKey),
+        username: await aesGcmEncrypt(credential.username, masterKey),
+        password: await aesGcmEncrypt(credential.password, masterKey),
+        url: await aesGcmEncrypt(credential.url, masterKey),
+        userDefined1Label: await aesGcmEncrypt(credential.userDefined1Label, masterKey),
+        userDefined1: await aesGcmEncrypt(credential.userDefined1, masterKey),
+        userDefined2Label: await aesGcmEncrypt(credential.userDefined2Label, masterKey),
+        userDefined2: await aesGcmEncrypt(credential.userDefined2, masterKey),
+        notes: await aesGcmEncrypt(credential.notes, masterKey),
+        pwdOptions: await aesGcmEncrypt(credential.pwdOptions, masterKey),
+    };
+}
+
+export async function encryptCredentials(credentials: ICredential[], masterKey: ArrayBuffer): Promise<ICredential[]> {
+    return await Promise.all(credentials.map(async item => await encryptCredential(item, masterKey)));
+}
+
+export async function encryptTag(tag: ITag, masterKey: ArrayBuffer): Promise<ITag> {
+    return { ...tag, label: await aesGcmEncrypt(tag.label, masterKey) };
+}
+
+export async function encryptTags(tags: ITag[], masterKey: ArrayBuffer): Promise<ITag[]> {
+    return await Promise.all(tags.map(async item => await encryptTag(item, masterKey)));
 }
 
 export function isWeakPassword(password: string) {
     return getPasswordScore(password) <= weakPasswordScoreThreshold;
-}
-
-async function forPropertiesOf(credential: ICredential, action: (val: string) => Promise<string>, excludes: string[]) {
-    const encrypted: any = {};
-
-    const properties = Object.keys(credential);
-
-    const isExcluded = (k: string) => excludes.indexOf(k) !== -1;
-    const isNotExcluded = (k: string) => !isExcluded(k);
-
-    // Map the excluded properties directly
-    properties.filter(isExcluded).forEach(k => encrypted[k] = credential[k]);
-
-    const encryptedMappings = properties.filter(isNotExcluded)
-        .map(async k => { encrypted[k] = await action(credential[k]); });
-
-    await Promise.all(encryptedMappings);
-
-    return (encrypted as ICredential);
 }
 
 // The following functions were adapted from:

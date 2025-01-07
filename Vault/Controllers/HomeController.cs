@@ -65,6 +65,11 @@ namespace Vault.Controllers
                     await conn.ExecuteAsync(SqlStatements.Update, credential, tran);
                 }
 
+                foreach (var tag in model.UpdatedTags)
+                {
+                    await conn.ExecuteAsync(SqlStatements.UpdateTagLabel, tag, tran);
+                }
+
                 var passwordUpdateData = new {
                     model.UserID,
                     model.OldPasswordHash,
