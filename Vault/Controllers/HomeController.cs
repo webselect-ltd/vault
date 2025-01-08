@@ -2,31 +2,61 @@
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Vault.Models;
 using Vault.Support;
+using static Vault.Support.CloudflareAccessSecurity;
 
 namespace Vault.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ILogger<HomeController> _logger;
         private readonly Settings _cfg;
         private readonly SqlExecutor _db;
 
         public HomeController(
+            ILogger<HomeController> logger,
             IOptions<Settings> options,
             IConnectionFactory cf)
         {
             ArgumentNullException.ThrowIfNull(options);
 
+            _logger = logger;
             _cfg = options.Value;
             _db = new SqlExecutor(cf);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var req = HttpContext.Request;
             var securityKey = default(object);
+            var cloudflareAccessUser = default(string);
+            var cloudflareAccessToken = default(string);
+
+            if (req.Headers.TryGetValue("Cf-Access-Jwt-Assertion", out var value))
+            {
+                var jwt = value.ToString();
+
+                _logger.LogDebug("CF JWT: Token {jwt}", jwt);
+
+                var signingKeys = await RetrieveSigningKeys(_logger, _cfg.CloudflareAccessTeamDomain);
+
+                if (TryValidateToken(
+                    logger: _logger,
+                    token: jwt,
+                    issuer: $"https://{_cfg.CloudflareAccessTeamDomain}",
+                    audience: _cfg.CloudflareAccessAUDTag,
+                    signingKeys: signingKeys,
+                    jwt: out var validToken))
+                {
+                    cloudflareAccessUser = validToken.Payload["email"].ToString();
+                    cloudflareAccessToken = validToken.Payload["sub"].ToString();
+
+                    _logger.LogDebug("CF JWT: Token successfully validated ({Email})", cloudflareAccessUser);
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(_cfg.SecurityKey))
             {
@@ -41,7 +71,9 @@ namespace Vault.Controllers
                 AbsoluteUrl = new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"),
                 EnableSessionTimeout = _cfg.EnableSessionTimeout,
                 SessionTimeoutInSeconds = _cfg.SessionTimeoutInSeconds,
-                SecurityKey = securityKey
+                SecurityKey = securityKey,
+                CloudflareAccessUser = cloudflareAccessUser,
+                CloudflareAccessToken = cloudflareAccessToken,
             };
 
             return View(model);

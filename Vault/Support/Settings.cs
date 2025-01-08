@@ -9,5 +9,9 @@
         public string SecurityKey { get; set; }
 
         public string SecurityKeyParameterName { get; set; }
+
+        public string CloudflareAccessTeamDomain { get; set; }
+
+        public string CloudflareAccessAUDTag { get; set; }
     }
 }
