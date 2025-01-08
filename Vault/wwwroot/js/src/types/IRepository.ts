@@ -1,7 +1,8 @@
 ﻿import { ICredential, ICredentialSummary, ILoginResult, ITag, ITagIndex } from './all';
 
 export interface IRepository {
-    login(hashedUsername: string, hashedPassword: string): Promise<ILoginResult>;
+    login(username: string, password: string): Promise<ILoginResult>;
+    loginDelegated(username: string, token: string): Promise<ILoginResult>;
 
     loadTagIndex(): Promise<ITagIndex>;
     createTag(tag: ITag): Promise<ITag>;

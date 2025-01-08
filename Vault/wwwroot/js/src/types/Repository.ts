@@ -52,6 +52,12 @@ export class Repository implements IRepository {
         return loginResult;
     }
 
+    public async loginDelegated(username: string, token: string) {
+        const password = 'cf-access-' + token;
+
+        return await this.login(username, password);
+    }
+
     public async loadTagIndex() {
         interface Temp {
             tags: ITag[];

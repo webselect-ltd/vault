@@ -36,6 +36,8 @@ interface IVaultGlobals {
     enableSessionTimeout: boolean;
     sessionTimeoutInSeconds: number;
     securityKey?: ISecurityKeyDetails;
+    cloudflareAccessUser: string;
+    cloudflareAccessToken: string;
 }
 
 interface IVaultUIElements {
@@ -568,6 +570,38 @@ ui.searchInput.on('keyup', rateLimit(async e => {
     updateCredentialListUI(ui.container, results);
 }, 200));
 
+async function init() {
+    tagIndex = await repository.loadTagIndex();
+
+    ui.tagsInput = new TagInput<ITag>({
+        input: document.getElementById('tags'),
+        data: tagIndex.tags || [],
+        maxNumberOfSuggestions: tagInputSuggestionLimit,
+        minCharsBeforeShowingSuggestions: tagInputMinChars,
+        getId: (item) => item.tagID,
+        getLabel: (item) => item.label,
+        allowNewTags: false,
+        itemTemplate: tagInputItemTemplate,
+        onTagsChanged: async (instance, added, removed, selected) => {
+            const credentials = await repository.loadCredentialSummaryList();
+            const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
+            updateCredentialListUI(ui.container, results);
+        }
+    });
+
+    ui.loginForm.get().classList.add('d-none');
+    ui.loginFormModal.hide();
+    ui.controls.get().classList.remove('d-none');
+    ui.searchInput.focus();
+
+    if (_VAULT_GLOBALS.enableSessionTimeout) {
+        setSession();
+        // TODO: mab-dom doesn't support multiple event names in one 'on' call
+        ui.body.on('click', setSession);
+        ui.body.on('keyup', setSession);
+    }
+}
+
 ui.loginForm.on('submit', async e => {
     e.preventDefault();
 
@@ -586,35 +620,7 @@ ui.loginForm.on('submit', async e => {
         const loginResult = await repository.login(username, password);
 
         if (loginResult.success) {
-            tagIndex = await repository.loadTagIndex();
-
-            ui.tagsInput = new TagInput<ITag>({
-                input: document.getElementById('tags'),
-                data: tagIndex.tags || [],
-                maxNumberOfSuggestions: tagInputSuggestionLimit,
-                minCharsBeforeShowingSuggestions: tagInputMinChars,
-                getId: (item) => item.tagID,
-                getLabel: (item) => item.label,
-                allowNewTags: false,
-                itemTemplate: tagInputItemTemplate,
-                onTagsChanged: async (instance, added, removed, selected) => {
-                    const credentials = await repository.loadCredentialSummaryList();
-                    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
-                    updateCredentialListUI(ui.container, results);
-                }
-            });
-
-            ui.loginForm.get().classList.add('d-none');
-            ui.loginFormModal.hide();
-            ui.controls.get().classList.remove('d-none');
-            ui.searchInput.focus();
-
-            if (_VAULT_GLOBALS.enableSessionTimeout) {
-                setSession();
-                // TODO: mab-dom doesn't support multiple event names in one 'on' call
-                ui.body.on('click', setSession);
-                ui.body.on('keyup', setSession);
-            }
+            await init();
         } else {
             ui.loginErrorMessage.removeClass('d-none');
         }
@@ -823,4 +829,17 @@ ui.loginFormModalElement.on('shown.bs.modal', function (e) {
     ui.loginForm.find('#Username').focus();
 })
 
-ui.loginFormModal.show();
+if (!_VAULT_GLOBALS.cloudflareAccessUser) {
+    ui.loginFormModal.show();
+}
+else {
+    withLoadSpinner(async () => {
+        const loginResult = await repository.loginDelegated(_VAULT_GLOBALS.cloudflareAccessUser, _VAULT_GLOBALS.cloudflareAccessToken);
+
+        if (loginResult.success) {
+            await init();
+        } else {
+            alert('ACCESS DENIED');
+        }
+    });
+}

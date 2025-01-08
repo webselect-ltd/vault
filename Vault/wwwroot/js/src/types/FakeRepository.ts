@@ -91,7 +91,11 @@ export class FakeRepository implements IRepository {
         }];
     }
 
-    public async login(hashedUsername: string, hashedPassword: string) {
+    public async login(username: string, password: string) {
+        return { userID: 'user1', success: true };
+    }
+
+    public async loginDelegated(username: string, token: string) {
         return { userID: 'user1', success: true };
     }
 

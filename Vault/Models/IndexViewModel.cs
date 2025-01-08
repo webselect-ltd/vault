@@ -13,5 +13,9 @@ namespace Vault.Models
         public int SessionTimeoutInSeconds { get; set; }
 
         public object SecurityKey { get; set; }
+
+        public string CloudflareAccessUser { get; set; }
+
+        public string CloudflareAccessToken { get; set; }
     }
 }
